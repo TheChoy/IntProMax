@@ -12,7 +12,7 @@ $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
         <link rel="stylesheet" href="css/style_QR_payment.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
         <title>Document</title>
-        <script src="javascrip_member/QRpayment.js" defer></script>
+        <!-- <script src="javascrip_member/QRpayment.js" defer></script> -->
     </head>
     <body>
         <div class="top-navbar">
@@ -75,6 +75,57 @@ document.getElementById("confirm-btn").addEventListener("click", function() {
         window.location.href = "success_payment.html"; // ปกติไปหน้าสำเร็จ
     }
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const uploadBtn = document.getElementById("upload-btn");
+    const qrPreview = document.getElementById("qr-preview");
+    const cancelBtn = document.getElementById("cancel-btn");
+    const confirmBtn = document.getElementById("confirm-btn");
+
+    // สร้าง input สำหรับอัพโหลดไฟล์
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+
+    // เมื่อมีการเลือกไฟล์
+    fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                qrPreview.src = e.target.result; // อัปเดตรูปภาพใน preview
+                // แสดงปุ่มยืนยันและยกเลิกหลังจากเลือกไฟล์
+                cancelBtn.style.display = 'inline-block';
+                confirmBtn.style.display = 'inline-block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // เมื่อคลิกที่ปุ่ม "อัพโหลด"
+    uploadBtn.addEventListener('click', () => {
+        fileInput.click(); // เปิดหน้าต่างเลือกไฟล์
+    });
+});
+function submitForm() {
+    // สามารถใช้ AJAX เพื่อส่งข้อมูลที่ต้องการก่อนเปลี่ยนหน้า
+    let formData = { "key": "value" };
+
+    fetch('success_payment.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        // ส่งข้อมูลสำเร็จแล้ว ทำการเปลี่ยนหน้า
+        window.location.href = 'success_payment.html'; // ไปยังไฟล์เป้าหมาย
+    })
+    .catch(error => console.error('Error:', error));
+}
 </script>
 
 </html>
