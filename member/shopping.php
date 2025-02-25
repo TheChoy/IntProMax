@@ -45,6 +45,7 @@ $result = mysqli_stmt_get_result($stmt);
 
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -54,11 +55,13 @@ $result = mysqli_stmt_get_result($stmt);
     <script src="javascrip_member/shopping.js" defer></script>
     <title>Product Equipment</title>
 </head>
+
 <body>
 
     <!-- ✅ นาฟบาร์ด้านบน -->
     <div class="top-navbar">
         <nav class="nav-links">
+            <div><a href="order_emergency.php">ชำระเงินเคสฉุกเฉิน</a></div>
             <div><a href="contact.html">ติดต่อเรา</a></div>
             <div class="dropdown">
                 <img src="image/user.png" alt="User" class="nav-logo">
@@ -107,8 +110,8 @@ $result = mysqli_stmt_get_result($stmt);
         </div>
     </div>
 
-   <!-- Sidebar -->
-   <div class="filter-sidebar" id="filterSidebar">
+    <!-- Sidebar -->
+    <div class="filter-sidebar" id="filterSidebar">
         <div class="sidebar-header">
             <h2>ระบุความต้องการของคุณ</h2>
             <button class="close-sidebar">&times;</button>
@@ -132,7 +135,7 @@ $result = mysqli_stmt_get_result($stmt);
                 <option value="first">มากไปน้อย</option>
                 <option value="basic">น้อยไปมาก</option>
             </select>
-            
+
             <label for="">ช่วงราคาสินค้า:</label>
             <div class="price-range">
                 <input type="number" id="minPrice" placeholder="ต่ำสุด" min="0" max="1000000" value="0">
@@ -144,23 +147,24 @@ $result = mysqli_stmt_get_result($stmt);
 
         </div>
     </div>
-   
 
-   <!-- ✅ แสดงข้อมูลสินค้า -->
-   <div id="prodContian">
+
+    <!-- ✅ แสดงข้อมูลสินค้า -->
+    <div id="prodContian">
         <section class="product-container">
-        <?php while ($row = mysqli_fetch_assoc($result)) : ?>
-            <div class="product">
-                <a href="product_details.php?id=<?= $row['equipment_id'] ?>">
-                    <img src="image/<?= htmlspecialchars($row['equipment_image']) ?>" alt="<?= htmlspecialchars($row['equipment_name']) ?>">
-                    <br><br>
-                    <p><?= htmlspecialchars($row['equipment_name']) ?></p>
-                    <p class="cost">฿ <?= number_format($row['equipment_price']) ?></p>
-                </a>
-            </div>
-        <?php endwhile; ?>
+            <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+                <div class="product">
+                    <a href="product_details.php?id=<?= $row['equipment_id'] ?>">
+                        <img src="image/<?= htmlspecialchars($row['equipment_image']) ?>" alt="<?= htmlspecialchars($row['equipment_name']) ?>">
+                        <br><br>
+                        <p><?= htmlspecialchars($row['equipment_name']) ?></p>
+                        <p class="cost">฿ <?= number_format($row['equipment_price']) ?></p>
+                    </a>
+                </div>
+            <?php endwhile; ?>
         </section>
     </div>
 
 </body>
+
 </html>

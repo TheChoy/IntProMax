@@ -32,6 +32,7 @@ include "username.php";
 
 <div class="top-navbar">
     <nav class="nav-links">
+        <div><a href="order_emergency.php">ชำระเงินเคสฉุกเฉิน</a></div>
         <div><a href="contact.html">ติดต่อเรา</a></div>
         <div class="dropdown">
             <img src="image/user.png" alt="Logo" class="nav-logo">
@@ -230,7 +231,7 @@ include "username.php";
             }
 
             selectedMonth.innerText = months[month];
-            selectedYear.innerText = year + 0   ; // แปลงเป็นปี พ.ศ.
+            selectedYear.innerText = year + 0; // แปลงเป็นปี พ.ศ.
         }
 
         prevMonthBtn.addEventListener("click", () => {
@@ -327,7 +328,7 @@ include "username.php";
                 url: 'form.php', // เปลี่ยน URL ไปยังไฟล์ form.php
                 type: 'POST',
                 data: formData,
-                
+
 
                 // ** การตอบกลับจาก server
                 success: function(data, status) {

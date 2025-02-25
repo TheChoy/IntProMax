@@ -23,6 +23,7 @@ $user_id = $_SESSION['user_id']; // ดึงค่า user_id จาก session
 </head>
 <div class="top-navbar">
     <nav class="nav-links">
+        <div><a href="order_emergency.php">ชำระเงินเคสฉุกเฉิน</a></div>
         <div><a href="contact.html">ติดต่อเรา</a></div>
         <div class="dropdown">
             <img src="image/user.png" alt="Logo" class="nav-logo">
@@ -57,8 +58,9 @@ $user_id = $_SESSION['user_id']; // ดึงค่า user_id จาก session
         </a>
     </div>
 </div>
+
 <body>
-    
+
 </body>
 
 </html>

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 require("username.php");
 $equipment_name = $_GET['equipment_name'];
@@ -20,6 +20,7 @@ $row  = mysqli_fetch_assoc($result);
 
 
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -31,6 +32,7 @@ $row  = mysqli_fetch_assoc($result);
 </head>
 <div class="top-navbar">
     <nav class="nav-links">
+        <div><a href="order_emergency.php">ชำระเงินเคสฉุกเฉิน</a></div>
         <div><a href="contact.html">ติดต่อเรา</a></div>
         <div class="dropdown">
             <img src="image/user.png" alt="Logo" class="nav-logo">
@@ -65,30 +67,30 @@ $row  = mysqli_fetch_assoc($result);
 
     <h1>รายละเอียดการเคลม/ต่ออายุการใช้งาน</h1>
     <form action="submit_claim_action.php" method="POST">
-    <div class="product-details">
-    <img src="image/<?php echo $row["equipment_image"];?>" alt="product-detail" width="400" height="400"> <br>
+        <div class="product-details">
+            <img src="image/<?php echo $row["equipment_image"]; ?>" alt="product-detail" width="400" height="400"> <br>
 
-        <div class="info-group">
+            <div class="info-group">
                 <input type="hidden" name="equipment" value="<?php echo $row["equipment_id"]; ?>">
-                <h2 id="product-name"><?php echo $row["equipment_name"];?></h2>
-        </div>
+                <h2 id="product-name"><?php echo $row["equipment_name"]; ?></h2>
+            </div>
 
-        <div class="selected">
-            <select id="action" name="action" required>
-                <option value="none" disabled selected>เคลม/ต่ออายุการใช้งาน</option>
-                <option value="เคลม">เคลม</option>
-                <option value="ซ่อม">ซ่อม</option>
-                <option value="ต่ออายุการใช้งาน">ต่ออายุการใช้งาน</option>
-            </select>
-        </div>
+            <div class="selected">
+                <select id="action" name="action" required>
+                    <option value="none" disabled selected>เคลม/ต่ออายุการใช้งาน</option>
+                    <option value="เคลม">เคลม</option>
+                    <option value="ซ่อม">ซ่อม</option>
+                    <option value="ต่ออายุการใช้งาน">ต่ออายุการใช้งาน</option>
+                </select>
+            </div>
 
-        <div class="form-group">
-            <label for="reason">เหตุผล</label>
-            <textarea id="reason" name="reason" rows="5" cols="50"
-                placeholder="กรอกเหตุผลที่ต้องการเคลมหรือใช้งานต่อ"></textarea>
+            <div class="form-group">
+                <label for="reason">เหตุผล</label>
+                <textarea id="reason" name="reason" rows="5" cols="50"
+                    placeholder="กรอกเหตุผลที่ต้องการเคลมหรือใช้งานต่อ"></textarea>
+            </div>
+            <button type="submit">ยืนยัน</button> <!-- เช็กว่าเคลมหรือต่ออายุ และส่งไปยัง executive approve -->
         </div>
-        <button type="submit">ยืนยัน</button> <!-- เช็กว่าเคลมหรือต่ออายุ และส่งไปยัง executive approve -->
-    </div>
     </form>
 
 </body>
