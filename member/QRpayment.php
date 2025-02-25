@@ -1,6 +1,5 @@
 <?php
-$order_total = isset($_GET['order_total']) ? $_GET['order_total'] : 0;
-echo "ยอดชำระทั้งหมด: ฿" . number_format($order_total, 2);
+$order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
 
 
 ?>

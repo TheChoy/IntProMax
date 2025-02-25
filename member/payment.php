@@ -149,7 +149,7 @@ $row_result_member = mysqli_fetch_assoc($result_member);
     <script>
         document.getElementById("tbtn").addEventListener("click", function() {
             let totalOrderPrice = parseFloat(document.querySelector('.summary .totalprice').textContent.replace('฿', '').trim());
-            this.href = `QRpayment.php?order_total=${totalOrderPrice}`;
+            this.href = `QRpayment.php?price_total=${totalOrderPrice}`;
         });
 
         // 1. ประกาศราคาต่อชิ้นจากฐานข้อมูล
