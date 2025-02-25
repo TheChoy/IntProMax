@@ -49,6 +49,16 @@ include("username.php");
         </div>
     </div>
 
+    <div class="search-section">
+        <div class="search-container">
+            <form method="GET" action="shopping.php">
+                <input type="text" name="q" placeholder="ค้นหา..." class="search-input" value="">
+                <button class="search-button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
 
 </body>
 
