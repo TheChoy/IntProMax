@@ -1,7 +1,5 @@
 <?php
 $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
-
-
 ?>
 
 <html lang="en">
@@ -62,9 +60,21 @@ $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
         </div><br>
         <div class="QR-buttons">
             <button class="cancle">ยกเลิก</button>
-            <button class="confirm" onclick="window.location.href='success_payment.html';">ยืนยัน</button>
+            <button class="confirm" id="confirm-btn">ยืนยัน</button>
 
         </div>
     </section>
 </body>
+<script>
+document.getElementById("confirm-btn").addEventListener("click", function() {
+    let orderTotal = <?php echo $order_total; ?>;
+    
+    if (orderTotal > 100000) {
+        window.location.href = "approve_payment.html"; // ไปหน้าอื่นเมื่อมากกว่า 100,000
+    } else {
+        window.location.href = "success_payment.html"; // ปกติไปหน้าสำเร็จ
+    }
+});
+</script>
+
 </html>
