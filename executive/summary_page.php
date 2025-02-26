@@ -12,10 +12,10 @@ $selected_province = isset($_GET['province']) ? $_GET['province'] : "ทั้�
 
 // สร้าง WHERE Clause ตามฟิลเตอร์ที่เลือก
 // ช่วงราคาสินค้า
-$where_clause = "WHERE order_total BETWEEN $min_price AND $max_price";
+$where_clause = "WHERE order_equipment_total BETWEEN $min_price AND $max_price";
 // วันที่ซื้อสินค้า
 if ($selected_month) {
-    $where_clause .= " AND DATE_FORMAT(order_date, '%Y-%m') = '$selected_month'";
+    $where_clause .= " AND DATE_FORMAT(order_equipment_date, '%Y-%m') = '$selected_month'";
 }
 // เพศ
 if ($selected_gender !== "ทั้งหมด") {
@@ -37,9 +37,9 @@ $sqrt = "SELECT
         equipment_type,
         SUM(CASE WHEN member_gender = 'ชาย' THEN 1 ELSE 0 END) AS male_count,
         SUM(CASE WHEN member_gender = 'หญิง' THEN 1 ELSE 0 END) AS female_count
-        FROM `order`
-        JOIN `equipment` ON `order`.equipment_id = `equipment`.equipment_id
-        JOIN `member` ON `order`.member_id = `member`.member_id
+        FROM `order_equipment`
+        JOIN `equipment` ON `order_equipment`.equipment_id = `equipment`.equipment_id
+        JOIN `member` ON `order_equipment`.member_id = `member`.member_id
         $where_clause
         GROUP BY equipment_type";  // ใช้ WHERE 1=1 เพื่อง่ายต่อการต่อคำสั่งเพิ่มเติม
 
