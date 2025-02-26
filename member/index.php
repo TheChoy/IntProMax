@@ -2,12 +2,12 @@
 session_start();
 
 // ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login_form.php");
-    exit();
-}
+// if (!isset($_SESSION['user_id'])) {
+//     header("Location: login_form.php");
+//     exit();
+// }
 
-$user_id = $_SESSION['user_id']; // ดึงค่า user_id จาก session
+// $user_id = $_SESSION['user_id']; // ดึงค่า user_id จาก session
 ?>
 
 <html lang="th">
