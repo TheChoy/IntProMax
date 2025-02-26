@@ -2,7 +2,7 @@
     $servername = "localhost";
     $username = "root";
     $password = "1234";
-    $dbname = "car_report";
+    $dbname = "intpro";
 
     // Create connection
     $conn = mysqli_connect($servername, $username, $password, $dbname);

@@ -1,7 +1,36 @@
 <?php
-include("username.php");
+include("username.php"); // ตรวจสอบว่าไฟล์นี้มีการเชื่อมต่อฐานข้อมูลด้วย $conn
 
+// ตรวจสอบว่ามีการกดปุ่มค้นหาหรือไม่
+$search = isset($_POST['search']) ? trim($_POST['search']) : "";
+$hasSearched = isset($_POST['search']); // เช็คว่ามีการค้นหาแล้วหรือยัง
+
+// ค้นหาข้อมูลเฉพาะเมื่อมีการค้นหา
+$result = null;
+if ($hasSearched) {
+    $sql = "SELECT order_emergency_case.order_emergency_case_id, 
+                   emergency_case_report.emergency_case_report_patient_name,
+                   emergency_case_report.emergency_case_report_reason, 
+                   emergency_case_report.emergency_case_report_hospital_waypoint, 
+                   emergency_case_report.emergency_case_report_date, 
+                   emergency_case_report.emergency_case_report_time, 
+                   order_emergency_case.order_emergency_case_price, 
+                   order_emergency_case.order_emergency_case_status
+            FROM order_emergency_case 
+            JOIN emergency_case_report 
+            ON order_emergency_case.emergency_case_report_id = emergency_case_report.emergency_case_report_id
+            WHERE emergency_case_report.emergency_case_report_patient_name LIKE ? 
+               OR emergency_case_report.emergency_case_report_reason LIKE ?
+               OR emergency_case_report.emergency_case_report_hospital_waypoint LIKE ?";
+
+    $stmt = $conn->prepare($sql);
+    $search_param = "%$search%";
+    $stmt->bind_param("sss", $search_param, $search_param, $search_param);
+    $stmt->execute();
+    $result = $stmt->get_result();
+}
 ?>
+
 
 <head>
     <meta charset="UTF-8">
@@ -9,7 +38,7 @@ include("username.php");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style_order_emergency.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <title>Document</title>
+    <title>ค้นหาเคสฉุกเฉิน</title>
 </head>
 
 <body>
@@ -18,7 +47,7 @@ include("username.php");
             <div><a href="order_emergency.php">ชำระเงินเคสฉุกเฉิน</a></div>
             <div><a href="contact.html">ติดต่อเรา</a></div>
             <div class="dropdown">
-                <img src="image/user.png" alt="Logo" class="nav-logo">
+                <img src="image/user.png" alt="User" class="nav-logo">
                 <div class="dropdown-menu">
                     <a href="profile.html">โปรไฟล์</a>
                     <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
@@ -27,7 +56,7 @@ include("username.php");
                 </div>
             </div>
             <a href="index.html">
-                <img src="image/united-states-of-america.png" alt="Logo" class="nav-logo">
+                <img src="image/united-states-of-america.png" alt="Language" class="nav-logo">
             </a>
         </nav>
     </div>
@@ -51,15 +80,63 @@ include("username.php");
 
     <div class="search-section">
         <div class="search-container">
-            <form method="GET" action="shopping.php">
-                <input type="text" name="q" placeholder="ค้นหา..." class="search-input" value="">
-                <button class="search-button">
+            <form method="POST" action="order_emergency.php">
+                <input type="text" name="search" placeholder="ค้นหา..." class="search-input" value="<?= htmlspecialchars($search) ?>">
+                <button type="submit" class="search-button">
                     <i class="fas fa-search"></i>
                 </button>
+                <!-- <button type="button" class="reset-btn" onclick="window.location.href='order_emergency.php'">Reset</button> -->
             </form>
         </div>
     </div>
 
+    <?php if ($hasSearched): ?> <!-- แสดงตารางเฉพาะเมื่อมีการค้นหา -->
+        <table class="styled-table">
+            <tr>
+                <th>รหัสรายการเคสฉุกเฉิน</th>
+                <th>ชื่อผู้ป่วย</th>
+                <th>สาเหตุ/อาการป่วย</th>
+                <th>สถานที่ปลายทาง</th>
+                <th>วันที่รายงาน</th>
+                <th>เวลาที่รายงาน</th>
+                <th>ยอดชำระ</th>
+                <th>สถานะ</th>
+                <th>จ่ายเงิน</th>
+            </tr>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= $row['order_emergency_case_id'] ?></td>
+                    <td><?= $row['emergency_case_report_patient_name'] ?></td>
+                    <td><?= $row['emergency_case_report_reason'] ?></td>
+                    <td><?= $row['emergency_case_report_hospital_waypoint'] ?></td>
+                    <td><?= $row['emergency_case_report_date'] ?></td>
+                    <td><?= $row['emergency_case_report_time'] ?></td>
+                    <td><?= number_format($row['order_emergency_case_price']) ?> บาท</td>
+                    <td><?= $row['order_emergency_case_status'] ?></td>
+                    <td>
+                        <?php if ($row['order_emergency_case_status'] === "ชำระเงินแล้ว"): ?>
+                            <span style="color: gray;">✅ ชำระเงินแล้ว</span>
+                        <?php else: ?>
+                            <a href="QRpayment.php?price_total=<?= $row['order_emergency_case_price'] ?>" class="pay-button">
+                                ชำระเงิน
+                            </a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
+        </table>
+
+        <?php if ($result->num_rows == 0): ?>
+            <p>❌ ไม่พบข้อมูลที่ค้นหา</p>
+        <?php endif; ?>
+    <?php endif; ?>
+
+    <?php
+    if ($hasSearched) {
+        $stmt->close();
+    }
+    $conn->close();
+    ?>
 </body>
 
 </html>
