@@ -73,7 +73,7 @@
                     <div class="product-details">
                         <h2><?= $row['equipment_name'] ?></h2> <!-- แสดงชื่อสินค้า -->
                         <br>
-                        <p class="price"><?= number_format($row['equipment_price'], 2) ?> บาท</p> <!-- แสดงราคา -->
+                        <p class="price"><?= number_format($row['equipment_price_per_unit'], 2) ?> บาท</p> <!-- แสดงราคา -->
                         <br>
                         <p class="detail"><?= nl2br($row['equipment_detail']) ?></p> <!-- แสดงรายละเอียดสินค้า -->
                     </div>

@@ -6,27 +6,27 @@
         $user = json_decode($data, true);
 
         // ตรวจสอบว่าข้อมูลครบถ้วนหรือไม่
-        if (!isset($user["member_id"], $user["equipment_id"], $user["order_type"], 
-                  $user["order_price"], $user["order_quantity"], $user["order_total"], 
-                  $user["order_buy_type"], $user["order_months"])) {
+        if (!isset($user["member_id"], $user["equipment_id"], $user["order_equipment_type"], 
+                  $user["order_equipment_price"], $user["order_equipment_quantity"], $user["order_equipment_total"], 
+                  $user["order_equipment_buy_type"], $user["order_equipment_months"])) {
             die("Missing required fields");
         }
 
         $member_id = $user["member_id"];
         $equipment_id = $user["equipment_id"];
-        $order_type  = $user["order_type"];
-        $order_price = $user["order_price"];
-        $order_quantity = $user["order_quantity"];
-        $order_total = $user["order_total"];
-        $order_months =  $user["order_months"];
-        $order_buy_type = $user["order_buy_type"];
+        $order_equipment_type  = $user["order_equipment_type"];
+        $order_equipment_price = $user["order_equipment_price"];
+        $order_equipment_quantity = $user["order_equipment_quantity"];
+        $order_equipment_total = $user["order_equipment_total"];
+        $order_equipment_months =  $user["order_equipment_months"];
+        $order_equipment_buy_type = $user["order_equipment_buy_type"];
 
 
         echo  $member_id ;
 
         // ✅ ใช้ backticks `` ครอบชื่อ table `order` (เพราะเป็นคำสงวนใน MySQL)
-        $sql = "INSERT INTO `order` 
-                (member_id, equipment_id, order_type, order_price, order_quantity, order_total, order_months,order_buy_type)
+        $sql = "INSERT INTO `order_equipment` 
+                (member_id, equipment_id, order_equipment_type, order_equipment_price, order_equipment_quantity, order_equipment_total, order_equipment_months,order_equipment_buy_type)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         // ✅ ใช้ Prepared Statement ป้องกัน SQL Injection
@@ -37,12 +37,12 @@
         $stmt->bind_param("iissiiis", 
             $member_id, 
             $equipment_id, 
-            $order_type, 
-            $order_price, 
-            $order_quantity, 
-            $order_total, 
-            $order_months,
-            $order_buy_type 
+            $order_equipment_type, 
+            $order_equipment_price, 
+            $order_equipment_quantity, 
+            $order_equipment_total, 
+            $order_equipment_months,
+            $order_equipment_buy_type 
         );
 
         if ($stmt->execute()) {

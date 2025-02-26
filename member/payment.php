@@ -4,7 +4,7 @@ $ids = $_GET['id'];
 // get medical_euipment table
 $medical_equipment_sql = "SELECT * 
             FROM equipment
-            LEFT JOIN `order` ON `equipment`.equipment_id = `order`.equipment_id
+            LEFT JOIN `order_equipment` ON `equipment`.equipment_id = `order_equipment`.equipment_id
             WHERE `equipment`.`equipment_id` = '$ids'";
 $result_medical_equipment = mysqli_query($conn, $medical_equipment_sql);
 $row = mysqli_fetch_assoc($result_medical_equipment);
@@ -105,7 +105,7 @@ $row_result_member = mysqli_fetch_assoc($result_member);
                             </div>
                         </td>
                         <td>
-                            <p class="cost">฿ <?= number_format($row['equipment_price'], 2) ?></p>
+                            <p class="cost">฿ <?= number_format($row['equipment_price_per_unit'], 2) ?></p>
                         </td>
                     </tr>
                 </table>
@@ -142,7 +142,7 @@ $row_result_member = mysqli_fetch_assoc($result_member);
                 <p>ค่าจัดส่ง <span class="delivery">฿ 120</span></p>
                 <p>ยอดชำระทั้งหมด <span class="totalprice">฿ 6,020</span></p>
             </div>
-            <a class="order-button2" id="tbtn" href="QRpayment.html">สั่งสินค้า</a>
+            <a class="order-button2" id="tbtn" href="QRpayment.php">สั่งสินค้า</a>
         </div>
     </section>
 
@@ -154,7 +154,7 @@ $row_result_member = mysqli_fetch_assoc($result_member);
         });
 
         // 1. ประกาศราคาต่อชิ้นจากฐานข้อมูล
-        const pricePerItem = parseFloat("<?= $row['equipment_price'] ?>"); // ราคาต่อชิ้นจากฐานข้อมูล
+        const pricePerItem = parseFloat("<?= $row['equipment_price_per_unit'] ?>"); // ราคาต่อชิ้นจากฐานข้อมูล
         const shippingCost = 120; // ค่าจัดส่ง
 
         const totalPriceElement = document.querySelector('.cost'); // ตารางที่แสดงราคารวม
@@ -334,19 +334,19 @@ $row_result_member = mysqli_fetch_assoc($result_member);
             let formData = {
                 "member_id": member_id,
                 "equipment_id": equipment_id,
-                "order_type": payment_purchase,
-                "order_price": payment_cost,
-                "order_quantity": payment_quantity,
-                "order_total": payment_totalprice,
-                "order_buy_type": payment_type,
-                "order_months": payment_rent_months
+                "order_equipment_type": payment_purchase,
+                "order_equipment_price": payment_cost,
+                "order_equipment_quantity": payment_quantity,
+                "order_equipment_total": payment_totalprice,
+                "order_equipment_buy_type": payment_type,
+                "order_equipment_months": payment_rent_months
             }
 
-            fetch_order(formData);
+            fetch_order_equipment(formData);
 
         });
 
-        const fetch_order = function(formData) {
+        const fetch_order_equipment = function(formData) {
             fetch('insert_order.php', {
                     "method": 'POST',
                     "headers": {

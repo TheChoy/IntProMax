@@ -9,7 +9,7 @@ $maxPrice = isset($_GET['maxPrice']) ? (int)$_GET['maxPrice'] : 1000000;
 $priceSort = isset($_GET['priceSort']) ? $_GET['priceSort'] : '';
 
 // เริ่มคำสั่ง SQL
-$sql = "SELECT * FROM equipment WHERE equipment_price BETWEEN ? AND ?";
+$sql = "SELECT * FROM equipment WHERE equipment_price_per_unit BETWEEN ? AND ?";
 $params = [$minPrice, $maxPrice];
 $types = "ii";
 
@@ -29,9 +29,9 @@ if (!empty($categoryFilter)) {
 
 // การเรียงลำดับราคา
 if ($priceSort === 'asc') {
-    $sql .= " ORDER BY equipment_price ASC";
+    $sql .= " ORDER BY equipment_price_per_unit ASC";
 } elseif ($priceSort === 'desc') {
-    $sql .= " ORDER BY equipment_price DESC";
+    $sql .= " ORDER BY equipment_price_per_unit DESC";
 } else {
     $sql .= " ORDER BY equipment_id"; // เรียงตาม ID เป็นค่าเริ่มต้น
 }
@@ -158,7 +158,7 @@ $result = mysqli_stmt_get_result($stmt);
                         <img src="image/<?= htmlspecialchars($row['equipment_image']) ?>" alt="<?= htmlspecialchars($row['equipment_name']) ?>">
                         <br><br>
                         <p><?= htmlspecialchars($row['equipment_name']) ?></p>
-                        <p class="cost">฿ <?= number_format($row['equipment_price']) ?></p>
+                        <p class="cost">฿ <?= number_format($row['equipment_price_per_unit']) ?></p>
                     </a>
                 </div>
             <?php endwhile; ?>
