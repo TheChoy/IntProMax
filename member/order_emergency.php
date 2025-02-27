@@ -8,24 +8,16 @@ $hasSearched = isset($_POST['search']); // เช็คว่ามีการ�
 // ค้นหาข้อมูลเฉพาะเมื่อมีการค้นหา
 $result = null;
 if ($hasSearched) {
-    $sql = "SELECT order_emergency_case.order_emergency_case_id, 
-                   emergency_case_report.emergency_case_report_patient_name,
-                   emergency_case_report.emergency_case_report_reason, 
-                   emergency_case_report.emergency_case_report_hospital_waypoint, 
-                   emergency_case_report.emergency_case_report_date, 
-                   emergency_case_report.emergency_case_report_time, 
-                   order_emergency_case.order_emergency_case_price, 
-                   order_emergency_case.order_emergency_case_status
+    $sql = "SELECT *
             FROM order_emergency_case 
-            JOIN emergency_case_report 
-            ON order_emergency_case.emergency_case_report_id = emergency_case_report.emergency_case_report_id
-            WHERE emergency_case_report.emergency_case_report_patient_name LIKE ? 
-               OR emergency_case_report.emergency_case_report_reason LIKE ?
-               OR emergency_case_report.emergency_case_report_hospital_waypoint LIKE ?";
+            WHERE order_emergency_case.order_emergency_case_patient_name LIKE ? 
+               OR order_emergency_case.order_emergency_case_reason LIKE ?
+               OR order_emergency_case.order_emergency_case_hospital_waypoint LIKE ?
+               OR order_emergency_case.order_emergency_case_communicant LIKE ?";
 
     $stmt = $conn->prepare($sql);
     $search_param = "%$search%";
-    $stmt->bind_param("sss", $search_param, $search_param, $search_param);
+    $stmt->bind_param("ssss", $search_param, $search_param, $search_param, $search_param);
     $stmt->execute();
     $result = $stmt->get_result();
 }
@@ -95,29 +87,29 @@ if ($hasSearched) {
             <tr>
                 <th>รหัสรายการเคสฉุกเฉิน</th>
                 <th>ชื่อผู้ป่วย</th>
+                <th>ชื่อผู้ติดต่อ</th>
                 <th>สาเหตุ/อาการป่วย</th>
                 <th>สถานที่ปลายทาง</th>
                 <th>วันที่รายงาน</th>
                 <th>เวลาที่รายงาน</th>
                 <th>ยอดชำระ</th>
-                <th>สถานะ</th>
                 <th>จ่ายเงิน</th>
             </tr>
             <?php while ($row = $result->fetch_assoc()): ?>
                 <tr>
                     <td><?= $row['order_emergency_case_id'] ?></td>
-                    <td><?= $row['emergency_case_report_patient_name'] ?></td>
-                    <td><?= $row['emergency_case_report_reason'] ?></td>
-                    <td><?= $row['emergency_case_report_hospital_waypoint'] ?></td>
-                    <td><?= $row['emergency_case_report_date'] ?></td>
-                    <td><?= $row['emergency_case_report_time'] ?></td>
+                    <td><?= $row['order_emergency_case_patient_name'] ?></td>
+                    <td><?= $row['order_emergency_case_communicant'] ?></td>
+                    <td><?= $row['order_emergency_case_reason'] ?></td>
+                    <td><?= $row['order_emergency_case_hospital_waypoint'] ?></td>
+                    <td><?= $row['order_emergency_case_date'] ?></td>
+                    <td><?= $row['order_emergency_case_time'] ?></td>
                     <td><?= number_format($row['order_emergency_case_price']) ?> บาท</td>
-                    <td><?= $row['order_emergency_case_status'] ?></td>
                     <td>
                         <?php if ($row['order_emergency_case_status'] === "ชำระเงินแล้ว"): ?>
                             <span style="color: gray;">✅ ชำระเงินแล้ว</span>
                         <?php else: ?>
-                            <a href="QRpayment.php?price_total=<?= $row['order_emergency_case_price'] ?>" class="pay-button">
+                            <a href="QRpayment_emergency.php?order_id=<?= $row['order_emergency_case_id'] ?>" class="pay-button">
                                 ชำระเงิน
                             </a>
                         <?php endif; ?>

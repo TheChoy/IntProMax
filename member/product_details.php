@@ -61,7 +61,7 @@
         $result = mysqli_query($conn, $sql);
         $row = mysqli_fetch_assoc($result);
         ?>
-
+ 
         <!-- แสดงภาพสินค้าจากฐานข้อมูล -->
         <div>
             <img src="image/<?= $row['equipment_image'] ?>" alt="">

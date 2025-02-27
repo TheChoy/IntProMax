@@ -232,6 +232,7 @@ $conn->close();
                         <?php endforeach; ?>
                     </select>
                 </div>
+                <a href="summary_page.php" class="reset-button" id="reset-button">reset</a>
             </div>
     </main>
 
@@ -242,7 +243,7 @@ $conn->close();
         const labels = <?php echo json_encode($labels); ?>;
         const maleData = <?php echo json_encode($maleData); ?>;
         const femaleData = <?php echo json_encode($femaleData); ?>;
-        
+
         Chart.defaults.elements.bar.borderRadius = 5;
 
         // สร้างกราฟด้วย Chart.js
