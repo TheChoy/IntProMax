@@ -16,16 +16,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $member_id = 1; // สมมติ
     $executive_id = 1; // สมมติ
     // $member_id = $_SESSION['member_id']; // ดึง ID สมาชิกจาก session หลัง loginรอทำlogin
-    $status = "รออนุมัติ"; // เริ่มต้นด้วยสถานะรอการอนุมัติต้องรอการอนุมัติจากผู้บริหาร
     $approve_status = "รออนุมัติ"; // สถานะการอนุมัติของผู้บริหาร
 
     // ตรวจสอบว่าเป็นเคลมหรือต่ออายุ และบันทึกลงฐานข้อมูล
 if ($action == "เคลม") {
-    $sql = "INSERT INTO claim (member_id, equipment_id, executive_id, claim_approve, claim_detail, claim_date, claim_status, claim_type) VALUES ('$member_id', '$equipment_id', '$executive_id', '$approve_status', '$reason', NOW(), '$status', '$action')";
+    $sql = "INSERT INTO claim (member_id, equipment_id, executive_id, claim_approve, claim_detail, claim_date, claim_type) VALUES ('$member_id', '$equipment_id', '$executive_id', '$approve_status', '$reason', NOW(), '$action')";
     } else if ($action == "ต่ออายุการใช้งาน") {
-    $sql = "INSERT INTO claim (member_id, equipment_id, executive_id, claim_approve, claim_detail, claim_date, claim_status, claim_type) VALUES ('$member_id', '$equipment_id', '$executive_id', '$approve_status', '$reason', NOW(), '$status', '$action')";
+    $sql = "INSERT INTO claim (member_id, equipment_id, executive_id, claim_approve, claim_detail, claim_date, claim_type) VALUES ('$member_id', '$equipment_id', '$executive_id', '$approve_status', '$reason', NOW(), '$action')";
     } else if ($action == "ซ่อม") {
-    $sql = "INSERT INTO claim (member_id, equipment_id, executive_id, claim_approve, claim_detail, claim_date, claim_status, claim_type) VALUES ('$member_id', '$equipment_id', '$executive_id', '$approve_status', '$reason', NOW(), '$status', '$action')";
+    $sql = "INSERT INTO claim (member_id, equipment_id, executive_id, claim_approve, claim_detail, claim_date, claim_type) VALUES ('$member_id', '$equipment_id', '$executive_id', '$approve_status', '$reason', NOW(), '$action')";
 }
 
 
