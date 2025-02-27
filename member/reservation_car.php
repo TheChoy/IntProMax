@@ -1,19 +1,5 @@
 <?php
-include "username.php";
-
-// คิวรีข้อมูลการจองกิจกรรม
-// $event_sql = "SELECT event_booking_date,
-//                     event_booking_start_time
-//                 FROM  event_booking ";
-// $result_event_booking = mysqli_query($conn, $event_sql);
-// $row_event = mysqli_fetch_assoc($result_event_booking);
-
-// // คิวรีข้อมูลการจองรถพยาบาล
-// $ambulance_sql = "SELECT ambulance_booking_date,
-//                         ambulance_booking_start_time
-//                     FROM  ambulance_booking ";
-// $result_ambulance_booking = mysqli_query($conn, $ambulance_sql);
-// $row_ambu = mysqli_fetch_assoc($result_ambulance_booking);
+include("username.php");
 ?>
 
 
@@ -32,7 +18,6 @@ include "username.php";
 
 <div class="top-navbar">
     <nav class="nav-links">
-        <div><a href="order_emergency.php">ชำระเงินเคสฉุกเฉิน</a></div>
         <div><a href="contact.html">ติดต่อเรา</a></div>
         <div class="dropdown">
             <img src="image/user.png" alt="Logo" class="nav-logo">
@@ -231,7 +216,7 @@ include "username.php";
             }
 
             selectedMonth.innerText = months[month];
-            selectedYear.innerText = year + 0; // แปลงเป็นปี พ.ศ.
+            selectedYear.innerText = year + 0   ; // แปลงเป็นปี พ.ศ.
         }
 
         prevMonthBtn.addEventListener("click", () => {
@@ -328,7 +313,7 @@ include "username.php";
                 url: 'form.php', // เปลี่ยน URL ไปยังไฟล์ form.php
                 type: 'POST',
                 data: formData,
-
+                
 
                 // ** การตอบกลับจาก server
                 success: function(data, status) {

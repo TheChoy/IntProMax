@@ -22,7 +22,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style_car.css">
+    <link rel="stylesheet" href="css/style_car.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <title>ฟอร์มจองรถ</title>
@@ -40,7 +40,6 @@ $conn->close();
 <body>
     <div class="top-navbar">
         <nav class="nav-links">
-            <div><a href="order_emergency.php">ชำระเงินเคสฉุกเฉิน</a></div>
             <div><a href="contact.html">ติดต่อเรา</a></div>
             <div class="dropdown">
                 <img src="image/user.png" alt="Logo" class="nav-logo">
@@ -106,19 +105,19 @@ $conn->close();
                     <label for="level">ระดับรถ</label>
 
                     <div>
-                        <input type="radio" id="first" name="level" value="first"> ระดับ 1
+                        <input type="radio" id="first" name="level" value="1" required onchange="calculatePrice()"> ระดับ 1
                     </div>
                     <div>
-                        <input type="radio" id="basic" name="level" value="basic"> ระดับ 2
+                        <input type="radio" id="basic" name="level" value="2" required onchange="calculatePrice()"> ระดับ 2
                     </div>
                     <div>
-                        <input type="radio" id="advanced" name="level" value="advanced"> ระดับ 3
+                        <input type="radio" id="advanced" name="level" value="3" required onchange="calculatePrice()"> ระดับ 3
                     </div>
                 </div>
             </div>
             <div class="form-group">
-                <label for="province">จังหวัด</label>
-                <select id="province" name="province" required
+                <label for="province1">จังหวัด</label>
+                <select id="province1" name="province1" required
                     style="width: 25%; padding: 8px; border: 1px solid #ccc; border-radius: 15px;">
                     <option value="" selected hidden>เลือกจังหวัด</option>
                     <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
@@ -225,14 +224,16 @@ $conn->close();
             <div class="form-group">
                 <label for="nurse_number">จำนวนพยาบาล</label>
                 <input type="number" id="nurse_number" name="nurse_number" required min="1" step="1" value="1"
-                    style="text-align: center; width: 100px;" oninput="validateNumber(event) "> คน/คัน
+                    style="text-align: center; width: 100px;" oninput="calculatePrice()"> คน/คัน
             </div>
 
             <div class="form-group">
                 <label for="ambulance_number">จำนวนรถพยาบาล</label>
                 <input type="number" id="ambulance_number" name="ambulance_number" required min="1" step="1" value="1"
-                    style="text-align: center; width: 100px;" oninput="validateNumber(event)"> คัน
+                    style="text-align: center; width: 100px;" oninput="calculatePrice()"> คัน
+                <!-- oninput="validateNumber(event) -->
             </div>
+
             <div class="form-group">
                 <label for="payment_method">วิธีการชำระเงิน</label>
                 <input type="hidden" id="payment_method_event" name="payment_method_event">
@@ -241,6 +242,15 @@ $conn->close();
                     <button type="button" id="payment-credit" class="payment-button">บัตรเครดิต</button>
                 </div>
             </div>
+
+            <!-- แสดงราคาค่าบริการ -->
+            <div class="form-group">
+                <p id="priceDisplay1" style="text-align: center; font-size: 18px;">ราคาค่าบริการ : 0 บาท</p>
+            </div>
+
+            <!-- เก็บราคาสำหรับส่งไปยัง Backend -->
+            <input type="hidden" id="calculatedPrice1" name="calculatedPrice1">
+
             <div class="form-submit">
                 <button type="button" id="cancel-button" class="cancel-button"
                     style="background-color: #F8E6DE;">ยกเลิก</button>
@@ -269,13 +279,13 @@ $conn->close();
                     <label for="level">ระดับรถ</label>
 
                     <div>
-                        <input type="radio" id="first" name="level" value="first"> ระดับ 1
+                        <input type="radio" id="first" name="level" value="1" require onchange="calculatePrice()"> ระดับ 1
                     </div>
                     <div>
-                        <input type="radio" id="basic" name="level" value="basic"> ระดับ 2
+                        <input type="radio" id="basic" name="level" value="2" require onchange="calculatePrice()"> ระดับ 2
                     </div>
                     <div>
-                        <input type="radio" id="advanced" name="level" value="advanced"> ระดับ 3
+                        <input type="radio" id="advanced" name="level" value="3" require onchange="calculatePrice()"> ระดับ 3
                     </div>
                 </div>
             </div>
@@ -288,8 +298,8 @@ $conn->close();
                 </label>
             </div>
             <div class="form-group">
-                <label for="province">จังหวัด</label>
-                <select id="province" name="province" required
+                <label for="province2">จังหวัด</label>
+                <select id="province2" name="province2" required
                     style="width: 25%; padding: 8px; border: 1px solid #ccc; border-radius: 15px;">
                     <option value="" selected hidden>เลือกจังหวัด</option>
                     <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
@@ -380,10 +390,10 @@ $conn->close();
                 <label for="hospital">โรงพยาบาล</label>
                 <select id="hospital" name="hospital" required>
                     <option value="" selected hidden>เลือกโรงพยาบาล</option>
-                    <option value="โรงพยาบาลมหาวิทยาลัยนเรศวร">โรงพยาบาลมหาวิทยาลัยนเรศวร</option>
-                    <option value="โรงพยาบาลพุทธชินราช">โรงพยาบาลพุทธชินราช</option>
-                    <option value="โรงพยาบาลกรุงเทพพิษณุโลก">โรงพยาบาลกรุงเทพพิษณุโลก</option>
-                    <option value="โรงพยาบาลพิษณุเวช">โรงพยาบาลพิษณุเวช</option>
+                    <option value="โรงพยาบาลรามาธิบดี">โรงพยาบาลรามาธิบดี</option>
+                    <option value="โรงพยาบาลกรุงเทพ">โรงพยาบาลกรุงเทพ</option>
+                    <option value="โรงพยาบาลมะเร็งกรุงเทพ">โรงพยาบาลมะเร็งกรุงเทพ</option>
+                    <option value="โรงพยาบาลนพรัตนราชธานี">โรงพยาบาลนพรัตนราชธานี</option>
                 </select>
             </div>
             <div class="form-group">
@@ -411,6 +421,7 @@ $conn->close();
                     <option value="ยาชา">ยาชา</option>
                 </select>
             </div>
+
             <div class="form-group">
                 <label for="payment-method">วิธีการชำระเงิน</label>
                 <input type="hidden" id="payment_method_hospital" name="payment_method_hospital">
@@ -419,6 +430,14 @@ $conn->close();
                     <button type="button" id="payment-credit2" class="payment-button">บัตรเครดิต</button>
                 </div>
             </div>
+
+            <!-- แสดงราคาค่าบริการ -->
+            <div class="form-group">
+                <p id="priceDisplay2" style="text-align: center; font-size: 18px;">ราคาค่าบริการ: 0 บาท</p>
+            </div>
+
+            <!-- เก็บราคาสำหรับส่งไปยัง Backend -->
+            <input type="hidden" id="calculatedPrice2" name="calculatedPrice2">
 
             <div class="form-submit">
                 <button type="button" id="cancel-button" class="cancel-button"
@@ -498,39 +517,248 @@ $conn->close();
     </script>
 
 
-
     <script>
         function selectPayment(paymentType, inputId) {
             document.getElementById(inputId).value = paymentType;
         }
-        //เปลี่ยนฟอร์ม
-        const formSelect = document.getElementById('formSelect');
-        const forms = document.querySelectorAll('.form-container');
+        // กำหนด Layer ตามจังหวัด
+        const layers = {
+            "layer_0" : ["กรุงเทพมหานคร"],
+            "layer_1": ["นนทบุรี", "ปทุมธานี", "สมุทรปราการ", "สมุทรสาคร", "นครปฐม", "พระนครศรีอยุธยา","สมุทรสงคราม"], // น้อยกว่า 100 km
+            "layer_2": ["ราชบุรี", "ฉะเชิงเทรา", "สระบุรี", "นครนายก", "ปราจีนบุรี", "ชลบุรี", "ลพบุรี", "กาญจนบุรี", "สระแก้ว", "เพชรบุรี", "ระยอง", "อ่างทอง", "สิงห์บุรี", "สุพรรณบุรี"], //น้อยกว่า 200 km
+            "layer_3": ["ตาก", "พิษณุโลก", "สุโขทัย", "อุตรดิตถ์", "ชัยนาท", "นครสวรรค์", "อุทัยธานี", "กำแพงเพชร", "พิจิตร", "เพชรบูรณ์", "นครราชสีมา", "ชัยภูมิ", "บุรีรัมย์", "ศรีสะเกษ", "ร้อยเอ็ด", "มหาสารคาม", "ขอนแก่น", "สุรินทร์", "ประจวบคีรีขันธ์", "เลย", "จันทบุรี", "ตราด", "ชุมพร", "ระนอง"], // น้อยกว่า 500 km
+            "layer_4": ["อุบลราชธานี", "อำนาจเจริญ", "ยโสธร", "มุกดาหาร", "กาฬสินธุ์", "สกลนคร", "นครพนม", "หนองบัวลำภู", "หนองคาย", "บึงกาฬ", "อุดรธานี", "น่าน", "แพร่", "พะเยา", "ลำปาง", "ลำพูน", "สุราษฎร์ธานี"], //น้อยกว่า 700 km
+            "layer_5": ["นครศรีธรรมราช", "พัทลุง", "สงขลา", "ยะลา", "ปัตตานี", "นราธิวาส", "ภูเก็ต", "พังงา", "กระบี่", "ตรัง", "สตูล", "เชียงราย", "เชียงใหม่", "แม่ฮ่องสอน"] // 700 km ขึ้นไป
+        };
 
-        // Function to hide all forms and show the selected one
-        function switchForm() {
-            const selectedForm = formSelect.value;
+        // ราคาต่อ Layer
+        const layerPrices = {
+            "layer_0": 200,
+            "layer_1": 500,
+            "layer_2": 800,
+            "layer_3": 1500,
+            "layer_4": 2000,
+            "layer_5": 3000
+        };
 
-            // Hide all forms
-            forms.forEach(form => {
-                form.classList.remove('active');
-            });
+        // ราคาต่อระดับรถ
+        const vehicleLevelPrices = {
+            "1": 400, // ระดับ 1
+            "2": 800, // ระดับ 2
+            "3": 1200 // ระดับ 3
+        };
 
-            // Show the selected form
-            document.getElementById(selectedForm).classList.add('active');
+        // ราคาต่อระดับรถของจองรถสำหรับรับส่งผู้ป่วย + พนักงาน2คน  200บาท
+        const vehicleLevelPrices2 = {
+            "1": 600, // ระดับ 1
+            "2": 1000, // ระดับ 2
+            "3": 1400 // ระดับ 3
+        };
+
+        // อัตราเพิ่มของงาน Event (แพงกว่าปกติ)
+        const eventMultiplier = 1.5; // 1.5 เท่าของราคาปกติ
+        // ราคาสำหรับพยาบาล
+        const nursePrice = 100; // พยาบาล 500 บาท/คน
+        // ค่าเริ่มต้นของพยาบาลใน form2 (3 คน)
+        const defaultNurseCountForm2 = 2;
+        // ค่าเริ่มต้นของรถพยาบาลใน form2 (1 คัน)
+        const defaultAmbulanceCountForm2 = 1;
+
+
+
+        // ฟังก์ชันคำนวณราคา
+        function calculatePrice() {
+            let province1 = document.getElementById("province1").value;
+            let province2 = document.getElementById("province2").value;
+            let bookingType = document.getElementById("formSelect").value;
+            let price = 0;
+
+            // หาระดับรถที่เลือก
+            let vehicleLevel = document.querySelector('input[name="level"]:checked');
+            let vehicleLevelCost = vehicleLevel ? vehicleLevelPrices[vehicleLevel.value] : 0;
+
+            // คำนวณราคาใน Form1 (Event)
+            if (province1) {
+                for (const [layer, provinces] of Object.entries(layers)) {
+                    if (provinces.includes(province1)) {
+                        price = layerPrices[layer];
+                        break;
+                    }
+                }
+
+                // ถ้าเลือกงาน Event เพิ่มราคาตามอัตรา
+                if (bookingType === "form1") {
+                    price = Math.ceil(price * eventMultiplier);
+                }
+
+                // รับค่าพยาบาลและรถพยาบาลจาก input
+                let nurseCount = parseInt(document.getElementById("nurse_number").value) || 0;
+                let ambulanceCount = parseInt(document.getElementById("ambulance_number").value) || 0;
+
+                // ราคาของรถพยาบาลใน form1 จะเท่ากับราคาของระดับรถที่เลือก
+                let ambulanceCost = ambulanceCount * vehicleLevelCost;
+
+                // คำนวณค่าพยาบาลทั้งหมดโดยคูณ nursePrice กับจำนวนรถพยาบาลที่เลือก
+                let nurseCost = nurseCount * nursePrice;
+
+                // เพิ่มค่าพยาบาล, รถพยาบาล และระดับรถ
+                let extraCost = (nurseCount * nursePrice * ambulanceCount) + ambulanceCost;
+                price += extraCost;
+
+
+                // // เพิ่มค่าพยาบาล, รถพยาบาล และระดับรถ
+                // let extraCost = nurseCost + ambulanceCost;
+                // price += extraCost;
+
+
+
+                document.getElementById("priceDisplay1").innerText = "ราคาค่าบริการ: " + price.toLocaleString() + " บาท";
+                document.getElementById("calculatedPrice1").value = price;
+            }
+
+            // คำนวณราคาใน Form2 (รับส่งผู้ป่วย)
+            if (province2) {
+                let price2 = 0; // กำหนดค่าเริ่มต้นให้เป็น 0
+
+                // หาระดับรถที่เลือก
+                let vehicleLevel = document.querySelector('input[name="level"]:checked');
+                let vehicleLevelCost2 = vehicleLevel ? vehicleLevelPrices2[vehicleLevel.value] : 0;
+
+                // คำนวณราคาจากจังหวัดใน form2
+                for (const [layer, provinces] of Object.entries(layers)) {
+                    if (provinces.includes(province2)) {
+                        price2 = layerPrices[layer];
+                        break;
+                    }
+                }
+
+                // เพิ่มราคาตามระดับรถที่เลือก
+                price2 += vehicleLevelCost2;
+
+                // รับค่ารถพยาบาลจาก input (ค่าเริ่มต้นคือ 1 คัน)
+                let ambulanceCount = parseInt(document.getElementById("ambulance_number").value) || defaultAmbulanceCountForm2;
+                let ambulanceCost = ambulanceCount * vehicleLevelCost2;
+
+                // รับค่าพยาบาลจาก input (ค่าเริ่มต้นคือ 3 คน)
+                let nurseCount = parseInt(document.getElementById("nurse_number").value) || defaultNurseCountForm2;
+                let nurseCost = nurseCount * nursePrice;
+
+                // แสดงผลราคาสำหรับ form2
+                if (bookingType === "form2") {
+                    document.getElementById("priceDisplay2").innerText = "ราคาค่าบริการ: " + price2.toLocaleString() + " บาท";
+                    document.getElementById("calculatedPrice2").value = price2;
+                }
+            }
         }
 
-        // Add event listener to switch forms when the dropdown changes
-        formSelect.addEventListener('change', switchForm);
+        // กำหนดค่าเริ่มต้นของพยาบาลและรถพยาบาลใน form2
+        document.addEventListener("DOMContentLoaded", function() {
+            let nurseInput = document.getElementById("nurse_number");
+            let ambulanceInput = document.getElementById("ambulance_number");
+
+            if (nurseInput) {
+                nurseInput.value = defaultNurseCountForm2;
+            }
+
+            if (ambulanceInput) {
+                ambulanceInput.value = defaultAmbulanceCountForm2;
+            }
+
+            // เพิ่ม event listener ให้ระดับรถเพื่อให้ราคาปรับตามเมื่อเปลี่ยน
+            document.querySelectorAll('input[name="level"]').forEach(level => {
+                level.addEventListener("change", calculatePrice);
+            });
+
+            // คำนวณราคาตั้งแต่โหลดหน้าเว็บ
+            calculatePrice();
+        });
+        // ฟังก์ชันเปลี่ยนฟอร์ม
+        function switchForm() {
+            const selectedForm = document.getElementById('formSelect').value;
+            const forms = document.querySelectorAll('.form-container');
+
+            forms.forEach(form => {
+                form.style.display = "none"; // ซ่อนฟอร์มทั้งหมด
+                resetFormValues(form); // รีเซ็ตค่าของทุกฟอร์มที่ถูกซ่อน
+            });
+
+            // แสดงฟอร์มที่เลือก
+            const selectedFormElement = document.getElementById(selectedForm);
+            selectedFormElement.style.display = "block";
+            // document.getElementById(selectedForm).style.display = "block"; // แสดงฟอร์มที่เลือก
+
+            // รีเซ็ตค่าของ input ต่าง ๆ
+            resetFormValues(selectedFormElement);
+
+            // รีเซ็ตค่าบริการเป็น 0 ของทั้ง form1 และ form2
+            const priceDisplays1 = document.getElementById("form1").querySelectorAll('.price-display');
+            priceDisplays1.forEach(display => {
+                display.innerText = "ราคาค่าบริการ: 0 บาท"; // ตั้งค่าบริการเป็น 0
+            });
+
+            const priceDisplays2 = document.getElementById("form2").querySelectorAll('.price-display');
+            priceDisplays2.forEach(display => {
+                display.innerText = "ราคาค่าบริการ: 0 บาท"; // ตั้งค่าบริการเป็น 0
+            });
+
+            const calculatedPrices1 = document.getElementById("form1").querySelectorAll('.calculated-price');
+            calculatedPrices1.forEach(input => {
+                input.value = 0; // ตั้งค่าบริการเป็น 0 ใน input ที่ใช้เก็บราคาคำนวณ
+            });
+
+            const calculatedPrices2 = document.getElementById("form2").querySelectorAll('.calculated-price');
+            calculatedPrices2.forEach(input => {
+                input.value = 0; // ตั้งค่าบริการเป็น 0 ใน input ที่ใช้เก็บราคาคำนวณ
+            });
+
+
+            // คำนวณราคาทันทีเมื่อเปลี่ยนประเภทการจอง
+            calculatePrice();
+        }
+
+        // ผูกฟังก์ชันกับการเลือกจังหวัดและประเภทการจอง
+        document.getElementById("province1").addEventListener("change", calculatePrice);
+        document.getElementById("province2").addEventListener("change", calculatePrice);
+        document.getElementById("formSelect").addEventListener("change", () => {
+            switchForm();
+            calculatePrice(); // เรียกคำนวณราคาเมื่อเปลี่ยนประเภท
+        });
+
+        // เรียกใช้งานเมื่อหน้าโหลดครั้งแรก
+        switchForm();
+
+        // ฟังก์ชันรีเซ็ตค่าของฟอร์ม
+        function resetFormValues(form) {
+            // รีเซ็ตค่าของทุก input ในฟอร์มที่เลือก
+            const inputElements = form.querySelectorAll('input, select');
+
+            inputElements.forEach(input => {
+                if (input.type === 'radio' || input.type === 'checkbox') {
+                    input.checked = false; // รีเซ็ตค่าของ radio หรือ checkbox
+                } else if (input.type === 'number') {
+                    input.value = ''; // รีเซ็ตค่าของ input ที่เป็นตัวเลข
+                } else if (input.type === 'select-one') {
+                    input.selectedIndex = 0; // รีเซ็ตค่าของ select เป็นตัวเลือกแรก
+                } });
+
+            // รีเซ็ตค่าของพยาบาลและรถพยาบาลใน form2
+            if (form.id === "form2") {
+                document.getElementById("nurse_number").value = defaultNurseCountForm2;
+                document.getElementById("ambulance_number").value = defaultAmbulanceCountForm2;
+            }
+        }
     </script>
 
     <script>
         //ตรวจการรับค่าจังหวัดและเก็บเป็นภูมิภาค
         function checkRegion() {
             const provinces = {
-                "ภาคเหนือ": ["เชียงใหม่", "เชียงราย", "ลำปาง", "ลำพูน", "แพร่", "น่าน", "พะเยา", "แม่ฮ่องสอน", "อุตรดิตถ์", "สุโขทัย", "พิษณุโลก", "ตาก"],
-                "ภาคกลาง": ["กรุงเทพมหานคร", "สมุทรปราการ", "นนทบุรี", "ปทุมธานี", "พระนครศรีอยุธยา", "สระบุรี", "ลพบุรี", "อ่างทอง", "ชัยนาท", "สิงห์บุรี", "นครนายก"],
-                "ภาคตะวันออกเฉียงเหนือ": ["ขอนแก่น", "นครราชสีมา", "อุดรธานี", "อุบลราชธานี", "หนองคาย", "มหาสารคาม", "ร้อยเอ็ด", "สุรินทร์", "บุรีรัมย์", "ศรีสะเกษ", "กาฬสินธุ์", "ชัยภูมิ", "ยโสธร", "สกลนคร"],
+                "ภาคเหนือ": ["เชียงใหม่", "เชียงราย", "ลำปาง", "ลำพูน", "แพร่", "น่าน", "พะเยา", "แม่ฮ่องสอน", "อุตรดิตถ์", "สุโขทัย", "พิษณุโลก", "ตาก", "เพชรบูรณ์", "นครสวรรค์", "กำแพงเพชร", "พิจิตร", "อุทัยธานี"],
+                "ภาคกลาง": ["กรุงเทพมหานคร", "สมุทรปราการ", "นนทบุรี", "ปทุมธานี", "พระนครศรีอยุธยา", "สระบุรี", "ลพบุรี", "อ่างทอง", "ชัยนาท", "สิงห์บุรี", "นครนายก", "นครปฐม", "สุพรรณบุรี", "สมุทรสาคร", "สมุทรสงคราม", "เพชรบุรี", "ประจวบคีรีขันธ์", "ราชบุรี", "กาญจนบุรี",
+                    // รวมภาคตะวันออก
+                    "ชลบุรี", "ระยอง", "จันทบุรี", "ตราด", "ฉะเชิงเทรา", "ปราจีนบุรี", "สระแก้ว"
+                ],
+                "ภาคตะวันออกเฉียงเหนือ": ["ขอนแก่น", "นครราชสีมา", "อุดรธานี", "อุบลราชธานี", "หนองคาย", "มหาสารคาม", "ร้อยเอ็ด", "สุรินทร์", "บุรีรัมย์", "ศรีสะเกษ", "กาฬสินธุ์", "ชัยภูมิ", "ยโสธร", "สกลนคร", "หนองบัวลำภู", "นครพนม", "บึงกาฬ", "มุกดาหาร", "อำนาจเจริญ"],
                 "ภาคใต้": ["ภูเก็ต", "สุราษฎร์ธานี", "สงขลา", "นราธิวาส", "ยะลา", "ปัตตานี", "พังงา", "กระบี่", "ตรัง", "นครศรีธรรมราช", "พัทลุง", "ชุมพร", "ระนอง", "สตูล"]
             };
 
@@ -547,7 +775,6 @@ $conn->close();
             regionInput.value = region;
         }
     </script>
-
 
 </body>
 
