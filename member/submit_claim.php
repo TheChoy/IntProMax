@@ -43,7 +43,7 @@ $row  = mysqli_fetch_assoc($result);
                 <a href="logout.html">ออกจากระบบ</a>
             </div>
         </div>
-        <a href="submit_claim.html">
+        <a href="index.php">
             <img src="image/united-states-of-america.png" alt="Logo" class="nav-logo">
         </a>
     </nav>
@@ -53,9 +53,9 @@ $row  = mysqli_fetch_assoc($result);
 <!-- Navbar ชั้นล่าง -->
 <div class="main-navbar">
     <nav class="nav-links">
-        <div><a href="submit_claim.html">หน้าแรก</a></div>
+        <div><a href="index.php">หน้าแรก</a></div>
         <div><a href="reservation_car.html">จองคิวรถ</a></div>
-        <a href="submit_claim.html">
+        <a href="index.php">
             <img src="image/Logo.png" alt="Logo" class="nav-logo1">
         </a>
         <div><a href="shopping.php">ซื้อ/เช่าอุปกรณ์ทางการแพทย์</a></div>

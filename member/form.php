@@ -40,6 +40,7 @@ $conn->close();
 <body>
     <div class="top-navbar">
         <nav class="nav-links">
+            <div><a href="order_emergency.php">ชำระเงินเคสฉุกเฉิน</a></div>
             <div><a href="contact.html">ติดต่อเรา</a></div>
             <div class="dropdown">
                 <img src="image/user.png" alt="Logo" class="nav-logo">
@@ -50,7 +51,7 @@ $conn->close();
                     <a href="logout.html">ออกจากระบบ</a>
                 </div>
             </div>
-            <a href="index.html">
+            <a href="index.php">
                 <img src="image/united-states-of-america.png" alt="Logo" class="nav-logo">
             </a>
         </nav>
@@ -58,9 +59,9 @@ $conn->close();
 
     <div class="main-navbar">
         <nav class="nav-links">
-            <div><a href="index.html">หน้าแรก</a></div>
+            <div><a href="index.php">หน้าแรก</a></div>
             <div><a href="reservation_car.php" style="color: #FFB898">จองคิวรถ</a></div>
-            <a href="index.html">
+            <a href="index.php">
                 <img src="image/Logo.png" alt="Logo" class="nav-logo1">
             </a>
             <div><a href="shopping.php">ซื้อ/เช่าอุปกรณ์ทางการแพทย์</a></div>
@@ -254,7 +255,7 @@ $conn->close();
             <div class="form-submit">
                 <button type="button" id="cancel-button" class="cancel-button"
                     style="background-color: #F8E6DE;">ยกเลิก</button>
-                <button type="submit" name="submit_event" style="background-color: #FFB898;" id="submit-button">ยืนยัน</button>
+                <button href="QRpayment.php?order_id=<?= $row['event_booking_price'] ?>" type="submit" name="submit_event" style="background-color: #FFB898;" id="submit-button">ยืนยัน</button>
             </div>
     </form>
     </div>
@@ -442,7 +443,7 @@ $conn->close();
             <div class="form-submit">
                 <button type="button" id="cancel-button" class="cancel-button"
                     style="background-color: #F8E6DE;">ยกเลิก</button>
-                <button type="submit" name="submit_ambulance" style="background-color: #FFB898;" id="submit-button">ยืนยัน</button>
+                <button href="QRpayment.php?order_id=<?= $row['ambulance_booking_price'] ?>" type="submit" name="submit_ambulance" style="background-color: #FFB898;" id="submit-button">ยืนยัน</button>
             </div>
     </form>
     </div>
@@ -523,8 +524,8 @@ $conn->close();
         }
         // กำหนด Layer ตามจังหวัด
         const layers = {
-            "layer_0" : ["กรุงเทพมหานคร"],
-            "layer_1": ["นนทบุรี", "ปทุมธานี", "สมุทรปราการ", "สมุทรสาคร", "นครปฐม", "พระนครศรีอยุธยา","สมุทรสงคราม"], // น้อยกว่า 100 km
+            "layer_0": ["กรุงเทพมหานคร"],
+            "layer_1": ["นนทบุรี", "ปทุมธานี", "สมุทรปราการ", "สมุทรสาคร", "นครปฐม", "พระนครศรีอยุธยา", "สมุทรสงคราม"], // น้อยกว่า 100 km
             "layer_2": ["ราชบุรี", "ฉะเชิงเทรา", "สระบุรี", "นครนายก", "ปราจีนบุรี", "ชลบุรี", "ลพบุรี", "กาญจนบุรี", "สระแก้ว", "เพชรบุรี", "ระยอง", "อ่างทอง", "สิงห์บุรี", "สุพรรณบุรี"], //น้อยกว่า 200 km
             "layer_3": ["ตาก", "พิษณุโลก", "สุโขทัย", "อุตรดิตถ์", "ชัยนาท", "นครสวรรค์", "อุทัยธานี", "กำแพงเพชร", "พิจิตร", "เพชรบูรณ์", "นครราชสีมา", "ชัยภูมิ", "บุรีรัมย์", "ศรีสะเกษ", "ร้อยเอ็ด", "มหาสารคาม", "ขอนแก่น", "สุรินทร์", "ประจวบคีรีขันธ์", "เลย", "จันทบุรี", "ตราด", "ชุมพร", "ระนอง"], // น้อยกว่า 500 km
             "layer_4": ["อุบลราชธานี", "อำนาจเจริญ", "ยโสธร", "มุกดาหาร", "กาฬสินธุ์", "สกลนคร", "นครพนม", "หนองบัวลำภู", "หนองคาย", "บึงกาฬ", "อุดรธานี", "น่าน", "แพร่", "พะเยา", "ลำปาง", "ลำพูน", "สุราษฎร์ธานี"], //น้อยกว่า 700 km
@@ -739,7 +740,8 @@ $conn->close();
                     input.value = ''; // รีเซ็ตค่าของ input ที่เป็นตัวเลข
                 } else if (input.type === 'select-one') {
                     input.selectedIndex = 0; // รีเซ็ตค่าของ select เป็นตัวเลือกแรก
-                } });
+                }
+            });
 
             // รีเซ็ตค่าของพยาบาลและรถพยาบาลใน form2
             if (form.id === "form2") {

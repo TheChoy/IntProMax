@@ -72,7 +72,7 @@ $result = mysqli_stmt_get_result($stmt);
                     <a href="logout.html">ออกจากระบบ</a>
                 </div>
             </div>
-            <a href="index.html">
+            <a href="index.php">
                 <img src="image/united-states-of-america.png" alt="EN" class="nav-logo">
             </a>
         </nav>
@@ -81,9 +81,9 @@ $result = mysqli_stmt_get_result($stmt);
     <!-- ✅ นาฟบาร์หลัก -->
     <div class="main-navbar">
         <nav class="nav-links">
-            <div><a href="index.html">หน้าแรก</a></div>
+            <div><a href="index.php">หน้าแรก</a></div>
             <div><a href="reservation_car.php">จองคิวรถ</a></div>
-            <a href="index.html">
+            <a href="index.php">
                 <img src="image/Logo.png" alt="Logo" class="nav-logo1">
             </a>
             <div><a href="shopping.php" style="color: #E88B71;">ซื้อ/เช่าอุปกรณ์ทางการแพทย์</a></div>
