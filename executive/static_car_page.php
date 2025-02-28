@@ -137,7 +137,7 @@ foreach ($chartLabels as $source) {
 }
 
 // ส่งออกข้อมูลเป็น JSON สำหรับ JavaScript
-$chartDataJson = json_encode([ 
+$chartDataJson = json_encode([
     'labels' => $chartLabels,
     'datasets' => [
         ['label' => 'ระดับ 1', 'data' => $chartLevels['1'], 'backgroundColor' => 'rgba(255, 99, 132, 0.6)'],
@@ -177,12 +177,12 @@ $conn->close();
             <h1 href="ceo_home_page.html" style="font-family: Itim;">CEO - HOME</h1>
         </div>
         <nav class="nav" style="margin-left: 20%;">
-            <a href="approve_page.html" class="nav-item">อนุมัติคำสั่งซื้อ/เช่า</a>
-            <a href="approve_clam_page.html" class="nav-item">อนุมัติเคลม</a>
-            <a href="summary_page.html" class="nav-item">สรุปยอดขาย</a>
-            <a href="case_report_page.html" class="nav-item">ดูสรุปรายงานเคส</a>
-            <a href="history_fixed_page.html" class="nav-item">ประวัติการส่งซ่อมรถและอุปกรณ์การแพทย์</a>
-            <a href="static_car_page.html" class="nav-item active">สถิติการใช้งานรถ</a>
+            <a href="approve_page.php" class="nav-item">อนุมัติคำสั่งซื้อ/เช่า</a>
+            <a href="approve_claim_page.php" class="nav-item">อนุมัติเคลม</a>
+            <a href="summary_page.php" class="nav-item">สรุปยอดขาย</a>
+            <a href="case_report_page.php" class="nav-item">ดูสรุปรายงานเคส</a>
+            <a href="history_fixed_page.php" class="nav-item">ประวัติการส่งซ่อมรถและอุปกรณ์การแพทย์</a>
+            <a href="static_car_page.php" class="nav-item active">สถิติการใช้งานรถ</a>
         </nav>
     </header>
     <h1 class="header-static-car-page">ดูสถิติการใช้งานรถ</h1>
@@ -404,43 +404,44 @@ $conn->close();
         });
     });
 
-    
-    document.addEventListener("DOMContentLoaded", function() {
-    var chartData = <?php echo $chartDataJson; ?>;
 
-    // Find the maximum data value from the datasets
-    let maxDataValue = 0;
-    chartData.datasets.forEach(function(dataset) {
-        dataset.data.forEach(function(value) {
-            if (value > maxDataValue) {
-                maxDataValue = value;
+    document.addEventListener("DOMContentLoaded", function() {
+        var chartData = <?php echo $chartDataJson; ?>;
+
+        // Find the maximum data value from the datasets
+        let maxDataValue = 0;
+        chartData.datasets.forEach(function(dataset) {
+            dataset.data.forEach(function(value) {
+                if (value > maxDataValue) {
+                    maxDataValue = value;
+                }
+            });
+        });
+
+        // Set the Y-axis max value to be the max data value + 5
+        var ctx = document.getElementById('bookingChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: chartData.datasets
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: false
+                    },
+                    y: {
+                        stacked: false,
+                        beginAtZero: true, // Ensure it starts at 0
+                        min: 0, // Set the minimum value to 0
+                        max: maxDataValue + 5 // Set the maximum value to max data value + 5
+                    }
+                }
             }
         });
     });
-
-    // Set the Y-axis max value to be the max data value + 5
-    var ctx = document.getElementById('bookingChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: chartData.labels,
-            datasets: chartData.datasets
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: { stacked: false },
-                y: {
-                    stacked: false, 
-                    beginAtZero: true,  // Ensure it starts at 0
-                    min: 0,             // Set the minimum value to 0
-                    max: maxDataValue + 5  // Set the maximum value to max data value + 5
-                }
-            }
-        }
-    });
-});
-
 </script>
 
 </html>
