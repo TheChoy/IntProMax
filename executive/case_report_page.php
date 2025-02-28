@@ -16,7 +16,12 @@ if ($conn->connect_error) {
 // รับค่าฟิลเตอร์จาก GET parameters
 $min_age = isset($_GET['min_age']) ? (int)$_GET['min_age'] : 0;
 $max_age = isset($_GET['max_age']) ? (int)$_GET['max_age'] : 100;
-$selected_date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
+date_default_timezone_set('Asia/Bangkok');
+$selected_date = date('Y-m-d');
+if (isset($_GET['date']) && !empty($_GET['date'])) {
+    $selected_date = $_GET['date'];
+}
+
 $selected_gender = isset($_GET['gender']) ? $_GET['gender'] : "ทั้งหมด";
 $selected_symptom = isset($_GET['symptom']) ? $_GET['symptom'] : "ทั้งหมด";
 $selected_hospital = isset($_GET['hospital']) ? $_GET['hospital'] : "ทั้งหมด";
@@ -62,7 +67,7 @@ $femaleData = [];
 
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $labels[] = $row['order_emergency_case_reason'];   
+        $labels[] = $row['order_emergency_case_reason'];
         $maleData[] = $row['male_count'];
         $femaleData[] = $row['female_count'];
     }

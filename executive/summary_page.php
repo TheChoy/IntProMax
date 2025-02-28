@@ -370,9 +370,15 @@ $conn->close();
             document.getElementById("maxPrice").addEventListener("input", updateFilters);
             document.getElementById("filter-province-list").addEventListener("change", updateFilters);
         });
+        document.addEventListener("DOMContentLoaded", function() {
+            let today = new Date();
+            let year = today.getFullYear();
+            let month = (today.getMonth() + 1).toString().padStart(2, "0"); // บวก 1 เพราะ getMonth() เริ่มจาก 0
+            document.getElementById("calendarSelect").value = `${year}-${month}`;
+        });
 
 
-        // ฟังก์ชันสำหรับอัปเดตฟิลเตอร์และโหลดข้อมูลใหม่
+
         // ฟังก์ชันสำหรับอัปเดตฟิลเตอร์และโหลดข้อมูลใหม่
         document.addEventListener("DOMContentLoaded", () => {
             const params = new URLSearchParams(window.location.search);
