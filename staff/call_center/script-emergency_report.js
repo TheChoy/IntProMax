@@ -5,14 +5,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const reasonField = document.getElementById('cause');
     const otherCauseRow = document.getElementById('other-cause-row');
     const otherCauseField = document.getElementById('other-cause');
+    const districtSelect = document.getElementById("filter-zone-list");
+    const costInput = document.getElementById("cost");
 
-    // form.addEventListener('submit', (event) => {
-    //     event.preventDefault();
-    //     window.location.href = 'emergency_report_success.html'; // เปลี่ยนหน้าไปยัง emergency_report_success.html
-    // });
+    // ดึงค่าใช้จ่ายจากตัวแปรที่ส่งจาก PHP
+    const costPerDistrict = window.costPerDistrict;
+
+    // โหลดค่าใช้จ่ายเมื่อเปลี่ยนเขต
+    districtSelect.addEventListener('change', updateCost);
+    updateCost(); // โหลดค่าเริ่มต้นเมื่อเปิดหน้า
+
+    // ฟังก์ชันอัปเดตค่าใช้จ่าย
+    function updateCost() {
+        const selectedDistrict = districtSelect.value;
+        if (costPerDistrict[selectedDistrict]) {
+            costInput.value = costPerDistrict[selectedDistrict] + " บาท";
+        } else {
+            costInput.value = "";
+        }
+    }
 
     cancelButton.addEventListener('click', () => {
-        form.reset(); // รีเซ็ตหน้าฟอร์ม
+        form.reset();
+        updateCost(); // รีเซ็ตค่าใช้จ่าย
     });
 
     reasonField.addEventListener('change', () => {
@@ -25,17 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
             otherCauseField.value = ''; // ล้างค่าฟิลด์ข้อความ
         }
     });
-    
 });
-
-function getCurrentDate() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-
-    return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-}
 
 async function loadHospitals() {
     const jsonUrl = 'hospital.json'; // แทนที่ด้วย URL หรือ path ของไฟล์ JSON
