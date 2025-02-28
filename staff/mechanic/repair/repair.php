@@ -28,7 +28,7 @@ $status_data = mysqli_fetch_all($status_query, MYSQLI_ASSOC);
 <body>
     <nav>
         <ul class="menu">
-            <li><a href="..\\car_report\\car_report.php">รายงานสภาพรถพยาบาล</a></li>
+            <li><a href="..\car_report\car_report.php">รายงานสภาพรถพยาบาล</a></li>
             <li><a href="repair.php">การซ่อมอุปกรณ์และรถพยาบาล</a></li>
         </ul>
     </nav>
@@ -92,7 +92,7 @@ $status_data = mysqli_fetch_all($status_query, MYSQLI_ASSOC);
                             <td><?php echo $rs_result['repair_date']; ?></td>
                             <td><?php echo $rs_result['ambulance_id']; ?></td>
                             <td><?php echo $rs_result['repair_type']; ?></td>
-                            <td><?php echo $rs_result['repairing']; ?></td>
+                            <td><?php echo $rs_result['repair_repairing']; ?></td>
                             <td><?php echo $rs_result['repair_reason']; ?></td>
                             <td>
                                 <?php if ($rs_result['repair_success_datetime'] !== null) { ?>

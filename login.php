@@ -17,8 +17,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         UNION
         SELECT 'repair_staff' AS user_type, repair_staff_id  AS id, repair_staff_email AS email, repair_staff_password AS password 
         FROM repair_staff WHERE repair_staff_email = ?
+        UNION
+        SELECT 'emergency_staff' AS user_type, emergency_staff_id AS id, emergency_staff_email AS email, emergency_staff_password AS password 
+        FROM emergency_staff WHERE emergency_staff_email = ?
+        UNION
+        SELECT 'callcenter_staff' AS user_type, callcenter_staff_id AS id, callcenter_staff_email AS email, callcenter_staff_password AS password 
+        FROM callcenter_staff WHERE callcenter_staff_email = ?
     ");
-    $stmt->bind_param("sss", $email, $email, $email);
+    $stmt->bind_param("sssss", $email, $email, $email, $email, $email);
     $stmt->execute();
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
@@ -34,11 +40,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Redirect ไปยังหน้าที่เหมาะสม
             if ($user['user_type'] == 'executive') {
-                header("Location: executive_dashboard.php");
+                header("Location: executive\history_fixed_page.php");
             } elseif ($user['user_type'] == 'member') {
-                header("Location: member_dashboard.php");
+                header("Location: member/index.php");
+            } elseif ($user['user_type'] == 'repair_staff') {
+                header("Location: staff/mechanic/car_report/car_report.php");
+            } elseif ($user['user_type'] == 'emergency_staff') {
+                header("Location: staff/emergency/Timetable/time_table.php");
             } else {
-                header("Location: repair_staff_dashboard.php");
+                header("Location: staff/call_center/emergency_report.php");
             }
             exit();
         } else {

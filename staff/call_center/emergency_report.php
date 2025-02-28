@@ -1,8 +1,23 @@
 <?php
-    include 'connect.php'; 
-    //เลือกเฉพาะรถที่มีระดับ 2 หรือ 3
-    $query_ambulance = mysqli_query($conn, "SELECT * FROM ambulance WHERE ambulance_level = '2' OR ambulance_level = '3'");
-    $ambulance_data = mysqli_fetch_all($query_ambulance, MYSQLI_ASSOC);
+include 'connect.php';
+session_start();
+//เลือกเฉพาะรถที่มีระดับ 2 หรือ 3
+$query_ambulance = mysqli_query($conn, "SELECT * FROM ambulance WHERE ambulance_level = '2' OR ambulance_level = '3'");
+$ambulance_data = mysqli_fetch_all($query_ambulance, MYSQLI_ASSOC);
+
+$cost_levels = [
+    2000 => ["บางรัก", "สาทร", "ราชเทวี", "ปทุมวัน", "คลองสาน", "พระนคร", "ป้อมปราบศัตรูพ่าย", "สัมพันธวงศ์", "พญาไท", "ดินแดง", "ห้วยขวาง", "วัฒนา", "คลองเตย", "ดุสิต", "บางคอมแหลม", "ยานนาวา"],
+    2500 => ["บางพลัด", "บางกอกน้อย", "บางกอกใหญ่", "ธนบุรี", "ราษฎร์บูรณะ", "ทุ่งครุ", "จอมทอง", "ภาษีเจริญ", "ตลิ่งชัน", "บางซื่อ", "จตุจักร", "ลาดพร้าว", "วังทองหลาง", "บางกะปี", "สวนหลวง", "พระโขนง", "บางนา", "ประเวศ", "สะพานสูง", "บึงกุ่ม", "คันนายาว"],
+    3000 => ["ทวีวัฒนา", "บางแค", "หนองแขม", "บางบอน", "บางขุนเทียน", "ดอนเมือง", "หลักสี่", "สายไหม", "บางเขน", "คลองสามวา", "มีนบุรี", "ลาดกระบัง", "หนองจอก"]
+];
+
+// สร้างอาร์เรย์แม็ปเขต -> ราคา
+$district_cost_map = [];
+foreach ($cost_levels as $cost => $districts) {
+    foreach ($districts as $district) {
+        $district_cost_map[$district] = $cost;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -12,6 +27,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style-emergency_report.css">
+    <script>
+        window.costPerDistrict = <?php echo json_encode($district_cost_map, JSON_UNESCAPED_UNICODE); ?>;
+    </script>
     <script src="script-emergency_report.js" defer></script>
     <title>รายงานเคสฉุกเฉิน</title>
 </head>
@@ -62,59 +80,14 @@
 
         <div class="row">
             <label for="filter-zone-list">เขตที่เกิดเหตุ</label>
-            <select id="filter-zone-list" name="filter-zone-list" class="filter-select">
+            <select id="filter-zone-list" name="district" class="filter-select" required>
                 <option value="" selected hidden>กรุณาเลือกเขต</option>
-                <option value="พระนคร">พระนคร</option>
-                <option value="ดุสิต">ดุสิต</option>
-                <option value="หนองจอก">หนองจอก</option>
-                <option value="บางรัก">บางรัก</option>
-                <option value="บางเขน">บางเขน</option>
-                <option value="บางกะปิ">บางกะปิ</option>
-                <option value="ปทุมวัน">ปทุมวัน</option>
-                <option value="ป้อมปราบศัตรูพ่าย">ป้อมปราบศัตรูพ่าย</option>
-                <option value="พระโขนง">พระโขนง</option>
-                <option value="มีนบุรี">มีนบุรี</option>
-                <option value="ลาดกระบัง">ลาดกระบัง</option>
-                <option value="ยานนาวา">ยานนาวา</option>
-                <option value="สัมพันธวงศ์">สัมพันธวงศ์</option>
-                <option value="พญาไท">พญาไท</option>
-                <option value="ธนบุรี">ธนบุรี</option>
-                <option value="บางกอกใหญ่">บางกอกใหญ่</option>
-                <option value="ห้วยขวาง">ห้วยขวาง</option>
-                <option value="คลองสาน">คลองสาน</option>
-                <option value="ตลิ่งชัน">ตลิ่งชัน</option>
-                <option value="บางกอกน้อย">บางกอกน้อย</option>
-                <option value="บางขุนเทียน">บางขุนเทียน</option>
-                <option value="ภาษีเจริญ">ภาษีเจริญ</option>
-                <option value="หนองแขม">หนองแขม</option>
-                <option value="ราษฎร์บูรณะ">ราษฎร์บูรณะ</option>
-                <option value="บางพลัด">บางพลัด</option>
-                <option value="ดินแดง">ดินแดง</option>
-                <option value="บึงกุ่ม">บึงกุ่ม</option>
-                <option value="สาทร">สาทร</option>
-                <option value="บางซื่อ">บางซื่อ</option>
-                <option value="จตุจักร">จตุจักร</option>
-                <option value="บางคอแหลม">บางคอแหลม</option>
-                <option value="ประเวศ">ประเวศ</option>
-                <option value="คลองเตย">คลองเตย</option>
-                <option value="สวนหลวง">สวนหลวง</option>
-                <option value="จอมทอง">จอมทอง</option>
-                <option value="ดอนเมือง">ดอนเมือง</option>
-                <option value="ราชเทวี">ราชเทวี</option>
-                <option value="ลาดพร้าว">ลาดพร้าว</option>
-                <option value="วัฒนา">วัฒนา</option>
-                <option value="บางแค">บางแค</option>
-                <option value="หลักสี่">หลักสี่</option>
-                <option value="สายไหม">สายไหม</option>
-                <option value="คันนายาว">คันนายาว</option>
-                <option value="สะพานสูง">สะพานสูง</option>
-                <option value="วังทองหลาง">วังทองหลาง</option>
-                <option value="คลองสามวา">คลองสามวา</option>
-                <option value="บางนา">บางนา</option>
-                <option value="ทวีวัฒนา">ทวีวัฒนา</option>
-                <option value="บางบอน">บางบอน</option>
+                <?php foreach ($district_cost_map as $district => $cost) { ?>
+                    <option value="<?php echo $district; ?>"><?php echo $district; ?></option>
+                <?php } ?>
             </select>
         </div>
+
         <div class="row">
             <label for="start-point">สถานที่ต้นทาง</label>
             <input type="text" name="start-point" id="start-point" placeholder="ระบุรายละเอียดเพิ่มเติม" required>
@@ -130,12 +103,16 @@
             <select id="ambulance_id" name="ambulance_id" required>
                 <option value="" selected hidden>กรุณาเลือกรถ</option>
                 <!-- แสดงตัวเลือกแค่รถระดับ 2 หรือ 3 ตามที่ query มา-->
-                <?php foreach($ambulance_data as $row) { ?>
-                    <option value="<?php echo $row["ambulance_id"];?>">
-                        <?php echo $row["ambulance_id"];?>
+                <?php foreach ($ambulance_data as $row) { ?>
+                    <option value="<?php echo $row["ambulance_id"]; ?>">
+                        <?php echo $row["ambulance_id"]; ?>
                     </option>
                 <?php } ?>
             </select>
+        </div>
+        <div class="row">
+            <label for="cost">ค่าบริการ</label>
+            <input type="text" id="cost" name="cost" readonly>
         </div>
         <div class="button">
             <button type="submit" class="submit-button">บันทึก</button>

@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,14 +13,13 @@
     <title>รายงานสภาพรถ</title>
 
 </head>
-
 <body>
-    <nav>
-        <ul class="menu">
-            <li><a href="car_report.php">รายงานสภาพรถพยาบาล</a></li>
-            <li><a href="..\repair\repair.php">การซ่อมอุปกรณ์และรถพยาบาล</a></li>
-        </ul>
-    </nav>
+<nav>
+    <ul class="menu">
+        <li><a href="car_report.php">รายงานสภาพรถพยาบาล</a></li>
+        <li><a href="../repair/repair.php">การซ่อมอุปกรณ์และรถพยาบาล</a></li>
+    </ul>
+</nav>
 
     <div class="header">
         <h1 class="title">รายงานสภาพรถพยาบาล</h1>

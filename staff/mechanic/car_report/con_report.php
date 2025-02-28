@@ -2,8 +2,8 @@
 // กำหนดค่าการเชื่อมต่อฐานข้อมูล
 $servername = "localhost"; // ชื่อเซิร์ฟเวอร์ฐานข้อมูล (localhost คือเครื่องเดียวกัน)
 $username = "root"; // ชื่อผู้ใช้ MySQL
-$password = "1234"; // รหัสผ่าน MySQL
-$dbname = "car_report"; // ชื่อฐานข้อมูลที่ใช้
+$password = ""; // รหัสผ่าน MySQL
+$dbname = "intpro"; // ชื่อฐานข้อมูลที่ใช้
 
 // สร้างการเชื่อมต่อกับฐานข้อมูล
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -15,9 +15,10 @@ if ($conn->connect_error) {
 echo "Connected successfully <br>";
 
 // กำหนดค่าคงที่
+session_start();
 $current_date = date('Y-m-d'); // วันที่ปัจจุบัน
 $registration_car = $_POST['registration_car'] ?? ''; // หมายเลขทะเบียนรถ
-$id_steff = 2; // รหัสพนักงานซ่อม (ค่าเริ่มต้น)
+$id_staff = $_SESSION['user_id']; // รหัสพนักงานซ่อม (ค่าเริ่มต้น)
 
 
 foreach ($_POST["status"] as $section_title => $status) {
@@ -27,7 +28,7 @@ foreach ($_POST["status"] as $section_title => $status) {
         $status = "รอดำเนินการ";
     }
     $stmt3 = $conn->prepare("INSERT INTO repair (ambulance_id, repair_staff_id, repair_date, repair_type, repairing, repair_reason, repair_status) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt3->bind_param("iisssss", $registration_car, $id_steff, $current_date, $type, $section_title, $repair_reason, $status);
+    $stmt3->bind_param("iisssss", $registration_car, $id_staff, $current_date, $type, $section_title, $repair_reason, $status);
     $stmt3->execute();
     $stmt3->close();
 }

@@ -4,7 +4,7 @@
 date_default_timezone_set('Asia/Bangkok');  
 
 // เชื่อมต่อฐานข้อมูล MySQL
-$con = new mysqli('localhost', 'root', '1234', 'intpro'); // ใช้ database intpro
+$con = new mysqli('localhost', 'root', '', 'intpro'); // ใช้ database intpro
 
 // ตรวจสอบการเชื่อมต่อฐานข้อมูล ถ้าล้มเหลวจะแสดงข้อความข้อผิดพลาด
 if ($con->connect_error) {
@@ -18,9 +18,9 @@ $sql = "
         'ambulance' as type,
         CONCAT(ambulance_booking_date, 'T', ambulance_booking_start_time) AS start, 
         CASE 
-            WHEN ambulance_booking_fisnish_time IS NULL OR ambulance_booking_fisnish_time = '' 
+            WHEN ambulance_booking_finish_time IS NULL OR ambulance_booking_finish_time = '' 
             THEN CONCAT(ambulance_booking_date, 'T', ADDTIME(ambulance_booking_start_time, '01:00:00')) 
-            ELSE CONCAT(ambulance_booking_date, 'T', ambulance_booking_fisnish_time) 
+            ELSE CONCAT(ambulance_booking_date, 'T', ambulance_booking_finish_time) 
         END AS end
     FROM ambulance_booking
 

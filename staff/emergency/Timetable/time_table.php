@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>ตารางเวลารถพยาบาล</title>
-    
+
     <!-- โหลด jQuery จาก CDN สำหรับใช้เขียนโค้ด JavaScript ที่ยืดหยุ่นและสะดวก -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -24,6 +27,9 @@
 <body>
 
     <!-- ส่วนหัวของหน้าเว็บที่แสดงชื่อเรื่อง -->
+    <div>
+        <h2>ยินดีต้อนรับ <?= $_SESSION['user_email']; ?></h2>
+    </div>
     <div class="title">
         <h1>ตารางเวลารถพยาบาล</h1>
     </div>
@@ -32,7 +38,7 @@
     <div class="legend">
         <!-- แสดงสีหรือรูปแบบสำหรับการจองรถพยาบาล -->
         <span class="amBooking"></span> Ambulance Booking
-        
+
         <!-- แสดงสีหรือรูปแบบสำหรับการจองอีเวนต์ -->
         <span class="evBooking"></span> Event Booking
     </div>
