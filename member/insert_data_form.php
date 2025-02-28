@@ -78,6 +78,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($conn->query($sql) === TRUE) {
             echo "ข้อมูลถูกบันทึกเรียบร้อยแล้ว";
+            $price_total = $price; // หรือคำนวณเพิ่มถ้ามีส่วนลด
+            header("Location: QRPayment.php?price_total=" . urlencode($price_total));
         } else {
             echo "เกิดข้อผิดพลาด: " . $sql . "<br>" . $conn->error;
         }
@@ -238,6 +240,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // บันทึกข้อมูล
         if ($conn->query($sql) === TRUE) {
             echo "ข้อมูลถูกบันทึกเรียบร้อยแล้ว";
+            $price_total = $price; // หรือคำนวณเพิ่มถ้ามีส่วนลด
+            header("Location: QRPayment.php?price_total=" . urlencode($price_total));
         } else {
             echo "เกิดข้อผิดพลาด" . $sql . "<br>" . $conn->error;
         }
