@@ -136,7 +136,7 @@ foreach ($chartLabels as $source) {
 }
 
 // ส่งออกข้อมูลเป็น JSON สำหรับ JavaScript
-$chartDataJson = json_encode([ 
+$chartDataJson = json_encode([
     'labels' => $chartLabels,
     'datasets' => [
         ['label' => 'ระดับ 1', 'data' => $chartLevels['1'], 'backgroundColor' => 'rgba(255, 99, 132, 0.6)'],
@@ -403,43 +403,44 @@ $conn->close();
         });
     });
 
-    
-    document.addEventListener("DOMContentLoaded", function() {
-    var chartData = <?php echo $chartDataJson; ?>;
 
-    // Find the maximum data value from the datasets
-    let maxDataValue = 0;
-    chartData.datasets.forEach(function(dataset) {
-        dataset.data.forEach(function(value) {
-            if (value > maxDataValue) {
-                maxDataValue = value;
+    document.addEventListener("DOMContentLoaded", function() {
+        var chartData = <?php echo $chartDataJson; ?>;
+
+        // Find the maximum data value from the datasets
+        let maxDataValue = 0;
+        chartData.datasets.forEach(function(dataset) {
+            dataset.data.forEach(function(value) {
+                if (value > maxDataValue) {
+                    maxDataValue = value;
+                }
+            });
+        });
+
+        // Set the Y-axis max value to be the max data value + 5
+        var ctx = document.getElementById('bookingChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: chartData.datasets
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: false
+                    },
+                    y: {
+                        stacked: false,
+                        beginAtZero: true, // Ensure it starts at 0
+                        min: 0, // Set the minimum value to 0
+                        max: maxDataValue + 5 // Set the maximum value to max data value + 5
+                    }
+                }
             }
         });
     });
-
-    // Set the Y-axis max value to be the max data value + 5
-    var ctx = document.getElementById('bookingChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: chartData.labels,
-            datasets: chartData.datasets
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: { stacked: false },
-                y: {
-                    stacked: false, 
-                    beginAtZero: true,  // Ensure it starts at 0
-                    min: 0,             // Set the minimum value to 0
-                    max: maxDataValue + 5  // Set the maximum value to max data value + 5
-                }
-            }
-        }
-    });
-});
-
 </script>
 
 </html>
