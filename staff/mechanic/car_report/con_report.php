@@ -27,7 +27,7 @@ foreach ($_POST["status"] as $section_title => $status) {
     if ($status == "ไม่พร้อม"){
         $status = "รอดำเนินการ";
     }
-    $stmt3 = $conn->prepare("INSERT INTO repair (ambulance_id, repair_staff_id, repair_date, repair_type, repairing, repair_reason, repair_status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt3 = $conn->prepare("INSERT INTO repair (ambulance_id, repair_staff_id, repair_date, repair_type, repair_repairing, repair_reason, repair_status) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt3->bind_param("iisssss", $registration_car, $id_staff, $current_date, $type, $section_title, $repair_reason, $status);
     $stmt3->execute();
     $stmt3->close();

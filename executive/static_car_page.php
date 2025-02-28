@@ -176,12 +176,12 @@ $conn->close();
             <h1 href="ceo_home_page.html" style="font-family: Itim;">CEO - HOME</h1>
         </div>
         <nav class="nav" style="margin-left: 20%;">
-            <a href="approve_page.html" class="nav-item">อนุมัติคำสั่งซื้อ/เช่า</a>
-            <a href="approve_clam_page.html" class="nav-item">อนุมัติเคลม</a>
-            <a href="summary_page.html" class="nav-item">สรุปยอดขาย</a>
-            <a href="case_report_page.html" class="nav-item">ดูสรุปรายงานเคส</a>
-            <a href="history_fixed_page.html" class="nav-item">ประวัติการส่งซ่อมรถและอุปกรณ์การแพทย์</a>
-            <a href="static_car_page.html" class="nav-item active">สถิติการใช้งานรถ</a>
+            <a href="approve_page.php" class="nav-item">อนุมัติคำสั่งซื้อ/เช่า</a>
+            <a href="approve_clam_page.php" class="nav-item">อนุมัติเคลม</a>
+            <a href="summary_page.php" class="nav-item">สรุปยอดขาย</a>
+            <a href="case_report_page.php" class="nav-item">ดูสรุปรายงานเคส</a>
+            <a href="history_fixed_page.php" class="nav-item">ประวัติการส่งซ่อมรถและอุปกรณ์การแพทย์</a>
+            <a href="static_car_page.php" class="nav-item active">สถิติการใช้งานรถ</a>
         </nav>
     </header>
     <h1 class="header-static-car-page">ดูสถิติการใช้งานรถ</h1>

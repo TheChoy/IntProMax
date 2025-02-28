@@ -141,7 +141,7 @@ foreach ($notReady_ambu_data as $num) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css?ts=<?php echo time(); ?>">
-    <link rel="stylesheet" href="styletable.css">
+    <link rel="stylesheet" href="css/history_fixed_page.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css"> -->
@@ -161,11 +161,11 @@ foreach ($notReady_ambu_data as $num) {
             <h1 href="ceo_home_page.html" style="font-family: Itim;">CEO - HOME</h1>
         </div>
         <nav class="nav" style="margin-left: 20%;">
-            <a href="approve_page.html" class="nav-item">อนุมัติคำสั่งซื้อ/เช่า</a>
-            <a href="approve_clam_page.html" class="nav-item">อนุมัติเคลม</a>
-            <a href="summary_page.html" class="nav-item">สรุปยอดขาย</a>
-            <a href="case_report_page.html" class="nav-item">ดูสรุปรายงานเคส</a>
-            <a href="history_fixed_page.html" class="nav-item active">ประวัติการส่งซ่อมรถและอุปกรณ์การแพทย์</a>
+            <a href="approve_page.php" class="nav-item">อนุมัติคำสั่งซื้อ/เช่า</a>
+            <a href="approve_clam_page.php" class="nav-item">อนุมัติเคลม</a>
+            <a href="summary_page.php" class="nav-item">สรุปยอดขาย</a>
+            <a href="case_report_page.php" class="nav-item">ดูสรุปรายงานเคส</a>
+            <a href="history_fixed_page.php" class="nav-item active">ประวัติการส่งซ่อมรถและอุปกรณ์การแพทย์</a>
             <a href="static_car_page.html" class="nav-item">สถิติการใช้งานรถ</a>
         </nav>
     </header>
