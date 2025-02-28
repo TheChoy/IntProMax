@@ -149,7 +149,7 @@ $conn->close();
         </div>
         <nav class="nav" style="margin-left: 20%;">
             <a href="approve_page.php" class="nav-item">อนุมัติคำสั่งซื้อ/เช่า</a>
-            <a href="approve_clam_page.php" class="nav-item">อนุมัติเคลม</a>
+            <a href="approve_claim_page.php" class="nav-item">อนุมัติเคลม</a>
             <a href="summary_page.php" class="nav-item">สรุปยอดขาย</a>
             <a href="case_report_page.php" class="nav-item active">ดูสรุปรายงานเคส</a>
             <a href="history_fixed_page.php" class="nav-item">ประวัติการส่งซ่อมรถและอุปกรณ์การแพทย์</a>
