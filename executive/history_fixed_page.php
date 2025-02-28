@@ -166,7 +166,7 @@ foreach ($notReady_ambu_data as $num) {
             <a href="summary_page.php" class="nav-item">สรุปยอดขาย</a>
             <a href="case_report_page.php" class="nav-item">ดูสรุปรายงานเคส</a>
             <a href="history_fixed_page.php" class="nav-item active">ประวัติการส่งซ่อมรถและอุปกรณ์การแพทย์</a>
-            <a href="static_car_page.html" class="nav-item">สถิติการใช้งานรถ</a>
+            <a href="static_car_page.php" class="nav-item">สถิติการใช้งานรถ</a>
         </nav>
     </header>
     <br>
