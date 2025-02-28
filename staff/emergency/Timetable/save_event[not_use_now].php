@@ -5,7 +5,7 @@
 date_default_timezone_set('Asia/Bangkok'); // ตั้งค่าโซนเวลา
 
 // เชื่อมต่อฐานข้อมูล
-$con = new mysqli('localhost', 'root', '1234', 'intpro');
+$con = new mysqli('localhost', 'root', '', 'intpro');
 if ($con->connect_error) {
     die('Connection Failed: ' . $con->connect_error);
 }
