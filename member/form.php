@@ -40,7 +40,6 @@ $conn->close();
 <body>
     <div class="top-navbar">
         <nav class="nav-links">
-            <div><a href="order_emergency.php">ชำระเงินเคสฉุกเฉิน</a></div>
             <div><a href="contact.html">ติดต่อเรา</a></div>
             <div class="dropdown">
                 <img src="image/user.png" alt="Logo" class="nav-logo">
@@ -51,7 +50,7 @@ $conn->close();
                     <a href="logout.html">ออกจากระบบ</a>
                 </div>
             </div>
-            <a href="index.php">
+            <a href="index.html">
                 <img src="image/united-states-of-america.png" alt="Logo" class="nav-logo">
             </a>
         </nav>
@@ -59,9 +58,9 @@ $conn->close();
 
     <div class="main-navbar">
         <nav class="nav-links">
-            <div><a href="index.php">หน้าแรก</a></div>
+            <div><a href="index.html">หน้าแรก</a></div>
             <div><a href="reservation_car.php" style="color: #FFB898">จองคิวรถ</a></div>
-            <a href="index.php">
+            <a href="index.html">
                 <img src="image/Logo.png" alt="Logo" class="nav-logo1">
             </a>
             <div><a href="shopping.php">ซื้อ/เช่าอุปกรณ์ทางการแพทย์</a></div>
@@ -224,7 +223,7 @@ $conn->close();
             </div>
             <div class="form-group">
                 <label for="nurse_number">จำนวนพยาบาล</label>
-                <input type="number" id="nurse_number" name="nurse_number" required min="1" step="1" value="1"
+                <input type="number" id="nurse_number" name="nurse_number" required min="0" step="1" value="1"
                     style="text-align: center; width: 100px;" oninput="calculatePrice()"> คน/คัน
             </div>
 
@@ -255,7 +254,7 @@ $conn->close();
             <div class="form-submit">
                 <button type="button" id="cancel-button" class="cancel-button"
                     style="background-color: #F8E6DE;">ยกเลิก</button>
-                <button href="QRpayment.php?order_id=<?= $row['event_booking_price'] ?>" type="submit" name="submit_event" style="background-color: #FFB898;" id="submit-button">ยืนยัน</button>
+                <button type="submit" name="submit_event" style="background-color: #FFB898;" id="submit-button" onclick="submitPaymentEvent()">ยืนยัน</button>
             </div>
     </form>
     </div>
@@ -443,12 +442,19 @@ $conn->close();
             <div class="form-submit">
                 <button type="button" id="cancel-button" class="cancel-button"
                     style="background-color: #F8E6DE;">ยกเลิก</button>
-                <button href="QRpayment.php?order_id=<?= $row['ambulance_booking_price'] ?>" type="submit" name="submit_ambulance" style="background-color: #FFB898;" id="submit-button">ยืนยัน</button>
+                <button type="submit" name="submit_ambulance" style="background-color: #FFB898;" id="submit-button">ยืนยัน</button>
             </div>
     </form>
     </div>
 
     <script>
+        // ฟังก์ชันที่จะส่งข้อมูลไปยัง QRpayment.php เมื่อคลิกปุ่ม "ยืนยัน"
+        function submitPaymentEvent() {
+            var calculatedPrice = document.getElementById("calculatedPrice1").value; // รับค่า calculatedPrice1
+            var url = "QRpayment.php?total_price=" + calculatedPrice; // สร้าง URL สำหรับส่งข้อมูล
+            window.location.href = url; // เปลี่ยนหน้าผ่าน URL ที่ส่งข้อมูล
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             document.getElementById("payment-qr").addEventListener("click", function() {
                 document.getElementById("payment_method_event").value = "QR Promptpay";
@@ -544,9 +550,9 @@ $conn->close();
 
         // ราคาต่อระดับรถ
         const vehicleLevelPrices = {
-            "1": 400, // ระดับ 1
-            "2": 800, // ระดับ 2
-            "3": 1200 // ระดับ 3
+            "1": 600, // ระดับ 1
+            "2": 1000, // ระดับ 2
+            "3": 1400 // ระดับ 3
         };
 
         // ราคาต่อระดับรถของจองรถสำหรับรับส่งผู้ป่วย + พนักงาน2คน  200บาท
@@ -559,9 +565,9 @@ $conn->close();
         // อัตราเพิ่มของงาน Event (แพงกว่าปกติ)
         const eventMultiplier = 1.5; // 1.5 เท่าของราคาปกติ
         // ราคาสำหรับพยาบาล
-        const nursePrice = 100; // พยาบาล 500 บาท/คน
+        const nursePrice = 100; // พยาบาล 100 บาท/คน
         // ค่าเริ่มต้นของพยาบาลใน form2 (3 คน)
-        const defaultNurseCountForm2 = 2;
+        const defaultNurseCountForm2 = 0;
         // ค่าเริ่มต้นของรถพยาบาลใน form2 (1 คัน)
         const defaultAmbulanceCountForm2 = 1;
 
@@ -640,7 +646,7 @@ $conn->close();
                 let ambulanceCount = parseInt(document.getElementById("ambulance_number").value) || defaultAmbulanceCountForm2;
                 let ambulanceCost = ambulanceCount * vehicleLevelCost2;
 
-                // รับค่าพยาบาลจาก input (ค่าเริ่มต้นคือ 3 คน)
+                // รับค่าพยาบาลจาก input (ค่าเริ่มต้นคือ 2 คน)
                 let nurseCount = parseInt(document.getElementById("nurse_number").value) || defaultNurseCountForm2;
                 let nurseCost = nurseCount * nursePrice;
 
