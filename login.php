@@ -67,18 +67,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <title>เข้าสู่ระบบ</title>
     <link rel="stylesheet" href="style_login.css">
+
 </head>
 
 <body>
-    <h2>เข้าสู่ระบบ</h2>
-    <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
-    <form method="POST">
-        <label>อีเมล:</label>
-        <input type="email" name="email" required>
-        <label>รหัสผ่าน:</label>
-        <input type="password" name="password" required>
-        <button type="submit">เข้าสู่ระบบ</button>
-    </form>
+    <div class="login-container">
+        <h1>เข้าสู่ระบบ</h1>
+        <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
+        <form method="POST">
+            <label>อีเมล:</label>
+            <input type="email" name="email" required>
+            <label>รหัสผ่าน:</label>
+            <input type="password" name="password" required>
+            <button type="submit">เข้าสู่ระบบ</button>
+        </form>
+    </div>
+
 </body>
 
 </html>
