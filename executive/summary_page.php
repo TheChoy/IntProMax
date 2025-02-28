@@ -2,6 +2,7 @@
 include('username.php');
 
 // รับค่าจากฟอร์ม
+date_default_timezone_set('Asia/Bangkok');
 $selected_month = isset($_GET['month']) ? $_GET['month'] : date('Y-m');
 $selected_gender = isset($_GET['gender']) ? $_GET['gender'] : "ทั้งหมด";
 $selected_type = isset($_GET['type']) ? $_GET['type'] : "ทั้งหมด";
