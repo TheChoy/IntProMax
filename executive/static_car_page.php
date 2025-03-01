@@ -9,8 +9,8 @@ $gender = isset($_POST['gender']) ? $_POST['gender'] : '';
 $age_min = isset($_POST['age_min']) ? $_POST['age_min'] : 1;
 $age_max = isset($_POST['age_max']) ? $_POST['age_max'] : 120;
 $region = isset($_POST['region']) ? $_POST['region'] : [];
-$date_start = isset($_POST['date_start']) ? $_POST['date_start'] : '2025-01-01';
-$date_end = isset($_POST['date_end']) ? $_POST['date_end'] : '2025-01-31';
+$date_start = isset($_POST['date_start']) ? $_POST['date_start'] : '2025-03';
+$date_end = isset($_POST['date_end']) ? $_POST['date_end'] : '2025-03';
 
 //sql
 // สร้าง SQL Query
@@ -325,8 +325,8 @@ $conn->close();
                         <br>
 
                         <label for="">ปี/เดือน:</label>
-                        <input class="month-selected" name="date_start" id="calendarSelect" type="text" placeholder="ปี/เดือน" value="2025-01"> ถึง
-                        <input class="month-selected" name="date_end" id="calendarSelect" type="text" placeholder="ปี/เดือน" value="2025-01">
+                        <input class="month-selected" name="date_start" id="calendarSelect" type="text" placeholder="ปี/เดือน" value="2025-03"> ถึง
+                        <input class="month-selected" name="date_end" id="calendarSelect" type="text" placeholder="ปี/เดือน" value="2025-03">
 
                         <button type="submit">กรองข้อมูล</button>
                     </div>
