@@ -5,9 +5,9 @@ $equipment_name = $_GET['equipment_name'];
 $equipment_name = mysqli_real_escape_string($conn, $equipment_name); //ป้องกัน sql injection พวกเครื่องหมายต่างๆ
 
 
-$sql = "SELECT `order`.order_id, `order`.member_id, `equipment`.equipment_name, `equipment`.equipment_image, `equipment`.equipment_id
-        FROM `order` 
-        JOIN `equipment` ON `order`.equipment_id = `equipment`.equipment_id 
+$sql = "SELECT `order_equipment`.order_equipment_id, `order_equipment`.member_id, `equipment`.equipment_name, `equipment`.equipment_image, `equipment`.equipment_id
+        FROM `order_equipment` 
+        JOIN `equipment` ON `order_equipment`.equipment_id = `equipment`.equipment_id 
         WHERE `equipment`.equipment_name = '$equipment_name'";
 
 $result = mysqli_query($conn, $sql);

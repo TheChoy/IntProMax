@@ -2,11 +2,11 @@
 session_start(); // เริ่มต้น session เพื่อใช้ข้อมูลที่เก็บไว้ใน session ในการเข้าถึงข้อมูลสมาชิก
 require("username.php"); // รวมไฟล์ที่เชื่อมต่อกับฐานข้อมูลเพื่อใช้ในการ query ข้อมูล
 // SQL Query เพื่อดึงข้อมูล
-$sql = "SELECT `order`.order_id, `order`.member_id, equipment.equipment_name, equipment.equipment_image, claim.claim_approve
-        FROM `order`
-        JOIN equipment ON `order`.equipment_id = equipment.equipment_id
-        LEFT JOIN claim ON `order`.equipment_id = claim.equipment_id AND claim.claim_approve = 'รออนุมัติ'
-        WHERE `order`.member_id = 1"; // ดึงข้อมูลคำสั่งซื้อจาก member_id ที่ระบุ (สามารถเปลี่ยนเป็น $_SESSION['member_id'] เมื่อทำการ login สำเร็จ)
+$sql = "SELECT `order_equipment`.order_equipment_id, `order_equipment`.member_id, equipment.equipment_name, equipment.equipment_image, claim.claim_approve
+        FROM `order_equipment`
+        JOIN equipment ON `order_equipment`.equipment_id = equipment.equipment_id
+        LEFT JOIN claim ON `order_equipment`.equipment_id = claim.equipment_id AND claim.claim_approve = 'รออนุมัติ'
+        WHERE `order_equipment`.member_id = 1"; // ดึงข้อมูลคำสั่งซื้อจาก member_id ที่ระบุ (สามารถเปลี่ยนเป็น $_SESSION['member_id'] เมื่อทำการ login สำเร็จ)
 // ใช้ LEFT JOIN เพื่อตรวจสอบว่ามีเคลมที่ยังไม่ได้อนุมัติหรือไม่ โดยจะใช้ claim_status = 'รออนุมัติ' เพื่อดูสถานะ
 // ประมวลผลการ Query
 $result = $conn->query($sql); // ประมวลผลคำสั่ง SQL และเก็บผลลัพธ์ในตัวแปร $result
@@ -64,7 +64,7 @@ $conn->close(); // ปิดการเชื่อมต่อกับฐา�
 
         <?php while ($row = mysqli_fetch_assoc($result)) { ?> <!-- วนลูปเพื่อแสดงข้อมูลที่ได้จากการ Query -->
             <div class="product"> <!-- แสดงข้อมูลของแต่ละอุปกรณ์ -->
-                <p hidden>id: <?php echo $row["order_id"]; ?></p> <!-- เก็บข้อมูล order_id ไว้ที่ไม่แสดงผล -->
+                <p hidden>id: <?php echo $row["order_equipment_id"]; ?></p> <!-- เก็บข้อมูล order_id ไว้ที่ไม่แสดงผล -->
                 <img src="image/<?php echo $row["equipment_image"]; ?>" alt="product"> <!-- แสดงภาพของอุปกรณ์ -->
                 <h2> <?php echo $row["equipment_name"]; ?> </h2> <!-- แสดงชื่อของอุปกรณ์ -->
 
