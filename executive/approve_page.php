@@ -138,7 +138,7 @@ if (!empty($order_by)) {
                         <input type="number" id="minPrice" placeholder="ต่ำสุด" min="0" max="1000000" value="<?php echo $min_price; ?>">
                         <input type="range" id="minPriceRange" min="0" max="100000" step="1"  value="<?php echo $min_price; ?>"
                             oninput="updateMinPrice()">
-                        <input type="range" id="maxPriceRange" min="0" max="100000" step="10"  value="<?php echo $max_price; ?>"
+                        <input type="range" id="maxPriceRange" min="0" max="1000000" step="10"  value="<?php echo $max_price; ?>"
                             oninput="updateMaxPrice()">
                         <input type="number" id="maxPrice" placeholder="สูงสุด" min="100000" max="1000000" value="<?php echo $max_price; ?>">
                     
