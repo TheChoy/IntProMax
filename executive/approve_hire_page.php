@@ -4,16 +4,15 @@ include_once 'username.php';
 // รับค่าจาก GET (ถ้ามี)
 $start_date = $_GET['start_date'] ?? '';
 $end_date = $_GET['end_date'] ?? '';
-$order_equipment_quantity = $_GET['order_equipment_quantity'] ?? '';
-$order_equipment_price = $_GET['order_equipment_price'] ?? '';
+$order_quantity = $_GET['order_equipment_quantity'] ?? '';
+$order_price = $_GET['order_equipment_price'] ?? '';
 $min_price = $_GET['min_price'] ?? '';
 $max_price = $_GET['max_price'] ?? '';
 $equipment_type = $_GET['equipment_type'] ?? '';
 
-$sql = "SELECT * FROM `order_equipment` AS a 
-        INNER JOIN equipment AS e ON a.equipment_id = e.equipment_id 
-        INNER JOIN member AS m ON a.member_id = m.member_id 
-        WHERE a.order_equipment_type = 'เช่า' AND (a.order_equipment_approve IS NULL OR a.order_equipment_approve = '')";
+$sql = "SELECT * FROM order_equipment a 
+        inner join equipment e on a.equipment_id = e.equipment_id 
+        inner join member m on a.member_id = m.member_id WHERE a.order_equipment_type = 'เช่า' AND (a.order_equipment_approve IS NULL OR a.order_equipment_approve = '') ";
 
 
 
@@ -34,18 +33,18 @@ if ($equipment_type) {
 
 
 // จัดเรียงตามจำนวน
-$order_equipment_by = [];
-if ($order_equipment_quantity) {
-    $order_equipment_by[] = "order_equipment_quantity $order_equipment_quantity";
+$order_by = [];
+if ($order_quantity) {
+    $order_by[] = "order_equipment_quantity $order_quantity";
 }
 
 
 
-if ($order_equipment_price) {
-    $order_equipment_by[] = "order_equipment_price $order_equipment_price";
+if ($order_price) {
+    $order_by[] = "order_equipment_price $order_price";
 }
-if (!empty($order_equipment_by)) {
-    $sql .= " ORDER BY " . implode(", ", $order_equipment_by);
+if (!empty($order_by)) {
+    $sql .= " ORDER BY " . implode(", ", $order_by);
 }
 
 ?>
@@ -59,8 +58,8 @@ if (!empty($order_equipment_by)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="styletable.css">
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <link rel="stylesheet" href="css/approve_page.css">
     <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -128,7 +127,7 @@ if (!empty($order_equipment_by)) {
 
                     </select>
                     <label for="filter-price">เรียงลำดับราคา:</label>
-                    <select name="order_equipment_price" id="filter-price-list" class="filter-select">
+                    <select name="order_price" id="filter-price-list" class="filter-select">
                         <option value="" selected hidden>เลือกการจัดเรียงราคา</option>
                         <option value="">ทั้งหมด</option>
                         <option value="ASC" <?php echo (isset($_GET['order_equipment_price']) && $_GET['order_equipment_price'] == "ASC") ? "selected" : ""; ?>>น้อยสุด-มากสุด</option>
@@ -156,7 +155,7 @@ if (!empty($order_equipment_by)) {
                         <option value="อุปกรณ์ปฐมพยาบาล" <?php echo ($equipment_type == "อุปกรณ์ปฐมพยาบาล") ? "selected" : ""; ?>>อุปกรณ์ปฐมพยาบาล</option>
 
                     </select>
-                    <button id="btnAppFilter" class="filter-button" style="margin-top: 10px;">ใช้ตัวกรอง</button>
+                    <button id="btnApplyFilter" class="filter-button" style="margin-top: 10px;">ใช้ตัวกรอง</button>
                     <button id="btnReset" class="filter-button" style="margin-top: 10px;">รีเซ็ต</button>
 
                     
@@ -170,8 +169,8 @@ if (!empty($order_equipment_by)) {
 
     </div>
     <select class="select" name="option" style="margin-left: 2%;" onchange="location = this.value;">
-        <option value="approve_page.php">อนุมัติคำสั่งซื้อ</option>
-        <option value="approve_hire_page.php" selected>อนุมัติการเช่า</option>
+        <option value="approve_page.php" >อนุมัติคำสั่งซื้อ</option>
+        <option value="approve_hire_page.php"selected>อนุมัติการเช่า</option>
     </select>
 
     <main class="main-content">
@@ -182,13 +181,13 @@ if (!empty($order_equipment_by)) {
                     <th>ชื่ออุปกรณ์</th>
                     <th>ชื่อผู้เช่า</th>
                     <th>จำนวน</th>
-                    <th>ระยะเวลาที่เช่า (เดือน)</th>
+                    <th>ระยะเวลาเช่า (เดือน)</th>
                     <th>ราคา (บาท)</th>
                     <th>ราคารวม (บาท)</th>
-                    <th><input type="radio" onclick="selectAll('approve')" name="approval_<?= htmlspecialchars($row['order_equipment_id'] ?? '') ?>" class="item-radio" value="approve" 
-                    onchange="checkTest(<?= htmlspecialchars($row['order_equipment_id'] ?? 0) ?>, 'approved')">อนุมัติทั้งหมด</th>
-                    <th><input type="radio" onclick="selectAll('reject')"  name="approval_<?= htmlspecialchars($row['order_equipment_id'] ?? '') ?>" class="item-radio" value="reject" 
-                    onchange="checkTest(<?= htmlspecialchars($row['order_equipment_id'] ?? 0) ?>, 'not_approved')">ไม่อนุมัติทั้งหมด</th>
+                    <th><input type="radio" onclick="selectAll('approve')" name="approval_<?= htmlspecialchars($row['order_id'] ?? '') ?>" class="item-radio" value="approve" 
+                    onchange="checkTest(<?= htmlspecialchars($row['order_id'] ?? 0) ?>, 'approved')">อนุมัติทั้งหมด</th>
+                    <th><input type="radio" onclick="selectAll('reject')"  name="approval_<?= htmlspecialchars($row['order_id'] ?? '') ?>" class="item-radio" value="reject" 
+                    onchange="checkTest(<?= htmlspecialchars($row['order_id'] ?? 0) ?>, 'not_approved')">ไม่อนุมัติทั้งหมด</th>
                    
                 </tr>
             </thead>
@@ -198,16 +197,12 @@ if (!empty($order_equipment_by)) {
             </tbody>
 
                 <?php 
-                 
-                 
-                
 
                  $result = $conn->query($sql);
                  
                  if ($result && $result->num_rows > 0):  
                     while ($row = mysqli_fetch_assoc($result)) : ?>
-                        <tr id="row_<?= htmlspecialchars($row['order_equipment_id'] ?? '') ?>">
-
+                        <tr id="row_<?= $row['order_equipment_id'] ?>">
                             <td><img src="img/<?= $row['equipment_image'] ?>" alt="อุปกรณ์" width="100"></td>
                             <td><?= htmlspecialchars($row['equipment_name']) ?></td>
                             <td><?= $row['member_firstname'] . ' ' . $row['member_lastname'] ?></td>

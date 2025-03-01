@@ -30,8 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
 //filter ต่างๆ เขียนโค้ดในนนี้
 document.addEventListener("DOMContentLoaded", () => {
 
-    
-
 
     const slider = document.getElementById("priceRange");
     const priceInput = document.getElementById("priceInput");
@@ -48,11 +46,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    
 
-
-   
-    const btnAppFilter = document.getElementById('btnAppFilter');
+   //ตัวรับค่าปุ่มของ php
+    const btnApplyFilter = document.getElementById('btnApplyFilter');
     const objfilterQuantityList = document.getElementById('filter-quantity-list');
     const objStartDate = document.getElementById('start_date');
     const objEndDate = document.getElementById('end_date');
@@ -62,9 +58,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const objEquipMentFilterList = document.getElementById('equipment-filter-list');
 
    
-    btnAppFilter.addEventListener('click', (e) => {       
+    btnApplyFilter.addEventListener('click', (e) => {       
         reloadPage();
-    });
+    }); 
 
     btnReset.addEventListener('click', (e) => {
         location.href = "approve_hire_page.php";
@@ -100,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let startDate = objStartDate.value;
         let endDate = objEndDate.value;
         
-
+        //ไว้ debug
         console.log(minPriceRange, maxPriceRange);
         
         // alt + 96  `
@@ -192,7 +188,7 @@ function submitApproval() {
     document.querySelectorAll(".item-radio:checked").forEach(input => {
         let orderId = input.name.split("_")[1]; // ดึง order_id จาก name
         selectedOrders.push({
-            order_id: orderId,
+            order_equipment_id: orderId,
             approval_status: input.value
         });
     });
@@ -202,12 +198,6 @@ function submitApproval() {
         return;
     }
 }
-
-
-
-
-
-
 
 
 // ตัวที่ส่งข้อมูลไปยัง save_order PHP
@@ -220,7 +210,7 @@ function submitApproval() {
 
         if (orderId > 0) {
             selectedOrders.push({
-                order_id: orderId,
+                order_equipment_id: orderId,
                 approval_status: status
             });
         }
@@ -252,4 +242,18 @@ function submitApproval() {
     })
     .catch(error => console.error("Error:", error));
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
