@@ -82,6 +82,7 @@ $status_data = mysqli_fetch_all($status_query, MYSQLI_ASSOC);
                         <th>อุปกรณ์/อะไหล่</th>
                         <th>สาเหตุ</th>
                         <th>วันที่เสร็จสิ้น</th>
+                        <th>ราคาซ่อม</th>
                         <th>ID ผู้รายงาน</th>
                         <th>สถานะการซ่อม</th>
                     </tr>
@@ -95,17 +96,20 @@ $status_data = mysqli_fetch_all($status_query, MYSQLI_ASSOC);
                             <td><?php echo $rs_result['repair_repairing']; ?></td>
                             <td><?php echo $rs_result['repair_reason']; ?></td>
                             <td>
-                                <?php if ($rs_result['repair_success_datetime'] !== null) { ?>
-                                    <?php echo $rs_result['repair_success_datetime']; ?>
-                                <?php } else { ?>
-                                    <input type="datetime-local"
-                                        value="<?php echo $rs_result['repair_success_datetime']; ?>"
-                                        onchange="updateRepair(<?php echo $rs_result['repair_id']; ?>, this.value, 'date')">
-                                <?php } ?>
+                                <input type="date"
+                                    value="<?= $rs_result['repair_success_datetime'] ? substr($rs_result['repair_success_datetime'], 0, 10) : '' ?>"
+                                    min="<?= $rs_result['repair_date']; ?>"
+                                    data-repair-date="<?= $rs_result['repair_date']; ?>"
+                                    onchange="validateAndUpdateRepairDate(this, <?= $rs_result['repair_id']; ?>)">
+                            </td>
+                            <td>
+                                <input type="number" min="0"
+                                    value="<?= $rs_result['repair_cost'] ?>"
+                                    onchange="updateRepair(<?= $rs_result['repair_id'] ?>, this.value, 'cost')"> ฿
                             </td>
                             <td><?php echo $rs_result['repair_staff_id']; ?></td>
                             <td>
-                                <select onchange="updateRepair(<?php echo $rs_result['repair_id']; ?>, this.value, 'status')">
+                                <select onchange="validateAndUpdateStatus(this, <?php echo $rs_result['repair_id']; ?>)">
                                     <option value="รอดำเนินการ" <?php echo ($rs_result['repair_status'] == 'รอดำเนินการ') ? 'selected' : ''; ?>>รอดำเนินการ</option>
                                     <option value="กำลังดำเนินการ" <?php echo ($rs_result['repair_status'] == 'กำลังดำเนินการ') ? 'selected' : ''; ?>>กำลังดำเนินการ</option>
                                     <option value="เสร็จสิ้น" <?php echo ($rs_result['repair_status'] == 'เสร็จสิ้น') ? 'selected' : ''; ?>>เสร็จสิ้น</option>

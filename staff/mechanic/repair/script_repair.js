@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
 
   // ดึงตัวรับ input จากหน้าเว็บด้วย id เพื่อใส่ eventListener (filterTable)
@@ -69,32 +68,41 @@ function addRepair() {
   window.location.href = "from_repair.php";
 }
 
+function validateAndUpdateRepairDate(input, repairId) {
+  const selectedDate = new Date(input.value);
+  const repairDate = new Date(input.dataset.repairDate);
 
-// function deleteRepair(index) {
-//     let repairs = JSON.parse(localStorage.getItem('repairs')) || [];
-//     repairs.splice(index, 1);
-//     localStorage.setItem('repairs', JSON.stringify(repairs));
-//     loadRepairs(); // Reload the table
-// }
+  if (selectedDate < repairDate) {
+    alert("วันเสร็จสิ้นต้องไม่ก่อนวันรับซ่อม!");
+    input.value = '';
+    return;
+  }
 
-// ฟังก์ชันบันทึกข้อมูล
-// function saveRepair() {
-//     const rows = document.querySelectorAll("tbody tr");
-//     const updatedData = [];
+  // เรียกฟังก์ชันส่งข้อมูลไปอัปเดต
+  updateRepair(repairId, input.value, 'date');
+}
+function validateAndUpdateStatus(selectElement, repairId) {
+  const selectedStatus = selectElement.value;
 
-//     rows.forEach(row => {
-//         const rowData = {
-//             dateReceived: row.cells[0].textContent.trim(),
-//             license: row.cells[1].querySelector("input").value,
-//             repairType: row.cells[2].textContent.trim(),
-//             equipment: row.cells[3].textContent.trim(),
-//             reason: row.cells[4].textContent.trim(),
-//             dueDate: row.cells[5].querySelector("input").value,
-//             reporter: row.cells[6].textContent.trim(),
-//             status: row.cells[7].querySelector("select").value
-//         };
-//         updatedData.push(rowData);
-//     });
+  if (selectedStatus === "เสร็จสิ้น") {
+    // หา input วันเสร็จและราคาจากแถวเดียวกัน
+    const row = selectElement.closest('tr');
+    const dateInput = row.querySelector('input[type="date"]');
+    const costInput = row.querySelector('input[type="number"]');
 
-//     console.log("ข้อมูลที่บันทึก:", updatedData);
-//     alert("ข้อมูลถูกบันทึกเรียบร้อยแล้ว!");
+    if (!dateInput.value) {
+      alert("กรุณากรอกวันที่เสร็จสิ้นก่อนเปลี่ยนสถานะเป็น 'เสร็จสิ้น'");
+      selectElement.value = "รอดำเนินการ"; // reset
+      return;
+    }
+
+    if (!costInput.value || parseFloat(costInput.value) <= 0) {
+      alert("กรุณากรอกราคาซ่อมก่อนเปลี่ยนสถานะเป็น 'เสร็จสิ้น'");
+      selectElement.value = "รอดำเนินการ"; // reset
+      return;
+    }
+  }
+
+  // ถ้าผ่านเงื่อนไข ให้ส่งค่าต่อไป
+  updateRepair(repairId, selectedStatus, 'status');
+}
