@@ -183,6 +183,7 @@ $conn->close();
             <a href="case_report_page.php" class="nav-item">ดูสรุปรายงานเคส</a>
             <a href="history_fixed_page.php" class="nav-item">ประวัติการส่งซ่อมรถและอุปกรณ์การแพทย์</a>
             <a href="static_car_page.php" class="nav-item active">สถิติการใช้งานรถ</a>
+            <a href="summary_buy.php" class="nav-item">สรุปยอดขาย</a>
         </nav>
     </header>
     <h1 class="header-static-car-page">ดูสถิติการใช้งานรถ</h1>
