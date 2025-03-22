@@ -105,7 +105,7 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="summary_page.js" defer></script>
-    <title>สรุปยอดขาย</title>
+    <title>สถิติคำสั่งซื้อ/เช่าสินค้า</title>
     <style>
         canvas {
             width: 80% !important;
@@ -144,7 +144,7 @@ $conn->close();
         <nav class="nav" style="margin-left: 20%;">
             <a href="approve_page.php" class="nav-item">อนุมัติคำสั่งซื้อ/เช่า</a>
             <a href="approve_claim_page.php" class="nav-item">อนุมัติเคลม</a>
-            <a href="summary_page.php" class="nav-item active">สรุปยอดขาย</a>
+            <a href="summary_page.php" class="nav-item active">สถิติคำสั่งซื้อ/เช่าสินค้า</a>
             <a href="case_report_page.php" class="nav-item">ดูสรุปรายงานเคส</a>
             <a href="history_fixed_page.php" class="nav-item">ประวัติการส่งซ่อมรถและอุปกรณ์การแพทย์</a>
             <a href="static_car_page.php" class="nav-item">สถิติการใช้งานรถ</a>
@@ -158,7 +158,7 @@ $conn->close();
         <div id="chart-femaleData" style="display: none;"><?php echo json_encode($femaleData); ?></div>
 
 
-        <h1 style="text-align: center;">สรุปยอดขาย</h1>
+        <h1 style="text-align: center;">สถิติคำสั่งซื้อ/เช่าสินค้า</h1>
         <div class="search-section">
             <!-- <div class="search-container">
                 <input type="text" placeholder="ระบุชื่อสินค้า..." class="search-input">

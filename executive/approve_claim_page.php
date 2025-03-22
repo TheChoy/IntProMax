@@ -56,7 +56,7 @@ if (!$result) {
         <nav class="nav" style="margin-left: 20%;">
             <a href="approve_page.php" class="nav-item">อนุมัติคำสั่งซื้อ/เช่า</a>
             <a href="approve_claim_page.php" class="nav-item active">อนุมัติเคลม</a>
-            <a href="summary_page.php" class="nav-item">สรุปยอดขาย</a>
+            <a href="summary_page.php" class="nav-item">สถิติคำสั่งซื้อ/เช่าสินค้า</a>
             <a href="case_report_page.php" class="nav-item">ดูสรุปรายงานเคส</a>
             <a href="history_fixed_page.php" class="nav-item">ประวัติการส่งซ่อมรถและอุปกรณ์การแพทย์</a>
             <a href="static_car_page.php" class="nav-item">สถิติการใช้งานรถ</a>
