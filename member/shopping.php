@@ -9,7 +9,7 @@ $maxPrice = isset($_GET['maxPrice']) ? (int)$_GET['maxPrice'] : 1000000;
 $priceSort = isset($_GET['priceSort']) ? $_GET['priceSort'] : '';
 
 // เริ่มคำสั่ง SQL
-$sql = "SELECT * FROM equipment WHERE equipment_price_per_unit BETWEEN ? AND ?";
+$sql = "SELECT * FROM equipment WHERE equipment_price_per_unit BETWEEN ? AND ? AND equipment_quantity > 0";
 $params = [$minPrice, $maxPrice];
 $types = "ii";
 

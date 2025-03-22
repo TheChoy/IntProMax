@@ -1,13 +1,20 @@
 <?php
 include 'username.php';
 $ids = $_GET['id'];
-// get medical_euipment table
+
+// get medical_equipment table
 $medical_equipment_sql = "SELECT * 
             FROM equipment
-            LEFT JOIN `order_equipment` ON `equipment`.equipment_id = `order_equipment`.equipment_id
-            WHERE `equipment`.`equipment_id` = '$ids'";
+            LEFT JOIN order_equipment ON equipment.equipment_id = order_equipment.equipment_id
+            WHERE equipment.`equipment_id` = '$ids'";
 $result_medical_equipment = mysqli_query($conn, $medical_equipment_sql);
 $row = mysqli_fetch_assoc($result_medical_equipment);
+
+// ถ้าจำนวนสินค้าคงเหลือ = 0 ให้ redirect หรือแสดงข้อความไม่พบสินค้า
+if ($row['equipment_quantity'] == 0) {
+    echo "<script>alert('สินค้าหมดแล้ว'); window.location.href = 'shopping.php';</script>";
+    exit();
+}
 
 // get member
 $random_memeber = $_GET['member_id'];
@@ -148,10 +155,16 @@ $row_result_member = mysqli_fetch_assoc($result_member);
 
 
     <script>
-        document.getElementById("tbtn").addEventListener("click", function() {
-            let totalOrderPrice = parseFloat(document.querySelector('.summary .totalprice').textContent.replace('฿', '').trim());
-            this.href = `QRpayment_order.php?price_total=${totalOrderPrice}`;
-        });
+      document.getElementById("tbtn").addEventListener("click", function() {
+    let totalOrderPrice = parseFloat(document.querySelector('.summary .totalprice').textContent.replace('฿', '').trim());
+
+    // ดึง equipment_id จาก URL (ถ้ามี)
+    const urlParams = new URLSearchParams(window.location.search);
+    const equipmentId = urlParams.get("id"); // เช่นจาก shopping.php?id=5
+
+    // ส่ง price_total + equipment_id ไปหน้า QRpayment
+    this.href = `QRpayment_order.php?price_total=${totalOrderPrice}&id=${equipmentId}`;
+});
 
         // 1. ประกาศราคาต่อชิ้นจากฐานข้อมูล
         const pricePerItem = parseFloat("<?= $row['equipment_price_per_unit'] ?>"); // ราคาต่อชิ้นจากฐานข้อมูล

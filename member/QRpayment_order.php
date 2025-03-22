@@ -1,10 +1,35 @@
 <?php
+include 'username.php';
+
 $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
+$order_id = isset($_GET['id']) ? $_GET['id'] : 0;
+
+// หากกดยืนยันแล้วให้ลด stock
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = json_decode(file_get_contents("php://input"), true);
+    $equipment_id = isset($data['equipment_id']) ? (int)$data['equipment_id'] : 0;
+
+    $sql = "UPDATE equipment SET equipment_quantity = equipment_quantity - 1 WHERE equipment_id = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $equipment_id);
+    mysqli_stmt_execute($stmt);
+
+    echo json_encode(["status" => "success"]);
+    exit();
+}
+
+// โหลดข้อมูลสินค้า
+$medical_equipment_sql = "SELECT * 
+    FROM equipment
+    LEFT JOIN order_equipment ON equipment.equipment_id = order_equipment.equipment_id
+    WHERE equipment.equipment_id = '$order_id'";
+$result_medical_equipment = mysqli_query($conn, $medical_equipment_sql);
+$row = mysqli_fetch_assoc($result_medical_equipment);
 ?>
 
-<html lang="en">
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -70,68 +95,36 @@ $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
     </body>
     <script>
         document.getElementById("confirm-btn").addEventListener("click", function() {
-            let orderTotal = <?php echo $order_total; ?>;
+            const urlParams = new URLSearchParams(window.location.search);
+            const equipmentId = urlParams.get("id");
+            const orderTotal = <?= $order_total ?>;
 
-            if (orderTotal > 100000) {
-                window.location.href = "approve_payment.html"; // ไปหน้าอื่นเมื่อมากกว่า 100,000
-            } else {
-                window.location.href = "success_payment.html"; // ปกติไปหน้าสำเร็จ
-            }
-        });
-
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const uploadBtn = document.getElementById("upload-btn");
-            const qrPreview = document.getElementById("qr-preview");
-            const cancelBtn = document.getElementById("cancel-btn");
-            const confirmBtn = document.getElementById("confirm-btn");
-
-            // สร้าง input สำหรับอัพโหลดไฟล์
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.accept = 'image/*';
-
-            // เมื่อมีการเลือกไฟล์
-            fileInput.addEventListener('change', () => {
-                const file = fileInput.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        qrPreview.src = e.target.result; // อัปเดตรูปภาพใน preview
-                        // แสดงปุ่มยืนยันและยกเลิกหลังจากเลือกไฟล์
-                        cancelBtn.style.display = 'inline-block';
-                        confirmBtn.style.display = 'inline-block';
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            // เมื่อคลิกที่ปุ่ม "อัพโหลด"
-            uploadBtn.addEventListener('click', () => {
-                fileInput.click(); // เปิดหน้าต่างเลือกไฟล์
-            });
-        });
-
-        function submitForm() {
-            // สามารถใช้ AJAX เพื่อส่งข้อมูลที่ต้องการก่อนเปลี่ยนหน้า
-            let formData = {
-                "key": "value"
-            };
-
-            fetch('success_payment.php', {
-                    method: 'POST',
+            fetch(window.location.href, {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json'
+                        "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify({
+                        equipment_id: equipmentId
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {
-                    // ส่งข้อมูลสำเร็จแล้ว ทำการเปลี่ยนหน้า
-                    window.location.href = 'success_payment.html'; // ไปยังไฟล์เป้าหมาย
+                    if (data.status === "success") {
+                        if (orderTotal > 100000) {
+                            window.location.href = "approve_payment.html";
+                        } else {
+                            window.location.href = "success_payment.html";
+                        }
+                    } else {
+                        alert("ไม่สามารถอัปเดตจำนวนสินค้าได้");
+                    }
                 })
-                .catch(error => console.error('Error:', error));
-        }
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+                });
+        });
     </script>
 
 </html>
