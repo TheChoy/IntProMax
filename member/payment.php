@@ -142,7 +142,7 @@ $row_result_member = mysqli_fetch_assoc($result_member);
                 <p>ค่าจัดส่ง <span class="delivery">฿ 120</span></p>
                 <p>ยอดชำระทั้งหมด <span class="totalprice">฿ 6,020</span></p>
             </div>
-            <a class="order-button2" id="tbtn" href="QRpayment.php">สั่งสินค้า</a>
+            <a class="order-button2" id="tbtn" href="QRpayment_order.php">สั่งสินค้า</a>
         </div>
     </section>
 
@@ -150,7 +150,7 @@ $row_result_member = mysqli_fetch_assoc($result_member);
     <script>
         document.getElementById("tbtn").addEventListener("click", function() {
             let totalOrderPrice = parseFloat(document.querySelector('.summary .totalprice').textContent.replace('฿', '').trim());
-            this.href = `QRpayment.php?price_total=${totalOrderPrice}`;
+            this.href = `QRpayment_order.php?price_total=${totalOrderPrice}`;
         });
 
         // 1. ประกาศราคาต่อชิ้นจากฐานข้อมูล
