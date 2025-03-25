@@ -2,9 +2,10 @@
 // กำหนดเขตเวลาให้เป็น Asia/Bangkok เพื่อให้เวลาแสดงผลถูกต้อง
 // ป้องกันปัญหาการแสดงเวลาผิดจาก Time Zone ของเซิร์ฟเวอร์
 date_default_timezone_set('Asia/Bangkok'); 
+session_start();
 
 // เชื่อมต่อฐานข้อมูล MySQL
-$con = new mysqli('localhost', 'root', '', 'intpro'); // ใช้ database intpro
+$con = new mysqli('localhost', 'root', '1234', 'intpro'); // ใช้ database intpro
 
 // ตรวจสอบการเชื่อมต่อฐานข้อมูล ถ้าล้มเหลวจะแสดงข้อความข้อผิดพลาด
 if ($con->connect_error) {
@@ -12,8 +13,8 @@ if ($con->connect_error) {
 }
 
 // ตรวจสอบว่ามีข้อมูลที่ส่งมาหรือไม่
-if (isset($_POST['title'], $_POST['type'], $_POST['newStartTime'], $_POST['newEndTime'])) {
-    $title = $_POST['title']; // ชื่อของ Event ที่ต้องการอัปเดต
+if (isset($_POST['id'], $_POST['type'], $_POST['newStartTime'], $_POST['newEndTime'])) {
+    $id = $_POST['id']; // ชื่อของ Event ที่ต้องการอัปเดต
     $type = $_POST['type']; // ประเภทของ Event (ambulance หรือ event)
     $newStartTime = $_POST['newStartTime']; // เวลาที่อัปเดตเริ่มต้นใหม่
     $newEndTime = $_POST['newEndTime']; // เวลาที่อัปเดตสิ้นสุดใหม่
@@ -30,19 +31,19 @@ if (isset($_POST['title'], $_POST['type'], $_POST['newStartTime'], $_POST['newEn
     // ตรวจสอบประเภทของ event และเลือกตารางที่ต้องอัปเดต
     if ($type === 'ambulance') {
         $sql = "UPDATE ambulance_booking 
-                SET ambulance_booking_start_time = ?, ambulance_booking_fisnish_time = ? 
-                WHERE ambulance_booking_location = ? AND ambulance_booking_date = ?";
+                SET ambulance_booking_start_time = ?, ambulance_booking_finish_time = ? 
+                WHERE ambulance_booking_id = ? LIMIT 1";
     } elseif ($type === 'event') {
         $sql = "UPDATE event_booking 
                 SET event_booking_start_time = ?, event_booking_finish_time = ? 
-                WHERE event_booking_location = ? AND event_booking_date = ?";
+                WHERE event_booking_id = ? LIMIT 1";
     } else {
         die(json_encode(['error' => 'Invalid event type']));
     }
 
     // เตรียมคำสั่ง SQL สำหรับอัปเดตข้อมูล
     $stmt = $con->prepare($sql);
-    $stmt->bind_param("ssss", $startTime, $endTime, $title, $startDate);
+    $stmt->bind_param("ssi", $startTime, $endTime, $id);
 
     // ดำเนินการอัปเดตข้อมูลลงในฐานข้อมูล
     if ($stmt->execute()) {
