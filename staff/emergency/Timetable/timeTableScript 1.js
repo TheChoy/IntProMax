@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
             url: 'update_finish_time.php', // เรียกใช้งาน PHP script ที่ใช้บันทึกเวลาสิ้นสุดของ event
             method: 'POST',
             data: {
-                title: event.title, // ชื่อของ event ที่จะอัปเดต
+                id: event.id,
                 type: event.extendedProps.type, // ประเภทของ event (ambulance หรือ event)
                 newStartTime: event.start.toISOString(), // เวลาเริ่มต้นใหม่ (ถ้ามีการลาก)
                 newEndTime: event.end.toISOString() // เวลาสิ้นสุดใหม่ที่ถูกอัปเดต
