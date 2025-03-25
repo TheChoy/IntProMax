@@ -1,6 +1,5 @@
 <?php
-
-header('Content-Type: application/text; charset=utf-8');
+header('Content-Type: application/json; charset=utf-8');
 
 //ตรวจสอบว่า JSON ที่รับมาถูกต้องหรือไม่
 function isValidJSON($str)
@@ -42,7 +41,8 @@ if (! empty($json_data['level1']) || ! empty($json_data['level2']) || ! empty($j
     if (! empty($json_data['level3'])) {
         $levelClauses[2] = "ambulance_level = '$json_data[level3]'";
     }
-}
+} 
+
 if (count($levelClauses) > 0) {
     $level = ' ( ' . implode(' OR ', $levelClauses) . ' ) ';
 }
@@ -65,62 +65,51 @@ if (! empty($json_data['cost'])) {
 
 //สร้าง string เก็บประโยค WHERE ตัวเต็มที่ได้จากการรวม $whereClauses แล้วเชื่อมด้วย AND
 $where = '';
-if (count($whereClauses) > 0) {
-    $where = ' WHERE ' . implode(' AND ', $whereClauses,) . ' AND ' . $level;
-} else {
-    $where = ' WHERE' . $level;
+if (!empty($whereClauses) && !empty($level)) {
+    $where = ' WHERE ' . implode(' AND ', $whereClauses) . ' AND ' . $level;
+} elseif (!empty($whereClauses)) {
+    $where = ' WHERE ' . implode(' AND ', $whereClauses);
+} elseif (!empty($level)) {
+    $where = ' WHERE ' . $level;
 }
 
-// echo $where;
-
-$query_all = mysqli_query($conn, 
-        "SELECT * from repair 
+$query_all = mysqli_query(
+    $conn,
+    "SELECT * , 
+        SUM(CASE WHEN ambulance_level = '1' THEN 1 ELSE 0 END) AS ambulance_level1,
+        SUM(CASE WHEN ambulance_level = '2' THEN 1 ELSE 0 END) AS ambulance_level2,
+        SUM(CASE WHEN ambulance_level = '3' THEN 1 ELSE 0 END) AS ambulance_level3
+        from repair 
         INNER JOIN ambulance on ambulance.ambulance_id = repair.ambulance_id
         INNER JOIN repair_staff on repair.repair_staff_id = repair_staff.repair_staff_id
-        $where");
+        $where
+        GROUP BY repair_type"
+);
+
 $all_data = mysqli_fetch_all($query_all, MYSQLI_ASSOC);
+
+// ---------------------------------------------------------------------------------
+// เตรียมข้อมูลสำหรับแสดงผลในกราฟ
+$labels = [];
+$level1Data = [];
+$level2Data = [];
+$level3Data = [];
+
+foreach ($all_data as $row) {
+    $labels[] = $row['repair_type'];
+    $level1Data[] = $row['ambulance_level1'];
+    $level2Data[] = $row['ambulance_level2'];
+    $level3Data[] = $row['ambulance_level3'];
+}
+
+echo json_encode([
+    'labels' => $labels,
+    'level1Data' => $level1Data,
+    'level2Data' => $level2Data,
+    'level3Data' => $level3Data,
+]);
+
+// ---------------------------------------------------------------------------------
 
 ?>
 
-<table>
-    <thead>
-        <tr>
-            <th>ทะเบียนรถพยาบาล</th>
-            <th>ระดับรถ</th>
-            <th>บันทึกโดย</th>
-            <th>วันที่บันทึก(ว-ด-ป)</th>
-            <th>วันที่ซ่อมเสร็จ</th>
-            <th>ประเภทการซ่อม</th>
-            <th>สาเหตุ</th>
-            <th>อุปกรณ์/อะไหล่</th>
-            <th>สถานะการซ่อม</th>
-            <th>ค่าใช้จ่าย(บาท)</th>
-        </tr>
-    </thead>
-    <tbody>
-            <!-- เมื่อเข้ามาครั้งแรก จะแสดงข้อมูลทั้งหมดจากตาราง repair -->
-            <?php foreach ($all_data as $rs_result) { ?>
-        <tr>
-            <td><?php echo $rs_result['ambulance_plate']; ?></td>
-            <td><?php echo $rs_result['ambulance_level']; ?></td>
-
-            <td><?php echo $rs_result['repair_staff_firstname']; ?></td>
-            <td><?php echo $rs_result['repair_date']; ?></td>
-            <td><?php echo $rs_result['repair_success_datetime']; ?></td>
-
-            <td><?php echo $rs_result['repair_type']; ?></td>
-            <td><?php echo $rs_result['repair_reason']; ?></td>
-            <td><?php echo $rs_result['repair_repairing']; ?></td>
-            <td><?php echo $rs_result['repair_status']; ?></td>
-            <td>
-                <?php if ($rs_result['repair_cost'] == '0') { ?>
-                    <?php echo "-" ?>
-                <?php } else { ?>
-                    <?php echo $rs_result['repair_cost'] ?>
-                <?php } ?>
-            </td>
-        </tr>
-    <?php } ?>
-
-    </tr>
-</table>

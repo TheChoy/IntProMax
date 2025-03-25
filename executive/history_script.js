@@ -1,9 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   // ดึงตัวรับ input จากหน้าเว็บด้วย id เพื่อใส่ eventListener (filterTable)
-  // ประเภท
-  const filterType = document.getElementById("select_type");
-  filterType.addEventListener('input', filterTable);
 
   // วันที่
   const filterDate1 = document.getElementById("calendarSelect1");
@@ -18,6 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
   filterLevel2.addEventListener('input', filterTable);
   const filterLevel3 = document.getElementById("level_select3");
   filterLevel3.addEventListener('input', filterTable);
+
+  // ประเภท
+  const filterType = document.getElementById("select_type");
+  filterType.addEventListener('input', filterTable);
 
   //เหตุผล
   const filterReason = document.getElementById("reason_select");
@@ -63,76 +64,24 @@ document.addEventListener('DOMContentLoaded', () => {
   //-----------------------------------------------------------------
 
   // รับค่าจาก PHP จากตัวแปรที่เราตั้งไว้ใน <script> ขอ history_fixed_page.php
-  const { allAmbu, readyAmbu, notReadyAmbu, ambuLabels, ambuCars, typeLabels, typeCounts } = ambuData;
+  const { allAmbu, readyAmbu, notReadyAmbu } = ambuData;
 
   // คำนวณ % รถที่ไม่พร้อมต่อจำนวนรถทั้งหมด
   let percent = (notReadyAmbu / allAmbu) * 100;
+  console.log("percent: ", percent);
 
   // ถ้า % รถที่ไม่พร้อมมากกว่า 65 ให้ขึ้นแจ้งเตือน
   if (percent > 65) {
     alert("รถพยาบาลไม่พร้อมใช้งานมากกว่า 65%");
+
   }
-  // console.log(percent);
-
-  console.log("AmbuData:", ambuData);
-
-
-  //----------------------------
-  // Bar Chart แสดงจำนวนครั้งการซ่อมของรถแต่ละคัน
-  const AmbuChart = new Chart(document.getElementById("ambulance_fixed"), {
-    type: 'bar',
-    data: {
-      labels: ambuLabels,
-      datasets: [{
-        label: 'จำนวนครั้งที่ซ่อม',
-        data: ambuCars,
-        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      plugins: {
-        title: {
-          display: true,
-          text: 'จำนวนการซ่อมรถพยาบาล level 1-3'
-        }
-      }
-    }
-  });
-
-  //----------------------------
-  // Doughnut Chart แสดงสัดส่วนประเภทการซ่อมทั้งหมด
-  const TypeChart = new Chart(document.getElementById("type_fixed"), {
-    type: 'doughnut',
-    data: {
-      labels: typeLabels,
-      datasets: [{
-        label: 'จำนวน',
-        data: typeCounts,
-        backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)'],
-        borderColor: 'rgb(166, 169, 175)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      plugins: {
-        title: {
-          display: true,
-          text: 'สัดส่วนของประเภทการซ่อม'
-        }
-      }
-    }
-  });
-
+  
 });
-
 
 async function filterTable() {
 
-
   //ดึง id ของ div ที่ต้องการแสดงผลลัพธ์จากการกรอง
-  const contentDiv = document.getElementById("main-content");
+  const contentDiv = document.getElementById("contentDiv");
 
   //รับค่าที่ user ใส่มา
   const filterDate1 = document.getElementById("calendarSelect1").value;
@@ -169,11 +118,11 @@ async function filterTable() {
     "cost": filterCost
   }
 
-  console.log(data);
-
+  console.log("data: " , data);
+  
 
   //ส่งข้อมูลไปที่ filter_result.php ด้วย fetch API ในรูปแบบ JSON
-  await fetch("filterFixed.php", {
+  await fetch("filterFixed copy.php", {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
@@ -182,8 +131,12 @@ async function filterTable() {
   })
     //รับข้อมูลที่ส่งกลับมาเป็น text
     .then((response) => response.text())
-    //แสดงข้อมูลที่ได้ใน div ที่กำหนดไว้
-    .then((text) => contentDiv.innerHTML = text)
+    .then((responseData) => {
+      //ตรวจสอบข้อมูลที่รับกลับมา
+      console.log("resData ", responseData);
+      //เรียกใช้ฟังก์ชั่นที่ชื่อว่า JSONparse และส่งข้อมูลที่รับกลับมาไปให้ ()
+      JSONparse(responseData);
+  });
 
 }
 
