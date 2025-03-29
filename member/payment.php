@@ -149,22 +149,40 @@ $row_result_member = mysqli_fetch_assoc($result_member);
                 <p>ค่าจัดส่ง <span class="delivery">฿ 120</span></p>
                 <p>ยอดชำระทั้งหมด <span class="totalprice">฿ 6,020</span></p>
             </div>
-            <a class="order-button2" id="tbtn" href="QRpayment_order.php">สั่งสินค้า</a>
+            <button class="order-button2" id="tbtn">สั่งสินค้า</button>
         </div>
     </section>
 
 
     <script>
-      document.getElementById("tbtn").addEventListener("click", function() {
-    let totalOrderPrice = parseFloat(document.querySelector('.summary .totalprice').textContent.replace('฿', '').trim());
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTotalPrice(); // คำนวณราคา
 
-    // ดึง equipment_id จาก URL (ถ้ามี)
-    const urlParams = new URLSearchParams(window.location.search);
-    const equipmentId = urlParams.get("id"); // เช่นจาก shopping.php?id=5
+            // ตรวจสอบว่า stock เหลือ 0 หรือไม่ (จาก PHP ฝังไว้)
+            const stockLeft = <?= $row['equipment_quantity'] ?>;
 
-    // ส่ง price_total + equipment_id ไปหน้า QRpayment
-    this.href = `QRpayment_order.php?price_total=${totalOrderPrice}&id=${equipmentId}`;
-});
+            if (stockLeft <= 0) {
+                alert("สินค้าหมดแล้ว");
+                window.location.href = "shopping.php";
+            }
+        });
+
+
+        document.getElementById("tbtn").addEventListener("click", function() {
+            let totalOrderPrice = parseFloat(document.querySelector('.summary .totalprice').textContent.replace('฿', '').trim());
+            const payment_quantity = parseInt(document.querySelector(".quantity-input").value || 1); // จำนวนสินค้าที่เลือก
+            // ดึง equipment_id จาก URL (ถ้ามี)
+            const urlParams = new URLSearchParams(window.location.search);
+            const equipmentId = urlParams.get("id"); // เช่นจาก shopping.php?id=5
+
+            // ส่ง price_total + equipment_id ไปหน้า QRpayment
+            fetch_order_equipment(formData).then((response) => {
+                const orderId = response.order_equipment_id;
+                window.location.href = `QRpayment_order.php?price_total=${totalOrderPrice}&id=${equipmentId}&quantity=${payment_quantity}&order_equipment_id=${orderId}`;
+            });
+
+
+        });
 
         // 1. ประกาศราคาต่อชิ้นจากฐานข้อมูล
         const pricePerItem = parseFloat("<?= $row['equipment_price_per_unit'] ?>"); // ราคาต่อชิ้นจากฐานข้อมูล
@@ -322,60 +340,50 @@ $row_result_member = mysqli_fetch_assoc($result_member);
 
         // รับข้อมูล
         document.getElementById("tbtn").addEventListener("click", function() {
-            let payment_quantity = parseInt(document.querySelector(".quantity-input").value);
-            let payment_cost = parseInt(document.querySelector(".cost").textContent.replace("฿", "").trim()) / payment_quantity;
-            let payment_rent_months = parseInt(document.querySelector(".installment-input").value)
-            let payment_totalprice = parseInt(document.querySelector(".totalprice").textContent.replace("฿", "").trim());
-            // ดึงค่าจาก URL
+            let totalOrderPrice = parseFloat(document.querySelector('.summary .totalprice').textContent.replace('฿', '').trim());
+            const payment_quantity = parseInt(document.querySelector(".quantity-input").value || 1);
+
             const urlParams = new URLSearchParams(window.location.search);
-            const equipment_id = urlParams.get("id");
+            const equipmentId = urlParams.get("id");
             const member_id = urlParams.get("member_id");
 
-
-
-
-
-            console.log("Quantity:", payment_quantity);
-            console.log("Cost per unit:", payment_cost);
-            console.log("Purchase Type:", payment_purchase);
-            console.log("Installment Months:", payment_rent_months);
-            console.log("Payment Type:", payment_type);
-            console.log("Total Price:", payment_totalprice);
-            console.log("Equipment ID:", equipment_id);
-            console.log("Member ID:", member_id);
+            // ✅ คำนวณราคาต่อหน่วยใหม่ก่อนใช้
+            let payment_cost = pricePerItem;
+            let payment_rent_months = parseInt(document.querySelector(".installment-input").value || 0);
 
             let formData = {
                 "member_id": member_id,
-                "equipment_id": equipment_id,
+                "equipment_id": equipmentId,
                 "order_equipment_type": payment_purchase,
                 "order_equipment_price": payment_cost,
                 "order_equipment_quantity": payment_quantity,
-                "order_equipment_total": payment_totalprice,
+                "order_equipment_total": totalOrderPrice,
                 "order_equipment_buy_type": payment_type,
                 "order_equipment_months": payment_rent_months
-            }
+            };
 
-            fetch_order_equipment(formData);
-
-        });
-
-        const fetch_order_equipment = function(formData) {
+            // ✅ ส่งข้อมูล แล้ว redirect พร้อม order_equipment_id
             fetch('insert_order.php', {
-                    "method": 'POST',
-                    "headers": {
-                        "Content-Type": "application/json; chatset=utf-8"
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
                     },
-                    "body": JSON.stringify(formData)
+                    body: JSON.stringify(formData)
                 })
-                .then(response => response.text()) // รับข้อมูลกลับจาก PHP
+                .then(response => response.json())
                 .then(data => {
-                    console.log("Response from PHP:", data); // ดูข้อมูลจาก PHP
+                    if (data.status === "success") {
+                        const order_equipment_id = data.order_equipment_id;
+                        window.location.href = `QRpayment_order.php?price_total=${totalOrderPrice}&id=${equipmentId}&quantity=${payment_quantity}&order_equipment_id=${order_equipment_id}`;
+                    } else {
+                        alert("เกิดข้อผิดพลาดในการสั่งซื้อ");
+                    }
                 })
                 .catch(error => {
-                    console.error('Error:', error); // หากเกิดข้อผิดพลาด
+                    console.error("Error:", error);
+                    alert("เชื่อมต่อกับเซิร์ฟเวอร์ไม่ได้");
                 });
-
-        }
+        });
     </script>
 </body>
 
