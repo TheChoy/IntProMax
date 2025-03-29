@@ -1,30 +1,72 @@
 <?php
 include 'username.php';
 
+// รับข้อมูลจากไคลเอนต์
 $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
 $order_id = isset($_GET['id']) ? $_GET['id'] : 0;
 
-// หากกดยืนยันแล้วให้ลด stock
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // รับข้อมูล JSON ที่ส่งมาจากไคลเอนต์
     $data = json_decode(file_get_contents("php://input"), true);
     $equipment_id = isset($data['equipment_id']) ? (int)$data['equipment_id'] : 0;
 
-    $sql = "UPDATE equipment SET equipment_quantity = equipment_quantity - 1 WHERE equipment_id = ?";
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "i", $equipment_id);
-    mysqli_stmt_execute($stmt);
+    if ($equipment_id > 0 && $order_id > 0) {
+        // ดึงข้อมูล order_equipment_quantity จากฐานข้อมูลโดยใช้ order_id
+        $sql_order = "SELECT order_equipment_quantity FROM order_equipment WHERE order_equipment_id = ?";
+        $stmt_order = mysqli_prepare($conn, $sql_order);
+        if ($stmt_order) {
+            mysqli_stmt_bind_param($stmt_order, "i", $order_id);
+            mysqli_stmt_execute($stmt_order);
+            mysqli_stmt_bind_result($stmt_order, $order_equipment_quantity);
+            mysqli_stmt_fetch($stmt_order);
+            mysqli_stmt_close($stmt_order);
 
-    echo json_encode(["status" => "success"]);
-    exit();
+            // ตรวจสอบค่าของ order_equipment_quantity ว่าไม่เป็น null หรือ 0
+            if (is_null($order_equipment_quantity) || $order_equipment_quantity <= 0) {
+                echo json_encode(["status" => "error", "message" => "Invalid order quantity"]);
+                exit;
+            }
+
+            // ตรวจสอบสต็อกสินค้าก่อนการอัปเดต
+            $sql_check_stock = "SELECT equipment_quantity FROM equipment WHERE equipment_id = ?";
+            $stmt_check_stock = mysqli_prepare($conn, $sql_check_stock);
+            mysqli_stmt_bind_param($stmt_check_stock, "i", $equipment_id);
+            mysqli_stmt_execute($stmt_check_stock);
+            mysqli_stmt_bind_result($stmt_check_stock, $equipment_quantity);
+            mysqli_stmt_fetch($stmt_check_stock);
+            mysqli_stmt_close($stmt_check_stock);
+
+            // หากสต็อกไม่เพียงพอ ให้ยกเลิก
+            if ($equipment_quantity < $order_equipment_quantity) {
+                echo json_encode(["status" => "error", "message" => "Not enough stock for equipment ID: $equipment_id"]);
+                exit;
+            }
+
+            // อัปเดตจำนวนสินค้าในตาราง equipment โดยลดตาม order_equipment_quantity
+            $sql_update_stock = "UPDATE equipment
+                                 SET equipment_quantity = equipment_quantity - ?
+                                 WHERE equipment_id = ? AND equipment_quantity >= ?";
+            $stmt_update_stock = mysqli_prepare($conn, $sql_update_stock);
+            if ($stmt_update_stock) {
+                mysqli_stmt_bind_param($stmt_update_stock, "iii", $order_equipment_quantity, $equipment_id, $order_equipment_quantity);
+                mysqli_stmt_execute($stmt_update_stock);
+
+                // ตรวจสอบว่ามีการเปลี่ยนแปลงข้อมูลหรือไม่
+                if (mysqli_affected_rows($conn) > 0) {
+                    echo json_encode(["status" => "success", "message" => "Stock updated"]);
+                } else {
+                    echo json_encode(["status" => "error", "message" => "No stock updated or equipment not found"]);
+                }
+
+                mysqli_stmt_close($stmt_update_stock);
+                exit;
+            } else {
+                echo json_encode(["status" => "error", "message" => "Database error during stock update"]);
+                exit;
+            }
+        }
+    }
 }
-
-// โหลดข้อมูลสินค้า
-$medical_equipment_sql = "SELECT * 
-    FROM equipment
-    LEFT JOIN order_equipment ON equipment.equipment_id = order_equipment.equipment_id
-    WHERE equipment.equipment_id = '$order_id'";
-$result_medical_equipment = mysqli_query($conn, $medical_equipment_sql);
-$row = mysqli_fetch_assoc($result_medical_equipment);
 ?>
 
 <!DOCTYPE html>
@@ -96,8 +138,8 @@ $row = mysqli_fetch_assoc($result_medical_equipment);
     <script>
         document.getElementById("confirm-btn").addEventListener("click", function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const equipmentId = urlParams.get("id");
-            const orderTotal = <?= $order_total ?>;
+            const equipmentId = urlParams.get("id"); // ค่าที่ได้จาก URL
+            const orderTotal = <?= $order_total ?>; // ตัวแปรที่ได้จาก PHP
 
             fetch(window.location.href, {
                     method: "POST",
@@ -105,7 +147,7 @@ $row = mysqli_fetch_assoc($result_medical_equipment);
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        equipment_id: equipmentId
+                        equipment_id: equipmentId // ส่ง equipment_id ไปยัง PHP
                     })
                 })
                 .then(response => response.json())
@@ -117,7 +159,7 @@ $row = mysqli_fetch_assoc($result_medical_equipment);
                             window.location.href = "success_payment.html";
                         }
                     } else {
-                        alert("ไม่สามารถอัปเดตจำนวนสินค้าได้");
+                        alert("ไม่สามารถอัปเดตจำนวนสินค้าได้: " + data.message);
                     }
                 })
                 .catch(error => {

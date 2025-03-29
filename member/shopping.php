@@ -1,7 +1,7 @@
 <?php
 include 'username.php'; // เชื่อมต่อฐานข้อมูล
 
-// // รับค่าจาก URL
+// รับค่าจาก URL
 $searchQuery = isset($_GET['q']) ? trim($_GET['q']) : '';
 $categoryFilter = isset($_GET['category']) ? trim($_GET['category']) : '';
 $minPrice = isset($_GET['minPrice']) ? (int)$_GET['minPrice'] : 0;

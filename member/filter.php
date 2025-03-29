@@ -31,13 +31,13 @@ if (! empty($json_data['category'])) {
     $whereClauses[0] = "equipment_type = '$json_data[category]' AND";
 }
 
-$whereClauses[1] = " equipment_price BETWEEN '$json_data[minPrice]' AND '$json_data[maxPrice]'";
+$whereClauses[1] = " equipment_price_per_unit BETWEEN '$json_data[minPrice]' AND '$json_data[maxPrice]'";
 
 if (! empty($json_data['priceSort'])) {
     if ($json_data['priceSort'] === "first") {
-        $whereClauses[2] = "ORDER BY equipment_price DESC";
+        $whereClauses[2] = "ORDER BY equipment_price_per_unit DESC";
     } elseif ($json_data['priceSort'] === "basic") {
-        $whereClauses[2] = "ORDER BY equipment_price ASC";
+        $whereClauses[2] = "ORDER BY equipment_price_per_unit ASC";
     }
 }
 
@@ -63,7 +63,7 @@ $result = mysqli_query($conn, "SELECT * FROM equipment $where");
                 <img src="image/<?= $row['equipment_image'] ?>" alt="<?= $row['equipment_name'] ?>">
                 <br><br>
                 <p><?= $row['equipment_name'] ?></p>
-                <p class="cost">฿ <?= number_format($row['equipment_price'],) ?></p>
+                <p class="cost">฿ <?= number_format($row['equipment_price_per_unit'],) ?></p>
             </a>
         </div>
         <?php
