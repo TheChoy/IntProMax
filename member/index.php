@@ -1,13 +1,19 @@
 <?php
+
+//-----------Session and Login-------------
 session_start();
+include 'username.php';
 
 // ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
-// if (!isset($_SESSION['user_id'])) {
-//     header("Location: login_form.php");
-//     exit();
-// }
+if (empty($_SESSION['logged_in'])) {
+    header("Location: ../login.php");
+    exit();
+}
 
-// $user_id = $_SESSION['user_id']; // ดึงค่า user_id จาก session
+// เรียก member_id จาก session มาใช้ :
+// $_SESSION['user_id'];
+//------------------------------------------
+
 ?>
 
 <html lang="th">
@@ -23,6 +29,7 @@ session_start();
 </head>
 <div class="top-navbar">
     <nav class="nav-links">
+        
         <div><a href="order_emergency.php">ชำระเงินเคสฉุกเฉิน</a></div>
         <div><a href="contact.html">ติดต่อเรา</a></div>
         <div class="dropdown">
@@ -31,7 +38,7 @@ session_start();
                 <a href="profile.html">โปรไฟล์</a>
                 <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
                 <a href="claim.php?user_id=<?php echo $user_id; ?>">เคลมสินค้า</a>
-                <a href="logout.html">ออกจากระบบ</a>
+                <a href="../logout.php">ออกจากระบบ</a>
             </div>
         </div>
         <a href="index.php">
@@ -60,6 +67,10 @@ session_start();
 </div>
 
 <body>
+
+    <div class="container">
+        <h1>ยินดีต้อนรับ <?php echo $_SESSION['user_email']; ?></h1>
+    </div>
 
 </body>
 

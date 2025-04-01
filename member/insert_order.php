@@ -1,5 +1,17 @@
 <?php
-include('username.php');
+//-----------Session and Login-------------
+session_start();
+include 'username.php';
+
+// ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
+if (empty($_SESSION['logged_in'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+// เรียก member_id จาก session มาใช้ :
+// $_SESSION['user_id'];
+//------------------------------------------
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $data = file_get_contents("php://input");

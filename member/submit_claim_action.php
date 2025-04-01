@@ -1,5 +1,18 @@
 <?php
+//-----------Session and Login-------------
 session_start();
+include 'username.php';
+
+// ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
+if (empty($_SESSION['logged_in'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+// เรียก member_id จาก session มาใช้ :
+// $_SESSION['user_id'];
+//------------------------------------------
+
 //รับค่าจากฟอร์ม
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //ตรวจว่าได้รับค่ามามั้ย print_r($_POST);
@@ -13,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
  // รับค่า "เคลม" หรือ "ต่ออายุการใช้งาน"
     $reason = htmlspecialchars($_POST['reason']); // เหตุผลจากฟอร์ม
     $equipment_id = $_POST['equipment']; // สมมติว่าเรามี id ของอุปกรณ์การแพทย์จาก URL หรือ session
-    $member_id = 1; // สมมติ
+    $member_id = $_SESSION['user_id']; // สมมติ
     $executive_id = 1; // สมมติ
     // $member_id = $_SESSION['member_id']; // ดึง ID สมาชิกจาก session หลัง loginรอทำlogin
     $approve_status = "รออนุมัติ"; // สถานะการอนุมัติของผู้บริหาร

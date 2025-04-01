@@ -26,7 +26,7 @@ $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
                     <a href="profile.html">โปรไฟล์</a>
                     <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
-                    <a href="logout.html">ออกจากระบบ</a>
+                    <a href="../logout.php">ออกจากระบบ</a>
                 </div>
             </div>
             <a href="index.php">

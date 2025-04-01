@@ -52,7 +52,6 @@ $result = mysqli_query($conn, "SELECT * FROM equipment $where");
 
 ?>
 
-
 <!-- ส่งข้อมูลด้านล่างนี้ไปแสดงที่ div id="prodContian" ในหน้า shopping.php -->
 <section class="product-container">
     <?php   

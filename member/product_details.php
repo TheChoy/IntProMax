@@ -1,3 +1,19 @@
+<?php 
+//-----------Session and Login-------------
+session_start();
+include 'username.php';
+
+// ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
+if (empty($_SESSION['logged_in'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+// เรียก member_id จาก session มาใช้ :
+// $_SESSION['user_id'];
+//------------------------------------------
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,7 +40,7 @@
                     <a href="profile.html">โปรไฟล์</a>
                     <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
-                    <a href="logout.html">ออกจากระบบ</a>
+                    <a href="../logout.php">ออกจากระบบ</a>
                 </div>
             </div>
             <a href="index.php">
@@ -61,7 +77,7 @@
         $result = mysqli_query($conn, $sql);
         $row = mysqli_fetch_assoc($result);
         ?>
-
+ 
         <!-- แสดงภาพสินค้าจากฐานข้อมูล -->
         <div>
             <img src="image/<?= $row['equipment_image'] ?>" alt="">
@@ -88,8 +104,8 @@
 
         <!-- ปุ่มที่ให้ผู้ใช้เพิ่มสินค้าลงในตะกร้า หรือยืนยันการสั่งซื้อ -->
         <div class="order-buttons">
-            <a href="order.php?id=<?= $row['equipment_id'] ?>">เพิ่มไปยังตะกร้า</a> <!-- ปุ่มเพิ่มสินค้าลงในตะกร้า -->
-            <a href="payment.php?id=<?= $row['equipment_id'] ?>&member_id=<?= rand(1, 10) ?>">ยืนยันการสั่งซื้อ</a> <!-- ปุ่มยืนยันการสั่งซื้อ -->
+            <a class="add-to-cart">เพิ่มไปยังตะกร้า</a> <!-- ปุ่มเพิ่มสินค้าลงในตะกร้า -->
+            <a href="payment.php?id=<?= $row['equipment_id'] ?>&member_id=<?= $_SESSION['user_id'] ?>">ยืนยันการสั่งซื้อ</a> <!-- ปุ่มยืนยันการสั่งซื้อ -->
             <!-- <a href="paymenttest.php?id=<?= $row['equipment_id'] ?>&member_id=1">ยืนยันการสั่งซื้อ</a> -->
         </div>
     </section>
