@@ -71,7 +71,7 @@ include 'username.php';
                         $m = 1;
                         for ($i = 0; $i < (int)$_SESSION["intLine"]; $i++) {
                             if (($_SESSION["strProductID"][$i]) != "") {
-                                $sql1 = "SELECT * FROM equipment WHERE equipment_id = '" . $_SESSION["strProductID"][$i] . "'";
+                                $sql1 = "select * from equipment WHERE equipment_id = '" . $_SESSION["strProductID"][$i] . "'";
                                 $result1 = mysqli_query($conn, $sql1);
                                 $row_equip = mysqli_fetch_array($result1);
 
@@ -88,10 +88,11 @@ include 'username.php';
                                     </td>
                                     <td><?= number_format($row_equip['equipment_price_per_unit'], 2) ?></td> <!-- แสดงราคาต่อหน่วย -->
                                     <td><?= $_SESSION['strQty'][$i] ?></td>
-                                    <td><?= number_format($sum, 2) ?></td> <!-- แสดงราคาสินค้ารวมต่อแถว -->
+                                    <td><?= number_format($sum, 2) ?></td>
+                                    <td><img src="image/delete.png" width="30" height="30"></td>
                                 </tr>
                         <?php
-                                $m++;
+                                $m = $m + 1;
                             }
                         }
                         ?>
