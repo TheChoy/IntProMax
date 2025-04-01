@@ -1,6 +1,16 @@
 <?php
 session_start();
 include 'username.php';
+
+// ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
+if (empty($_SESSION['logged_in'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+// เรียก member_id จาก session มาใช้
+$member_id = $_SESSION['user_id'];
+//------------------------------------------
 ?>
 
 <html lang="en">
@@ -47,7 +57,7 @@ include 'username.php';
         </nav>
 
         <div class="cart-icon">
-            <a href="cart.html">
+            <a href="cart.php">
                 <i class="fas fa-shopping-cart"></i>
             </a>
         </div>

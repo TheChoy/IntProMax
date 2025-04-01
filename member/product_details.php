@@ -104,7 +104,7 @@ if (empty($_SESSION['logged_in'])) {
 
         <!-- ปุ่มที่ให้ผู้ใช้เพิ่มสินค้าลงในตะกร้า หรือยืนยันการสั่งซื้อ -->
         <div class="order-buttons">
-            <a class="add-to-cart">เพิ่มไปยังตะกร้า</a> <!-- ปุ่มเพิ่มสินค้าลงในตะกร้า -->
+            <a class="add-to-cart" href="order.php?id=<?= $row['equipment_id'] ?>">เพิ่มไปยังตะกร้า</a> <!-- ปุ่มเพิ่มสินค้าลงในตะกร้า -->
             <a href="payment.php?id=<?= $row['equipment_id'] ?>&member_id=<?= $_SESSION['user_id'] ?>">ยืนยันการสั่งซื้อ</a> <!-- ปุ่มยืนยันการสั่งซื้อ -->
             <!-- <a href="paymenttest.php?id=<?= $row['equipment_id'] ?>&member_id=1">ยืนยันการสั่งซื้อ</a> -->
         </div>
