@@ -61,7 +61,7 @@
         $result = mysqli_query($conn, $sql);
         $row = mysqli_fetch_assoc($result);
         ?>
- 
+
         <!-- แสดงภาพสินค้าจากฐานข้อมูล -->
         <div>
             <img src="image/<?= $row['equipment_image'] ?>" alt="">
@@ -88,7 +88,7 @@
 
         <!-- ปุ่มที่ให้ผู้ใช้เพิ่มสินค้าลงในตะกร้า หรือยืนยันการสั่งซื้อ -->
         <div class="order-buttons">
-            <a class="add-to-cart">เพิ่มไปยังตะกร้า</a> <!-- ปุ่มเพิ่มสินค้าลงในตะกร้า -->
+            <a href="order.php?id=<?= $row['equipment_id'] ?>">เพิ่มไปยังตะกร้า</a> <!-- ปุ่มเพิ่มสินค้าลงในตะกร้า -->
             <a href="payment.php?id=<?= $row['equipment_id'] ?>&member_id=<?= rand(1, 10) ?>">ยืนยันการสั่งซื้อ</a> <!-- ปุ่มยืนยันการสั่งซื้อ -->
             <!-- <a href="paymenttest.php?id=<?= $row['equipment_id'] ?>&member_id=1">ยืนยันการสั่งซื้อ</a> -->
         </div>

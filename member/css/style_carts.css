@@ -158,3 +158,37 @@ body {
     color: #2D5696;
     /* เปลี่ยนสีเมื่อเมาส์ไปวาง */
 }
+
+.order-buttons {
+    position: auto;
+    bottom: 100px;    /* เพิ่มระยะห่างจากด้านล่าง */
+    left: 500px;     /* เพิ่มระยะห่างจากด้านขวา */
+    display: flex;
+    gap: 10px;
+    z-index: 100; /* ให้ปุ่มอยู่เหนือเนื้อหาของตาราง */
+}
+
+.order-buttons a {
+    background-color: #F8E6DE;
+    color: black;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.order-buttons .add-to-cart {
+    background-color: #F8E6DE;
+}
+
+.order-buttons .confirm-order {
+    background-color: #FFB898;
+}
+
+.order-buttons a:hover {
+    background-color: #fc9362;
+}
