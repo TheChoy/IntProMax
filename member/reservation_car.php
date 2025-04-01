@@ -46,7 +46,7 @@ include("username.php");
         <div><a href="shopping.php">ซื้อ/เช่าอุปกรณ์ทางการแพทย์</a></div>
     </nav>
     <div class="cart-icon">
-        <a href="cart.html">
+        <a href="cart.php">
             <i class="fas fa-shopping-cart"></i>
         </a>
     </div>

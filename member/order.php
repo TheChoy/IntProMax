@@ -8,7 +8,7 @@ if(!isset($_SESSION["intLine"]))    //เช็คว่าแถวเป็น
 	 $_SESSION["intLine"] = 0;
 	 $_SESSION["strProductID"][0] = $_GET["id"];   //รหัสสินค้า
 	 $_SESSION["strQty"][0] = 1;                   //จำนวนสินค้า
-	 header("location:paymenttest1.php");
+	 header("location:cart.php");
 }
 else
 {
@@ -25,6 +25,6 @@ else
 		 $_SESSION["strProductID"][$intNewLine] = $_GET["id"];
 		 $_SESSION["strQty"][$intNewLine] = 1;
 	}
-	 header("location:paymenttest1.php");
+	 header("location:cart.php");
 }
 ?>

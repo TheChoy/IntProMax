@@ -46,7 +46,7 @@ $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
         </nav>
 
         <div class="cart-icon">
-            <a href="cart.html">
+            <a href="cart.php">
                 <i class="fas fa-shopping-cart"></i>
             </a>
         </div>

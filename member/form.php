@@ -67,7 +67,7 @@ $conn->close();
         </nav>
 
         <div class="cart-icon">
-            <a href="cart.html">
+            <a href="cart.php">
                 <i class="fas fa-shopping-cart"></i>
             </a>
         </div>
