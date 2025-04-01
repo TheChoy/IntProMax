@@ -105,7 +105,6 @@ include 'username.php';
             </div>
         </form>
     </div>
-    <script src="javascrip_member/cart.js"></script>
 </body>
 
 </html>
