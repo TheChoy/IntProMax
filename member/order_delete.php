@@ -15,7 +15,7 @@ if (!isset($_SESSION["intLine"]))    //เช็คว่าแถวเป็�
 
 	$key = array_search($_GET["id"], $_SESSION["strProductID"]);
 	if ((string)$key != "") {
-		$_SESSION["strQty"][$key] = $_SESSION["strQty"][$key] + 1;
+		$_SESSION["strQty"][$key] = $_SESSION["strQty"][$key] - 1;
 	} else {
 		$_SESSION["intLine"] = $_SESSION["intLine"] + 1;
 		$intNewLine = $_SESSION["intLine"];

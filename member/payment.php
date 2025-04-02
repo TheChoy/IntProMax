@@ -1,18 +1,5 @@
 <?php
-//-----------Session and Login-------------
-session_start();
 include 'username.php';
-
-// ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
-if (empty($_SESSION['logged_in'])) {
-    header("Location: ../login.php");
-    exit();
-}
-
-// เรียก member_id จาก session มาใช้ :
-// $_SESSION['user_id'];
-//------------------------------------------
-
 $ids = $_GET['id'];
 
 // get medical_equipment table
@@ -30,8 +17,8 @@ if ($row['equipment_quantity'] == 0) {
 }
 
 // get member
-$member_id = $_GET['member_id'];
-$member_sql = "SELECT * FROM member WHERE member_id = $member_id";
+$random_memeber = $_GET['member_id'];
+$member_sql = "SELECT * FROM member WHERE member_id = $random_memeber";
 $result_member = mysqli_query($conn, $member_sql);
 $row_result_member = mysqli_fetch_assoc($result_member);
 ?>
@@ -59,7 +46,7 @@ $row_result_member = mysqli_fetch_assoc($result_member);
                     <a href="profile.html">โปรไฟล์</a>
                     <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
-                    <a href="../logout.php">ออกจากระบบ</a>
+                    <a href="logout.html">ออกจากระบบ</a>
                 </div>
             </div>
             <a href="index.php">

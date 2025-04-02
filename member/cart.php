@@ -67,6 +67,10 @@ $member_id = $_SESSION['user_id'];
         <form id="form1" method="POST" action="">
             <div class="div row">
                 <div class="col-md-10">
+                    <br>
+                    <div class="alert alert-primary h4" role="alert">
+                        การสั่งซื้ออุปกรณ์ทางการแพทย์
+                    </div>
                     <table class="table table-hover">
                         <tr>
                             <th>ลำดับสินค้า</th>
@@ -74,12 +78,13 @@ $member_id = $_SESSION['user_id'];
                             <th>ราคา</th>
                             <th>จำนวน</th>
                             <th>ราคารวม</th>
+                            <th>ลบ</th>
                         </tr>
                         <?php
                         $Total = 0;
                         $sumPrice = 0;
                         $m = 1;
-                        for ($i = 0; $i < (int)$_SESSION["intLine"]; $i++) {
+                        for ($i = 0; $i <= (int)$_SESSION["intLine"]; $i++) {
                             if (($_SESSION["strProductID"][$i]) != "") {
                                 $sql1 = "select * from equipment WHERE equipment_id = '" . $_SESSION["strProductID"][$i] . "'";
                                 $result1 = mysqli_query($conn, $sql1);
@@ -97,15 +102,27 @@ $member_id = $_SESSION['user_id'];
                                         <?= $row_equip['equipment_name'] ?>
                                     </td>
                                     <td><?= number_format($row_equip['equipment_price_per_unit'], 2) ?></td> <!-- แสดงราคาต่อหน่วย -->
-                                    <td><?= $_SESSION['strQty'][$i] ?></td>
+                                    <td><a href="order.php?id=<?= $row_equip['equipment_id'] ?>" class="btn btn-outline-primary">+</a> <?= $_SESSION['strQty'][$i] ?>
+                                        <a href="order_delete.php?id=<?= $row_equip['equipment_id'] ?>" class="btn btn-outline-primary">-</a>
+                                    </td>
                                     <td><?= number_format($sum, 2) ?></td>
-                                    <td><img src="image/delete.png" width="30" height="30"></td>
+                                    <td><a href="equipment_delete.php?Line=<?= $i ?>"><img src="image/delete.png" width="30"></a></td>
                                 </tr>
                         <?php
                                 $m = $m + 1;
                             }
                         }
                         ?>
+                        <tr>
+                            <td class="text-end" colspan="4">ค่าจัดส่ง</td>
+                            <td>120</td>
+                            <td>บาท</td>
+                        </tr>
+                        <tr>
+                            <td class="text-end" colspan="4">รวมเป็นเงิน</td>
+                            <td><?= number_format($sumPrice + 120, 2) ?></td>
+                            <td>บาท</td>
+                        </tr>
                     </table>
                     <div class="order-buttons">
                         <a href="shopping.php" class="add-to-cart">เลือกสินค้า</a>
