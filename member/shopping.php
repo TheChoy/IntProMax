@@ -13,7 +13,7 @@ if (empty($_SESSION['logged_in'])) {
 // $_SESSION['user_id'];
 //------------------------------------------
 
-// รับค่าจาก URL
+// // รับค่าจาก URL
 $searchQuery = isset($_GET['q']) ? trim($_GET['q']) : '';
 $categoryFilter = isset($_GET['category']) ? trim($_GET['category']) : '';
 $minPrice = isset($_GET['minPrice']) ? (int)$_GET['minPrice'] : 0;
@@ -81,7 +81,7 @@ $result = mysqli_stmt_get_result($stmt);
                     <a href="profile.html">โปรไฟล์</a>
                     <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
-                    <a href="../logout.php">ออกจากระบบ</a>
+                    <a href="logout.html">ออกจากระบบ</a>
                 </div>
             </div>
             <a href="index.php">
@@ -101,7 +101,7 @@ $result = mysqli_stmt_get_result($stmt);
             <div><a href="shopping.php" style="color: #E88B71;">ซื้อ/เช่าอุปกรณ์ทางการแพทย์</a></div>
         </nav>
         <div class="cart-icon">
-            <a href="cart.php">
+            <a href="cart.html">
                 <i class="fas fa-shopping-cart"></i>
             </a>
         </div>

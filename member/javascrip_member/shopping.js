@@ -7,12 +7,14 @@ async function applyFilters(){
     const priceSort = document.getElementById("priceSort").value;
     const minPrice = document.getElementById("minPrice").value;
     const maxPrice = document.getElementById("maxPrice").value;
+    const searchQuery = document.querySelector('.search-input').value; // ดึงค่าจากช่องค้นหา
 
     let data = {
         "category": category,
         "priceSort": priceSort,
         "minPrice": minPrice,
-        "maxPrice": maxPrice
+        "maxPrice": maxPrice,
+        "q": searchQuery // ส่งคำค้นหาด้วย
     }
 
     console.log(data);
@@ -68,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
 function updateMaxPrice() {
     var maxPriceRange = document.getElementById('maxPriceRange');
     var maxPriceInput = document.getElementById('maxPrice');
