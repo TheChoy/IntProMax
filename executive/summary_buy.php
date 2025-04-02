@@ -1,30 +1,18 @@
 <?php
 include 'username.php';
 
-echo time();
-
-$selectedMonth1 = $_GET['selected_month1'] ?? date('Y-m');
-$selectedMonth2 = $_GET['selected_month2'] ?? date('Y-m');
 
 $booking_where_sql_ambulance = "1=1";
 $booking_where_sql_event = "1=1";
 $booking_where_sql_emergency = "1=1";
 
-if (!empty($_GET['selected_month1']) && !empty($_GET['selected_month2'])) {
-    $month1 = mysqli_real_escape_string($conn, $_GET['selected_month1']);
-    $month2 = mysqli_real_escape_string($conn, $_GET['selected_month2']);
-
-    // คำนวณวันที่สุดท้ายของเดือน
-    $end_date = date("t", strtotime("$month2-01")); // t = จำนวนวันสูงสุดของเดือน
-
-    // แก้ SQL Query ให้ใช้วันที่ถูกต้อง
-    $booking_where_sql_ambulance .= " AND ab.ambulance_booking_date BETWEEN '$month1-01' AND '$month2-$end_date'";
-    $booking_where_sql_event .= " AND eb.event_booking_date BETWEEN '$month1-01' AND '$month2-$end_date'";
-    $booking_where_sql_emergency .= " AND ecr.order_emergency_case_date BETWEEN '$month1-01' AND '$month2-$end_date'";
+if (!empty($_GET['selected_month']) && !empty($_GET['selected_month2'])) {
+    $start_month = mysqli_real_escape_string($conn, $_GET['selected_month']) . "-01";
+    $end_month = mysqli_real_escape_string($conn, $_GET['selected_month2']) . "-31";
+    $booking_where_sql_ambulance .= " AND ab.ambulance_booking_date BETWEEN '$start_month' AND '$end_month'";
+    $booking_where_sql_event .= " AND eb.event_booking_date BETWEEN '$start_month' AND '$end_month'";
+    $booking_where_sql_emergency .= " AND ecr.order_emergency_case_date BETWEEN '$start_month' AND '$end_month'";
 }
-
-
-
 if (!empty($_GET['province'])) {
     $province = mysqli_real_escape_string($conn, $_GET['province']);
     $booking_where_sql_ambulance .= " AND ab.ambulance_booking_province = '$province'";
@@ -38,24 +26,25 @@ if (!empty($_GET['region']) && is_array($_GET['region'])) {
     $booking_where_sql_ambulance .= " AND ab.ambulance_booking_region IN ($in_region)";
     $booking_where_sql_event .= " AND eb.event_booking_region IN ($in_region)";
     $booking_where_sql_emergency .= " AND 'ภาคกลาง' IN ($in_region)";
+} else {
+    $booking_where_sql_ambulance .= " AND 1=0"; // ไม่มีการเลือก checkbox ใด ๆ
+    $booking_where_sql_event .= " AND 1=0"; // ไม่มีการเลือก checkbox ใด ๆ
+    $booking_where_sql_emergency .= " AND 1=0"; // ไม่มีการเลือก checkbox ใด ๆ
 }
 
 if (!empty($_GET['ambulance_level']) && is_array($_GET['ambulance_level'])) {
     $levels = array_map(fn($lvl) => "'" . mysqli_real_escape_string($conn, $lvl) . "'", $_GET['ambulance_level']);
     $booking_level_filter = "a.ambulance_level IN (" . implode(",", $levels) . ")";
 } else {
-    $booking_level_filter = "1=1";
+    $booking_level_filter = "1=0"; // ไม่มีการเลือก checkbox ใด ๆ
 }
 
 $where_clauses = [];
-
-if (!empty($_GET['selected_month1']) && !empty($_GET['selected_month2'])) {
-    $month1 = mysqli_real_escape_string($conn, $_GET['selected_month1']);
-    $month2 = mysqli_real_escape_string($conn, $_GET['selected_month2']);
-    $end_date = date("t", strtotime("$month2-01"));
-    $where_clauses[] = "order_equipment_date BETWEEN '$month1-01' AND '$month2-$end_date'";
+if (!empty($_GET['selected_month']) && !empty($_GET['selected_month2'])) {
+    $start_month = mysqli_real_escape_string($conn, $_GET['selected_month']) . "-01";
+    $end_month = mysqli_real_escape_string($conn, $_GET['selected_month2']) . "-31";
+    $where_clauses[] = "order_equipment_date BETWEEN '$start_month' AND '$end_month'";
 }
-
 if (!empty($_GET['gender'])) {
     $gender = mysqli_real_escape_string($conn, $_GET['gender']);
     $where_clauses[] = "member_gender = '$gender'";
@@ -73,6 +62,8 @@ if (!empty($_GET['region']) && is_array($_GET['region'])) {
         return "'" . mysqli_real_escape_string($conn, $r) . "'";
     }, $_GET['region']);
     $where_clauses[] = "member_region IN (" . implode(",", $regions) . ")";
+} else {
+    $where_clauses[] = "1=0"; // ไม่มีการเลือก checkbox ใด ๆ
 }
 $where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses) : "";
 
@@ -233,7 +224,6 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
     <script src="summary_buy.js"></script>
     <title>สรุปยอดขาย</title>
 
-
 </head>
 <style>
     .chart {
@@ -276,10 +266,13 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
             </div>
 
             <form method="GET" action="summary_buy.php" id="filterForm">
-                <label for="calendarSelect">ปี/เดือน:</label>
-                <input type="text" id="calendarSelect1" class="month-selected" name="selected_month1" placeholder="เลือกเดือน/ปี" value="<?= $_GET['selected_month1'] ?? '' ?>">
-                <input type="text" id="calendarSelect2" class="month-selected" name="selected_month2" placeholder="เลือกเดือน/ปี" value="<?= $_GET['selected_month2'] ?? '' ?>">
 
+
+                <label for="start_month">เริ่มต้น (ปี/เดือน):</label>
+                <input type="month" id="start_month" class="month-selected" name="selected_month" value="<?= $_GET['selected_month'] ?? '' ?>">
+                <br>
+                <label for="end_month">สิ้นสุด (ปี/เดือน):</label>
+                <input type="month" id="end_month" class="month-selected" name="selected_month2" value="<?= $_GET['selected_month2'] ?? '' ?>">
                 <br>
                 <label>เพศ:</label>
                 <select name="gender" class="filter-select">
@@ -412,33 +405,34 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
 
     </main>
     <script>
-        flatpickr("#calendarSelect1", {
+        const monthSelectConfig = {
             dateFormat: "Y-m",
             altInput: true,
             altFormat: "F Y",
-            defaultDate: "<?= $_GET['selected_month1'] ?? date('Y-m') ?>",
             plugins: [
                 new monthSelectPlugin({
                     shorthand: true,
                     dateFormat: "Y-m",
                     altFormat: "F Y"
                 })
-            ],
-            onchange: updateChart
+            ]
+        };
+
+        // กำหนดค่า default dates
+        const today = new Date();
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+        flatpickr("#start_month", {
+            ...monthSelectConfig,
+            defaultDate: "<?= $_GET['start_month'] ?? date('Y-m') ?>",
+            maxDate: new Date()
         });
-        flatpickr("#calendarSelect2", {
-            dateFormat: "Y-m",
-            altInput: true,
-            altFormat: "F Y",
-            defaultDate: "<?= $_GET['selected_month2'] ?? date('Y-m') ?>",
-            plugins: [
-                new monthSelectPlugin({
-                    shorthand: true,
-                    dateFormat: "Y-m",
-                    altFormat: "F Y"
-                })
-            ],
-            onchange: updateChart
+
+        flatpickr("#end_month", {
+            ...monthSelectConfig,
+            defaultDate: "<?= $_GET['end_month'] ?? date('Y-m') ?>",
+            maxDate: new Date()
         });
         //chart
         var ctx = document.getElementById('salesChart').getContext('2d');
@@ -535,8 +529,6 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
                 })
                 .then(res => res.json())
                 .then(data => {
-
-                    salesChart.destroy();
                     // อัปเดตข้อมูลในกราฟ
                     salesChart.data.datasets[0].data = [
                         data.ambulance_sales_level1,
@@ -565,3 +557,4 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
         }
     </script>
 </body>
+</html>
