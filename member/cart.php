@@ -84,37 +84,46 @@ $member_id = $_SESSION['user_id'];
                         $Total = 0;
                         $sumPrice = 0;
                         $m = 1;
-                        for ($i = 0; $i <= (int)$_SESSION["intLine"]; $i++) {
-                            if (($_SESSION["strProductID"][$i]) != "") {
-                                $sql1 = "select * from equipment WHERE equipment_id = '" . $_SESSION["strProductID"][$i] . "'";
-                                $result1 = mysqli_query($conn, $sql1);
-                                $row_equip = mysqli_fetch_array($result1);
+                        // ตรวจสอบว่า $_SESSION["strProductID"] ถูกตั้งค่าหรือยัง
+                        if (isset($_SESSION["strProductID"])) {
+                            for ($i = 0; $i <= (int)$_SESSION["intLine"]; $i++) {
+                                // ตรวจสอบว่า $_SESSION["strProductID"][$i] มีค่าอยู่จริงหรือไม่
+                                if (isset($_SESSION["strProductID"][$i]) && $_SESSION["strProductID"][$i] != "") {
+                                    $sql1 = "select * from equipment WHERE equipment_id = '" . $_SESSION["strProductID"][$i] . "'";
+                                    $result1 = mysqli_query($conn, $sql1);
+                                    $row_equip = mysqli_fetch_array($result1);
 
-                                $_SESSION["equipment_price_per_unit"] = $row_equip['equipment_price_per_unit'];
-                                $Total = $_SESSION["strQty"][$i];
-                                $sum = $Total * $row_equip['equipment_price_per_unit'];
-                                $sumPrice += $sum; // คำนวณราคารวม
+                                    $_SESSION["equipment_price_per_unit"] = $row_equip['equipment_price_per_unit'];
+                                    $Total = $_SESSION["strQty"][$i];
+                                    $sum = $Total * $row_equip['equipment_price_per_unit'];
+                                    $sumPrice += $sum; // คำนวณราคารวม
+
+                                    // แสดงตารางสินค้า
                         ?>
-                                <tr>
-                                    <td><?= $m ?></td>
-                                    <td>
-                                        <img src="image/<?= $row_equip['equipment_image'] ?>" width="100" height="100" class="border"> <!-- แสดงภาพสินค้า -->
-                                        <?= $row_equip['equipment_name'] ?>
-                                    </td>
-                                    <td><?= number_format($row_equip['equipment_price_per_unit'], 2) ?></td> <!-- แสดงราคาต่อหน่วย -->
-                                    <td> <a href="order_delete.php?id=<?= $row_equip['equipment_id'] ?>" class="btn btn-outline-primary">-</a> <?= $_SESSION['strQty'][$i] ?>
-                                       <a href="order.php?id=<?= $row_equip['equipment_id'] ?>" class="btn btn-outline-primary">+</a>
-                                    </td>
-                                    <td><?= number_format($sum, 2) ?></td>
-                                    <td><a href="equipment_delete.php?Line=<?= $i ?>"><img src="image/delete.png" width="30"></a></td>
-                                </tr>
-
-
+                                    <tr>
+                                        <td><?= $m ?></td>
+                                        <td>
+                                            <img src="image/<?= $row_equip['equipment_image'] ?>" width="100" height="100" class="border">
+                                            <?= $row_equip['equipment_name'] ?>
+                                        </td>
+                                        <td><?= number_format($row_equip['equipment_price_per_unit'], 2) ?></td>
+                                        <td>
+                                            <?php if ($_SESSION['strQty'][$i] > 1) { ?>
+                                                <a href="order_delete.php?id=<?= $row_equip['equipment_id'] ?>" class="btn btn-outline-primary">-</a>
+                                            <?php } ?>
+                                            <?= $_SESSION['strQty'][$i] ?>
+                                            <a href="order.php?id=<?= $row_equip['equipment_id'] ?>" class="btn btn-outline-primary">+</a>
+                                        </td>
+                                        <td><?= number_format($sum, 2) ?></td>
+                                        <td><a href="equipment_delete.php?Line=<?= $i ?>"><img src="image/delete.png" width="30"></a></td>
+                                    </tr>
                         <?php
-                                $m = $m + 1;
+                                    $m = $m + 1;
+                                }
                             }
                         }
                         ?>
+
                         <tr>
                             <td class="text-end" colspan="4">ค่าจัดส่ง</td>
                             <td>120</td>
