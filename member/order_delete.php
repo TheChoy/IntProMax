@@ -26,3 +26,4 @@ if (!isset($_SESSION["intLine"]))    //เช็คว่าแถวเป็�
 	header("location:cart.php");
 	exit();
 }
+?>
