@@ -102,12 +102,14 @@ $member_id = $_SESSION['user_id'];
                                         <?= $row_equip['equipment_name'] ?>
                                     </td>
                                     <td><?= number_format($row_equip['equipment_price_per_unit'], 2) ?></td> <!-- แสดงราคาต่อหน่วย -->
-                                    <td><a href="order.php?id=<?= $row_equip['equipment_id'] ?>" class="btn btn-outline-primary">+</a> <?= $_SESSION['strQty'][$i] ?>
-                                        <a href="order_delete.php?id=<?= $row_equip['equipment_id'] ?>" class="btn btn-outline-primary">-</a>
+                                    <td> <a href="order_delete.php?id=<?= $row_equip['equipment_id'] ?>" class="btn btn-outline-primary">-</a> <?= $_SESSION['strQty'][$i] ?>
+                                       <a href="order.php?id=<?= $row_equip['equipment_id'] ?>" class="btn btn-outline-primary">+</a>
                                     </td>
                                     <td><?= number_format($sum, 2) ?></td>
                                     <td><a href="equipment_delete.php?Line=<?= $i ?>"><img src="image/delete.png" width="30"></a></td>
                                 </tr>
+
+
                         <?php
                                 $m = $m + 1;
                             }
