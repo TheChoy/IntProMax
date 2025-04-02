@@ -17,9 +17,14 @@ if ($conn->connect_error) {
 $min_age = isset($_GET['min_age']) ? (int)$_GET['min_age'] : 0;
 $max_age = isset($_GET['max_age']) ? (int)$_GET['max_age'] : 100;
 date_default_timezone_set('Asia/Bangkok');
-$selected_date = date('Y-m-d');
-if (isset($_GET['date']) && !empty($_GET['date'])) {
-    $selected_date = $_GET['date'];
+
+$selected_date1 = date('Y-m-d');
+if (isset($_GET['date1']) && !empty($_GET['date1'])) {
+    $selected_date1 = $_GET['date1'];
+}
+$selected_date2 = date('Y-m-d');
+if (isset($_GET['date2']) && !empty($_GET['date2'])) {
+    $selected_date2 = $_GET['date2'];
 }
 
 $selected_gender = isset($_GET['gender']) ? $_GET['gender'] : "ทั้งหมด";
@@ -29,8 +34,8 @@ $selected_zone = isset($_GET['zone']) ? $_GET['zone'] : "ทั้งหมด";
 
 // สร้าง WHERE Clause ตามฟิลเตอร์ที่เลือก
 $where_clause = "WHERE order_emergency_case_patient_age BETWEEN $min_age AND $max_age";
-if ($selected_date) {
-    $where_clause .= " AND DATE(order_emergency_case_date) = '$selected_date'";
+if ($selected_date1 && $selected_date2) {
+    $where_clause .= " AND DATE(order_emergency_case_date) BETWEEN '$selected_date1' AND '$selected_date2'";
 }
 if ($selected_gender !== "ทั้งหมด") {
     $where_clause .= " AND order_emergency_case_patient_gender = '$selected_gender'";
@@ -181,7 +186,8 @@ $conn->close();
                 </div>
                 <div class="sidebar-content">
                     <label for="calendarSelect">เลือกวันที่:</label>
-                    <input class="calendar-selected" id="calendarSelect" type="text" placeholder="เลือกวันที่" value="2025-01-22">
+                    <input class="calendar-selected" id="calendarSelect1" type="text" placeholder="เลือกวันที่" value="2025-01-22">
+                    <input class="calendar-selected" id="calendarSelect2" type="text" placeholder="เลือกวันที่" value="2025-01-22">
 
                     <label for="filter-gender">เพศ:</label>
                     <select id="filter-gender-list" class="filter-select">
@@ -330,15 +336,21 @@ $conn->close();
         });
 
         // ตั้งค่า Flatpickr สำหรับเลือกวันที่
-        flatpickr("#calendarSelect", {
+        flatpickr("#calendarSelect1", {
             dateFormat: "Y-m-d",
-            defaultDate: "<?php echo $selected_date; ?>",
+            defaultDate: "<?php echo $selected_date1; ?>",
+            onChange: updateFilters
+        });
+        flatpickr("#calendarSelect2", {
+            dateFormat: "Y-m-d",
+            defaultDate: "<?php echo $selected_date2; ?>",
             onChange: updateFilters
         });
 
         // ฟังก์ชันสำหรับอัปเดตฟิลเตอร์และโหลดข้อมูลใหม่
         function updateFilters() {
-            const date = document.getElementById("calendarSelect").value;
+            const date1 = document.getElementById("calendarSelect1").value;
+            const date2 = document.getElementById("calendarSelect2").value;
             const gender = document.getElementById("filter-gender-list").value;
             const minAge = document.getElementById("minAge").value;
             const maxAge = document.getElementById("maxAge").value;
@@ -348,7 +360,8 @@ $conn->close();
 
             // สร้าง URL Query
             const params = new URLSearchParams({
-                date,
+                date1,
+                date2,
                 gender,
                 min_age: minAge,
                 max_age: maxAge,
@@ -383,7 +396,11 @@ $conn->close();
         }
 
         // ตั้งค่า Event Listeners สำหรับฟิลเตอร์
-        document.getElementById("calendarSelect").flatpickr({
+        document.getElementById("calendarSelect1").flatpickr({
+            dateFormat: "Y-m-d",
+            onChange: updateFilters
+        });
+        document.getElementById("calendarSelect2").flatpickr({
             dateFormat: "Y-m-d",
             onChange: updateFilters
         });
