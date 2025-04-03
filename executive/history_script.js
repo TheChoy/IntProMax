@@ -122,7 +122,7 @@ async function filterTable() {
   
 
   //ส่งข้อมูลไปที่ filter_result.php ด้วย fetch API ในรูปแบบ JSON
-  await fetch("filterFixed copy.php", {
+  await fetch("filterFixed.php", {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
