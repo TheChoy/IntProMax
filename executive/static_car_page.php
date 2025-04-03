@@ -330,8 +330,10 @@ $conn->close();
                         <input class="month-selected" name="date_end" id="calendarSelect" type="text" placeholder="ปี/เดือน" value="2025-03">
 
                         <button type="submit">กรองข้อมูล</button>
+                        <a href="static_car_page.php" class="reset-button" id="reset-button">reset</a>
                     </div>
                 </form>
+                
     </main>
 
     <canvas id="bookingChart" width="500" height="100"></canvas>

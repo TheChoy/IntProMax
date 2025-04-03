@@ -234,6 +234,7 @@ foreach ($notReady_ambu_data as $num) {
             <option value=" BETWEEN 10000 AND 50000">10,000-50,000 บาท</option>
             <option value=" > 50000">มากกว่า 50,000 บาท</option>
           </select>
+          <a href="history_fixed_page.php" class="reset-button" id="reset-button">reset</a>
         </div>
       </div>
   </main>
