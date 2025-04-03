@@ -231,6 +231,8 @@ $conn->close();
                             </option>
                         <?php endforeach; ?>
                     </select>
+
+                    <a href="case_report_page.php" class="reset-button" id="reset-button">reset</a>
                 </div>
             </div>
         </div>
