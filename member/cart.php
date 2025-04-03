@@ -109,11 +109,12 @@ $member_id = $_SESSION['user_id'];
                                         <td><?= number_format($row_equip['equipment_price_per_unit'], 2) ?></td>
                                         <td>
                                             <?php if ($_SESSION['strQty'][$i] > 1) { ?>
-                                                <a href="order_delete.php?id=<?= $row_equip['equipment_id'] ?>" class="btn btn-outline-primary">-</a>
+                                                <!-- ปุ่มลบจำนวน -->
+                                                <button type="button" class="btn btn-outline-primary update-cart" data-id="<?= $row_equip['equipment_id'] ?>" data-action="decrease">-</button>
                                             <?php } ?>
                                             <?= $_SESSION['strQty'][$i] ?>
-                                            <a href="order.php?id=<?= $row_equip['equipment_id'] ?>" class="btn btn-outline-primary">+</a>
-                                        </td>
+                                            <!-- ปุ่มเพิ่มจำนวน -->
+                                            <button type="button" class="btn btn-outline-primary update-cart" data-id="<?= $row_equip['equipment_id'] ?>" data-action="increase">+</button>
                                         <td><?= number_format($sum, 2) ?></td>
                                         <td><a href="equipment_delete.php?Line=<?= $i ?>"><img src="image/delete.png" width="30"></a></td>
                                     </tr>
@@ -143,6 +144,27 @@ $member_id = $_SESSION['user_id'];
             </div>
         </form>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.update-cart').click(function() {
+                const id = $(this).data('id');
+                const action = $(this).data('action');
+
+                $.ajax({
+                    url: 'order_ajax.php',
+                    type: 'POST',
+                    data: {
+                        id: id,
+                        action: action
+                    },
+                    success: function(response) {
+                        location.reload(); // หรือจะอัปเดตแค่บางส่วนของตารางก็ได้
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
