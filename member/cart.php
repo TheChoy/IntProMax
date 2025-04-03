@@ -19,7 +19,7 @@ $member_id = $_SESSION['user_id'];
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/style_carts.css">
+    <link rel="stylesheet" href="css/cart.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -136,12 +136,18 @@ $member_id = $_SESSION['user_id'];
                             <td>บาท</td>
                         </tr>
                     </table>
-                    <div class="order-buttons">
-                        <a href="shopping.php" class="add-to-cart">เลือกสินค้า</a>
-                        <a href="QRpayment_order.php" class="confirm-order">ยืนยันการสั่งซื้อ</a>
-                    </div>
                 </div>
             </div>
+    </div>
+    </form>
+    <div class="order-buttons">
+        <a href="shopping.php" class="add-to-cart">เลือกสินค้า</a>
+        <!-- <a href="QRpayment_order.php" class="confirm-order">ยืนยันการสั่งซื้อ</a> -->
+
+        <!-- เป็นฟอร์ม submit ไป insert_order.php -->
+        <form method="post" action="insert_order_ajax.php" style="display:inline;">
+            <input type="hidden" name="price_total" value="<?= $sumPrice + 120 ?>">
+            <button type="submit" class="confirm-order">ยืนยันการสั่งซื้อ</button>
         </form>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
