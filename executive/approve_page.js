@@ -28,11 +28,15 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 //filter ต่างๆ เขียนโค้ดในนนี้
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
 
 
     const slider = document.getElementById("priceRange");
     const priceInput = document.getElementById("priceInput");
+    const productList = document.getElementById("productList");
 
     // อัปเดต Input เมื่อเลื่อน Slider
     slider?.addEventListener("input", () => {
@@ -48,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
    //ตัวรับค่าปุ่มของ php
-    const btnApplyFilter = document.getElementById('btnApplyFilter');
+    
     const objfilterQuantityList = document.getElementById('filter-quantity-list');
     const objStartDate = document.getElementById('start_date');
     const objEndDate = document.getElementById('end_date');
@@ -56,15 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const objMinPriceRange = document.getElementById('minPriceRange');
     const objMaxPriceRange = document.getElementById('maxPriceRange');
     const objEquipMentFilterList = document.getElementById('equipment-filter-list');
-
    
-    btnApplyFilter.addEventListener('click', (e) => {       
-        reloadPage();
-    }); 
-
-    btnReset.addEventListener('click', (e) => {
-        location.href = "approve_page.php";
-    });
 
     objMinPriceRange.addEventListener('input', (e) => {
         console.clear();
@@ -84,34 +80,69 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-
-
-    const reloadPage = ()=>{
+        const reloadPage = ()=>{
       
-        // let filterValue = objfilterQuantityList.value;
-        let filterPrice = objFilterPriceList.value;
-        let minPriceRange = objMinPriceRange.value;
-        let maxPriceRange = objMaxPriceRange.value;
-        let equipmentFilter = objEquipMentFilterList.value;
-        let startDate = objStartDate.value;
-        let endDate = objEndDate.value;
-        
-        //ไว้ debug
-        console.log(minPriceRange, maxPriceRange);
-        
-        // alt + 96  `
-        window.location.href = 'approve_page.php?' + 
-        `start_date=${startDate}` + 
-        `&end_date=${endDate}` +
-        // `&order_quantity=${filterValue}` +
-        `&order_equipment_price=${filterPrice}`+
-        `&min_price=${minPriceRange}` +
-        `&max_price=${maxPriceRange}`+
-        `&equipment_type=${equipmentFilter}`; 
-    }
+            let filterValue = objfilterQuantityList.value;
+            let filterPrice = objFilterPriceList.value;
+            let minPriceRange = objMinPriceRange.value;
+            let maxPriceRange = objMaxPriceRange.value;
+            let equipmentFilter = objEquipMentFilterList.value;
+            let startDate = objStartDate.value;
+            let endDate = objEndDate.value;
+    
+        //โหลดสินค้าครั้งแรก
+        fetchProducts();
+            
+            //ไว้ debug
+            console.log(minPriceRange, maxPriceRange);
+            
+            // alt + 96  `
+            window.location.href = 'approve_page.php?' + 
+            `start_date=${startDate}` + 
+            `&end_date=${endDate}` +
+            // `&order_quantity=${filterValue}` +
+            `&order_equipment_price=${filterPrice}`+
+            `&min_price=${minPriceRange}` +
+            `&max_price=${maxPriceRange}`+
+            `&equipment_type=${equipmentFilter}`; 
+        }
+
+            // 🔄 ฟังก์ชันโหลดสินค้าแบบ AJAX
+            const fetchProducts = () => {
+                const formData = new FormData();
+                formData.append('start_date', objStartDate.value);
+                formData.append('end_date', objEndDate.value);
+                formData.append('order_equipment_price', objFilterPriceList.value);
+                formData.append('min_price', objMinPriceRange.value);
+                formData.append('max_price', objMaxPriceRange.value);
+                formData.append('equipment_type', objEquipMentFilterList.value);
+
+                fetch('approve_page.php', { // ✅ แก้ให้ดึงจากไฟล์ใหม่
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.text())
+                .then(data => {
+                    productList.innerHTML = data;
+                })
+                .catch(err => {
+                    console.error("โหลดสินค้าไม่สำเร็จ", err);
+                });
+            };
+
+            // 🔄 เรียกใช้เมื่อ filter มีการเปลี่ยนแปลง
+            objMinPriceRange.addEventListener('input', fetchProducts);
+            objMaxPriceRange.addEventListener('input', fetchProducts);
+            objEquipMentFilterList.addEventListener('change', fetchProducts);
+            objFilterPriceList.addEventListener('change', fetchProducts);
+            objStartDate.addEventListener('change', fetchProducts);
+            objEndDate.addEventListener('change', fetchProducts);
+
+            // ✅ โหลดสินค้าครั้งแรก
+            fetchProducts();
+
 
 });
-
 
 
 /**  */
@@ -155,14 +186,14 @@ document.addEventListener("DOMContentLoaded", () => {
         onChange: function (selectedDates, dateStr, instance) {
             updateChart(dateStr);
         }
+    
     });
+
 });
 
 let arrApproved = [];
 
 function checkTest(orderId, e) {
-
-
     
     //console.log("before", array);
     arrApproved = arrApproved.filter(e=>e?.orderId!==orderId);    
@@ -171,6 +202,7 @@ function checkTest(orderId, e) {
     // console.log(orderId, e.checked );
     
 }
+
 
 
 //ปุ่มยืนยันตัวที่ติ๊กทั้งหมด
