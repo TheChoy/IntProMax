@@ -315,103 +315,124 @@ $conn->close();
 
         // สคริปต์สำหรับเปิด-ปิด Sidebar
         document.addEventListener("DOMContentLoaded", () => {
-            const filterIcon = document.querySelector(".filter-icon");
-            const sidebar = document.getElementById("filterSidebar");
-            const closeSidebar = document.querySelector(".close-sidebar");
+                    const filterIcon = document.querySelector(".filter-icon");
+                    const sidebar = document.getElementById("filterSidebar");
+                    const closeSidebar = document.querySelector(".close-sidebar");
 
-            // เปิด Sidebar
-            filterIcon.addEventListener("click", () => {
-                sidebar.classList.add("open");
-            });
+                    // เปิด Sidebar
+                    filterIcon.addEventListener("click", () => {
+                        sidebar.classList.add("open");
+                    });
 
-            // ปิด Sidebar
-            closeSidebar.addEventListener("click", () => {
-                sidebar.classList.remove("open");
-            });
+                    // ปิด Sidebar
+                    closeSidebar.addEventListener("click", () => {
+                        sidebar.classList.remove("open");
+                    });
 
-            // ปิด Sidebar เมื่อคลิกนอก Sidebar
-            document.addEventListener("click", (e) => {
-                if (!sidebar.contains(e.target) && !filterIcon.contains(e.target)) {
-                    sidebar.classList.remove("open");
-                }
-            });
-        });
+                    // สคริปต์สำหรับเปิด-ปิด Sidebar
+                    document.addEventListener("DOMContentLoaded", () => {
+                        const filterIcon = document.querySelector(".filter-icon");
+                        const sidebar = document.getElementById("filterSidebar");
+                        const closeSidebar = document.querySelector(".close-sidebar");
 
-        // ตั้งค่า Flatpickr สำหรับเลือกวันที่
-        flatpickr("#calendarSelect1", {
-            dateFormat: "Y-m-d",
-            defaultDate: "<?php echo $selected_date1; ?>",
-            onChange: updateFilters
-        });
-        flatpickr("#calendarSelect2", {
-            dateFormat: "Y-m-d",
-            defaultDate: "<?php echo $selected_date2; ?>",
-            onChange: updateFilters
-        });
+                        // เปิด Sidebar
+                        filterIcon.addEventListener("click", () => {
+                            sidebar.classList.add("open");
+                        });
 
-        // ฟังก์ชันสำหรับอัปเดตฟิลเตอร์และโหลดข้อมูลใหม่
-        function updateFilters() {
-            const date1 = document.getElementById("calendarSelect1").value;
-            const date2 = document.getElementById("calendarSelect2").value;
-            const gender = document.getElementById("filter-gender-list").value;
-            const minAge = document.getElementById("minAge").value;
-            const maxAge = document.getElementById("maxAge").value;
-            const symptom = document.getElementById("filter-symtom-list").value;
-            const hospital = document.getElementById("filter-hospital-list").value;
-            const zone = document.getElementById("filter-zone-list").value;
+                        // ปิด Sidebar
+                        closeSidebar.addEventListener("click", () => {
+                            sidebar.classList.remove("open");
+                        });
 
-            // สร้าง URL Query
-            const params = new URLSearchParams({
-                date1,
-                date2,
-                gender,
-                min_age: minAge,
-                max_age: maxAge,
-                symptom,
-                hospital,
-                zone
-            });
+                        // ปิด Sidebar เมื่อคลิกนอก Sidebar ยกเว้น flatpickr calendar
+                        document.addEventListener("click", (e) => {
+                            if (
+                                !sidebar.contains(e.target) &&
+                                !filterIcon.contains(e.target) &&
+                                !e.target.closest(".flatpickr-calendar")
+                            ) {
+                                sidebar.classList.remove("open");
+                            }
+                        });
+                    });
 
-            // อัปเดต URL โดยไม่โหลดหน้าใหม่
-            const newUrl = window.location.pathname + "?" + params.toString();
-            window.history.replaceState({}, "", newUrl);
+                    // ตั้งค่า Flatpickr สำหรับเลือกวันที่
+                    flatpickr("#calendarSelect1", {
+                        dateFormat: "Y-m-d",
+                        defaultDate: "<?php echo $selected_date1; ?>",
+                        onChange: updateFilters
+                    });
+                    flatpickr("#calendarSelect2", {
+                        dateFormat: "Y-m-d",
+                        defaultDate: "<?php echo $selected_date2; ?>",
+                        onChange: updateFilters
+                    });
 
-            // โหลดข้อมูลใหม่ผ่าน AJAX
-            fetch(newUrl)
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
+                    // ฟังก์ชันสำหรับอัปเดตฟิลเตอร์และโหลดข้อมูลใหม่
+                    function updateFilters() {
+                        const date1 = document.getElementById("calendarSelect1").value;
+                        const date2 = document.getElementById("calendarSelect2").value;
+                        const gender = document.getElementById("filter-gender-list").value;
+                        const minAge = document.getElementById("minAge").value;
+                        const maxAge = document.getElementById("maxAge").value;
+                        const symptom = document.getElementById("filter-symtom-list").value;
+                        const hospital = document.getElementById("filter-hospital-list").value;
+                        const zone = document.getElementById("filter-zone-list").value;
 
-                    // อัปเดตข้อมูลกราฟใหม่
-                    const newLabels = JSON.parse(doc.getElementById('chart-labels').textContent);
-                    const newMaleData = JSON.parse(doc.getElementById('chart-maleData').textContent);
-                    const newFemaleData = JSON.parse(doc.getElementById('chart-femaleData').textContent);
+                        // สร้าง URL Query
+                        const params = new URLSearchParams({
+                            date1,
+                            date2,
+                            gender,
+                            min_age: minAge,
+                            max_age: maxAge,
+                            symptom,
+                            hospital,
+                            zone
+                        });
 
-                    // อัปเดตกราฟ Chart.js
-                    mychart.data.labels = newLabels;
-                    mychart.data.datasets[0].data = newMaleData;
-                    mychart.data.datasets[1].data = newFemaleData;
-                    mychart.update();
-                })
-                .catch(error => console.error('Error fetching updated data:', error));
-        }
+                        // อัปเดต URL โดยไม่โหลดหน้าใหม่
+                        const newUrl = window.location.pathname + "?" + params.toString();
+                        window.history.replaceState({}, "", newUrl);
 
-        // ตั้งค่า Event Listeners สำหรับฟิลเตอร์
-        document.getElementById("calendarSelect1").flatpickr({
-            dateFormat: "Y-m-d",
-            onChange: updateFilters
-        });
-        document.getElementById("calendarSelect2").flatpickr({
-            dateFormat: "Y-m-d",
-            onChange: updateFilters
-        });
-        document.getElementById("filter-gender-list").addEventListener("change", updateFilters);
-        document.getElementById("filter-symtom-list").addEventListener("change", updateFilters);
-        document.getElementById("minAge").addEventListener("input", updateFilters);
-        document.getElementById("maxAge").addEventListener("input", updateFilters);
-        document.getElementById("filter-hospital-list").addEventListener("change", updateFilters);
-        document.getElementById("filter-zone-list").addEventListener("change", updateFilters);
+                        // โหลดข้อมูลใหม่ผ่าน AJAX
+                        fetch(newUrl)
+                            .then(response => response.text())
+                            .then(html => {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(html, 'text/html');
+
+                                // อัปเดตข้อมูลกราฟใหม่
+                                const newLabels = JSON.parse(doc.getElementById('chart-labels').textContent);
+                                const newMaleData = JSON.parse(doc.getElementById('chart-maleData').textContent);
+                                const newFemaleData = JSON.parse(doc.getElementById('chart-femaleData').textContent);
+
+                                // อัปเดตกราฟ Chart.js
+                                mychart.data.labels = newLabels;
+                                mychart.data.datasets[0].data = newMaleData;
+                                mychart.data.datasets[1].data = newFemaleData;
+                                mychart.update();
+                            })
+                            .catch(error => console.error('Error fetching updated data:', error));
+                    }
+
+                    // ตั้งค่า Event Listeners สำหรับฟิลเตอร์
+                    document.getElementById("calendarSelect1").flatpickr({
+                        dateFormat: "Y-m-d",
+                        onChange: updateFilters
+                    });
+                    document.getElementById("calendarSelect2").flatpickr({
+                        dateFormat: "Y-m-d",
+                        onChange: updateFilters
+                    });
+                    document.getElementById("filter-gender-list").addEventListener("change", updateFilters);
+                    document.getElementById("filter-symtom-list").addEventListener("change", updateFilters);
+                    document.getElementById("minAge").addEventListener("input", updateFilters);
+                    document.getElementById("maxAge").addEventListener("input", updateFilters);
+                    document.getElementById("filter-hospital-list").addEventListener("change", updateFilters);
+                    document.getElementById("filter-zone-list").addEventListener("change", updateFilters);
+                });
     </script>
 </body>
 
