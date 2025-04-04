@@ -1,16 +1,20 @@
 <?php
 require('username.php');
 
+// เช็คว่าเป็น AJAX request หรือไม่
+$isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+    strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+
 // ดึงค่าจากฟอร์ม
-$source = isset($_POST['source']) ? $_POST['source'] : [];
-$level = isset($_POST['level']) ? $_POST['level'] : [];
-$province = isset($_POST['province']) ? $_POST['province'] : '';
-$gender = isset($_POST['gender']) ? $_POST['gender'] : '';
-$age_min = isset($_POST['age_min']) ? $_POST['age_min'] : 1;
-$age_max = isset($_POST['age_max']) ? $_POST['age_max'] : 120;
-$region = isset($_POST['region']) ? $_POST['region'] : [];
-$date_start = isset($_POST['date_start']) ? $_POST['date_start'] : '2025-03';
-$date_end = isset($_POST['date_end']) ? $_POST['date_end'] : '2025-03';
+$source = isset($_POST['source']) ? $_POST['source'] : ['emergency', 'ambulance', 'event'];
+$level = isset($_POST['level']) ? $_POST['level'] : ['1', '2', '3'];
+$province = isset($_POST['province']) ? $_POST['province'] : 'ทั้งหมด';
+$gender = isset($_POST['gender']) ? $_POST['gender'] : 'ทั้งหมด';
+$age_min = isset($_POST['age_min']) ? intval($_POST['age_min']) : 1;
+$age_max = isset($_POST['age_max']) ? intval($_POST['age_max']) : 120;
+$region = isset($_POST['region']) ? $_POST['region'] : ['ภาคเหนือ', 'ภาคตะวันออกเฉียงเหนือ', 'ภาคกลาง', 'ภาคใต้'];
+$date_start = isset($_POST['date_start']) ? $_POST['date_start'] : date('Y-m');
+$date_end = isset($_POST['date_end']) ? $_POST['date_end'] : date('Y-m');
 
 //sql
 // สร้าง SQL Query
@@ -99,7 +103,6 @@ $result = $conn->query($sql);
 $chartData = [];
 
 // ดึงข้อมูลจากฐานข้อมูล
-// ดึงข้อมูลจากฐานข้อมูล
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         // กำหนด source เป็นข้อความที่คุณต้องการ
@@ -145,6 +148,13 @@ $chartDataJson = json_encode([
         ['label' => 'ระดับ 3', 'data' => $chartLevels['3'], 'backgroundColor' => 'rgba(75, 192, 192, 0.6)']
     ]
 ]);
+
+// ถ้าเป็น AJAX request ให้ส่งข้อมูลกลับเป็น JSON
+if ($isAjax) {
+    header('Content-Type: application/json');
+    echo $chartDataJson;
+    exit;
+}
 
 $conn->close();
 
@@ -200,7 +210,7 @@ $conn->close();
                     <h2>ตัวกรอง</h2>
                     <button class="close-sidebar">&times;</button>
                 </div>
-                <form action="" method="POST">
+                <form id="filterForm" onsubmit="return false;">
                     <div class="sidebar-content">
                         <label for="">เลือกประเภทงาน:</label>
                         <input type="checkbox" name="source[]" value="emergency" checked> รับเคสฉุกเฉิน
@@ -311,8 +321,8 @@ $conn->close();
                         <br>
 
                         <label for="">อายุ:</label>
-                        <input class="input-age" name="age_min" value="1" min="1" max="120" type="number"> ถึง
-                        <input class="input-age" name="age_max" value="120" min="1" max="120" type="number"> ปี
+                        <input class="input-age" name="age_min" value="1" min="1" max="120" type="number" oninput="this.value = this.value.replace(/[^0-9]/g, '');"> ถึง
+                        <input class="input-age" name="age_max" value="120" min="1" max="120" type="number" oninput="this.value = this.value.replace(/[^0-9]/g, '');"> ปี
                         <br>
 
                         <label for="">เลือกภูมิภาค:</label>
@@ -326,125 +336,217 @@ $conn->close();
                         <br>
 
                         <label for="">ปี/เดือน:</label>
-                        <input class="month-selected" name="date_start" id="calendarSelect" type="text" placeholder="ปี/เดือน" value="2025-03"> ถึง
-                        <input class="month-selected" name="date_end" id="calendarSelect" type="text" placeholder="ปี/เดือน" value="2025-03">
+                        <input type="text" id="start_month" class="month-selected" name="start_month"
+                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['start_month'] ?? '' ?>"> ถึง
+                        <input type="text" id="end_month" class="month-selected" name="end_month"
+                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['end_month'] ?? '' ?>">
 
-                        <button type="submit">กรองข้อมูล</button>
-                        <a href="static_car_page.php" class="reset-button" id="reset-button">reset</a>
+
+                        <a href="static_car_page.php" class="reset-button" id="reset-button">Reset</a>
                     </div>
                 </form>
-                
+
     </main>
 
-    <canvas id="bookingChart" width="500" height="100"></canvas>
+    <!-- เพิ่ม div สำหรับแสดงผลกราฟ -->
+    <div id="chartContainer" style="width: 100%; height: 400px;">
+        <canvas id="bookingChart"></canvas>
+    </div>
 
 
 </body>
 
 <script>
-    // สคริปต์สำหรับเปิด-ปิด Sidebar
+    const monthSelectConfig = {
+        dateFormat: "Y-m",
+        altInput: true,
+        altFormat: "F Y",
+        plugins: [
+            new monthSelectPlugin({
+                shorthand: true,
+                dateFormat: "Y-m",
+                altFormat: "F Y"
+            })
+        ],
+        disableMobile: true
+    };
+    // กำหนดค่า default dates
+    const today = new Date();
+
+    // Initialize start_month flatpickr
+    const startMonthPicker = flatpickr("#start_month", {
+        ...monthSelectConfig,
+        defaultDate: "<?= $_GET['start_month'] ?? date('Y-m') ?>",
+        maxDate: today,
+        onChange: function(selectedDates, dateStr) {
+            if (selectedDates[0]) {
+                // Reset end_month configuration
+                endMonthPicker.destroy();
+
+                // Reinitialize end_month with updated config
+                const endConfig = {
+                    ...monthSelectConfig,
+                    defaultDate: endMonthPicker.selectedDates[0] || selectedDates[0],
+                    minDate: selectedDates[0],
+                    maxDate: today,
+                    onChange: function(selectedDates, dateStr) {
+                        if (selectedDates[0]) {
+                            const startDate = startMonthPicker.selectedDates[0];
+                            if (startDate && selectedDates[0] < startDate) {
+                                this.setDate(startDate);
+                            }
+                        }
+                    }
+                };
+
+                endMonthPicker = flatpickr("#end_month", endConfig);
+            }
+        }
+    });
+
+    // Initialize end_month flatpickr
+    let endMonthPicker = flatpickr("#end_month", {
+        ...monthSelectConfig,
+        defaultDate: "<?= $_GET['end_month'] ?? date('Y-m') ?>",
+        minDate: startMonthPicker.selectedDates[0] || "<?= $_GET['start_month'] ?? date('Y-m') ?>",
+        maxDate: today
+    });
+
+    //กราฟ
+    document.addEventListener('DOMContentLoaded', function() {
+        // ฟังก์ชันสำหรับอัพเดทกราฟ
+        function updateChart() {
+            const form = document.getElementById('filterForm');
+            const formData = new FormData(form);
+
+            // เพิ่มการตรวจสอบค่าอายุ
+            const ageMin = parseInt(document.querySelector('input[name="age_min"]').value);
+            const ageMax = parseInt(document.querySelector('input[name="age_max"]').value);
+            
+            if (ageMin > ageMax) {
+                alert('อายุต่ำสุดต้องน้อยกว่าอายุสูงสุด');
+                return;
+            }
+
+            // เพิ่มค่าวันที่จาก flatpickr
+            formData.set('date_start', document.getElementById('start_month').value);
+            formData.set('date_end', document.getElementById('end_month').value);
+
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (window.myChart instanceof Chart) {
+                    window.myChart.destroy();
+                }
+
+                const ctx = document.getElementById('bookingChart').getContext('2d');
+                window.myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                stacked: false,
+                            },
+                            y: {
+                                stacked: false,
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'สถิติการใช้งานรถตามประเภทและระดับ'
+                            }
+                        },
+                    }});
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Event listeners for form elements
+        const form = document.getElementById('filterForm');
+        const filterInputs = form.querySelectorAll('input:not([type="number"]), select');
+        const ageInputs = form.querySelectorAll('input[type="number"]');
+
+        // Event listener สำหรับ input ทั่วไปและ select
+        filterInputs.forEach(input => {
+            input.addEventListener('change', updateChart);
+        });
+
+        // Event listener สำหรับ input อายุ
+        ageInputs.forEach(input => {
+            let debounceTimer;
+            input.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    // ตรวจสอบค่าที่รับเข้ามา
+                    let value = parseInt(this.value);
+                    if (isNaN(value) || value < 1) {
+                        this.value = 1;
+                    } else if (value > 120) {
+                        this.value = 120;
+                    }
+                    updateChart();
+                }, 300); // รอ 300ms หลังจากผู้ใช้หยุดพิมพ์
+            });
+        });
+
+        // Event listener สำหรับ form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            updateChart();
+        });
+
+        // Event listener สำหรับ reset button
+        document.getElementById('reset-button').addEventListener('click', function(e) {
+            e.preventDefault();
+            form.reset();
+            updateChart();
+        });
+
+        // Initial chart load
+        updateChart();
+    });
+
+    // Sidebar toggle code
     document.addEventListener("DOMContentLoaded", () => {
         const filterIcon = document.querySelector(".filter-icon");
         const sidebar = document.getElementById("filterSidebar");
         const closeSidebar = document.querySelector(".close-sidebar");
 
-        // เปิด Sidebar
         filterIcon.addEventListener("click", () => {
             sidebar.classList.add("open");
         });
 
-        // ปิด Sidebar
         closeSidebar.addEventListener("click", () => {
             sidebar.classList.remove("open");
         });
 
-        // ปิด Sidebar เมื่อคลิกนอก Sidebar
         document.addEventListener("click", (e) => {
             if (!sidebar.contains(e.target) && !filterIcon.contains(e.target)) {
                 sidebar.classList.remove("open");
             }
         });
-
-    });
-    // ตั้งค่าปฏิทิน Flatpickr
-    flatpickr("#calendarSelect", {
-        dateFormat: "Y-m", // รูปแบบวันที่เป็น YYYY-MM
-        plugins: [
-            new monthSelectPlugin({
-                shorthand: true, // ใช้ชื่อย่อของเดือน
-                dateFormat: "Y-m", // รูปแบบวันที่
-                altFormat: "F Y" // รูปแบบการแสดงผลเป็น Full Month และ Year
-            })
-        ],
-        onChange: function(selectedDates, dateStr, instance) {
-            updateChart(dateStr);
-        }
     });
 
-    //เงื่อนไขให้ถ้าเลือกจังหวัดแล้วจะเลือกภูมิภาคไม่ได้ แต่ถ้าเลือกภูมิภาคจะเลือกจังหวัดไม่ได้
-    document.addEventListener("DOMContentLoaded", function() {
-        const provinceSelect = document.getElementById("filter-price-list");
-        const regionCheckboxes = document.querySelectorAll("input[name='region[]']");
-
-        function toggleSelection() {
-            if (provinceSelect.value && provinceSelect.value !== "ทั้งหมด") {
-                regionCheckboxes.forEach(checkbox => {
-                    checkbox.disabled = true;
-                });
-            } else if ([...regionCheckboxes].some(checkbox => checkbox.checked)) {
-                provinceSelect.disabled = true;
-            } else {
-                provinceSelect.disabled = false;
-                regionCheckboxes.forEach(checkbox => {
-                    checkbox.disabled = false;
-                });
-            }
-        }
-
-        provinceSelect.addEventListener("change", toggleSelection);
-        regionCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener("change", toggleSelection);
-        });
-    });
-
-
-    document.addEventListener("DOMContentLoaded", function() {
-        var chartData = <?php echo $chartDataJson; ?>;
-
-        // Find the maximum data value from the datasets
-        let maxDataValue = 0;
-        chartData.datasets.forEach(function(dataset) {
-            dataset.data.forEach(function(value) {
-                if (value > maxDataValue) {
-                    maxDataValue = value;
-                }
-            });
-        });
-
-        // Set the Y-axis max value to be the max data value + 5
-        var ctx = document.getElementById('bookingChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: chartData.labels,
-                datasets: chartData.datasets
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        stacked: false
-                    },
-                    y: {
-                        stacked: false,
-                        beginAtZero: true, // Ensure it starts at 0
-                        min: 0, // Set the minimum value to 0
-                        max: maxDataValue + 5 // Set the maximum value to max data value + 5
-                    }
-                }
-            }
-        });
-    });
+    // เพิ่ม Event Listener สำหรับ flatpickr
+    document.getElementById('start_month').addEventListener('change', updateChart);
+    document.getElementById('end_month').addEventListener('change', updateChart);
 </script>
 
 </html>
