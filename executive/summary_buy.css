@@ -23,7 +23,7 @@ body {
 }
 
 .month-selected{
-    width: 35%;
+    width: 42%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -113,8 +113,6 @@ body {
     margin-bottom: 15px;
     margin-left:1rem;
 }
-
-
 
 label{
     font-size: medium;
