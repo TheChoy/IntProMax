@@ -1,50 +1,32 @@
 <?php
 include 'username.php';
 
-// กำหนดค่า default
-if (empty($_GET)) {
-    // ตั้งค่า default สำหรับระดับรถ
-    $_GET['ambulance_level'] = ['1', '2', '3'];
-
-    // ตั้งค่า default สำหรับภูมิภาค
-    $_GET['region'] = ['ภาคเหนือ', 'ภาคกลาง', 'ภาคตะวันออกเฉียงเหนือ', 'ภาคใต้'];
-
-    // ตั้งค่า default สำหรับวันที่
-    $_GET['start_month'] = date('Y-m', strtotime('0 month'));
-    $_GET['end_month'] = date('Y-m');
-}
-
-$selectedMonth = $_GET['selected_month'] ?? date('Y-m');
+// ✅ ดึงช่วงเดือนอย่างถูกต้อง
+$start_month = mysqli_real_escape_string($conn, $_GET['selected_month'] ?? '') . "-01";
+$end_raw = mysqli_real_escape_string($conn, $_GET['selected_month2'] ?? '') . "-01";
+$end_month = date("Y-m-t", strtotime($end_raw));
 
 $booking_where_sql_ambulance = "1=1";
 $booking_where_sql_event = "1=1";
 $booking_where_sql_emergency = "1=1";
 
-if (!empty($_GET['selected_month'])) {
-    $month = mysqli_real_escape_string($conn, $_GET['selected_month']);
-    $booking_where_sql_ambulance .= " AND ab.ambulance_booking_date LIKE '$month%'";
-    $booking_where_sql_event .= " AND eb.event_booking_date LIKE '$month%'";
-    $booking_where_sql_emergency .= " AND ecr.order_emergency_case_date LIKE '$month%'";
-}
-
-if (!empty($_GET['start_month']) && !empty($_GET['end_month'])) {
-    $start_month = mysqli_real_escape_string($conn, $_GET['start_month']);
-    $end_month = mysqli_real_escape_string($conn, $_GET['end_month']);
-
-    $booking_where_sql_ambulance .= " AND ab.ambulance_booking_date BETWEEN '$start_month-01' AND '$end_month-31'";
-    $booking_where_sql_event .= " AND eb.event_booking_date BETWEEN '$start_month-01' AND '$end_month-31'";
-    $booking_where_sql_emergency .= " AND ecr.order_emergency_case_date BETWEEN '$start_month-01' AND '$end_month-31'";
-
-    // สำหรับ order_equipment
-    $where_clauses[] = "order_equipment_date BETWEEN '$start_month-01' AND '$end_month-31'";
+// ✅ เงื่อนไขวันที่แบบเดียวกันทั้ง booking และ equipment
+if (!empty($_GET['selected_month']) && !empty($_GET['selected_month2'])) {
+    $booking_where_sql_ambulance .= " AND ab.ambulance_booking_date BETWEEN '$start_month' AND '$end_month'";
+    $booking_where_sql_event .= " AND eb.event_booking_date BETWEEN '$start_month' AND '$end_month'";
+    $booking_where_sql_emergency .= " AND ecr.order_emergency_case_date BETWEEN '$start_month' AND '$end_month'";
 }
 
 if (!empty($_GET['province'])) {
     $province = mysqli_real_escape_string($conn, $_GET['province']);
-    $booking_where_sql_ambulance .= " AND (ab.ambulance_booking_province = '$province')";
-    $booking_where_sql_event .= " AND (eb.event_booking_province = '$province')";
-    $booking_where_sql_emergency .= " AND ('กรุงเทพมหานคร' = '$province')";
+    $booking_where_sql_ambulance .= " AND ab.ambulance_booking_province = '$province'";
+    $booking_where_sql_event .= " AND eb.event_booking_province = '$province'";
+    $booking_where_sql_emergency .= " AND 'กรุงเทพมหานคร' = '$province'";
 }
+if (!isset($_GET['region'])) {
+    $_GET['region'] = ['ภาคเหนือ', 'ภาคกลาง', 'ภาคตะวันออกเฉียงเหนือ', 'ภาคใต้'];
+}
+
 
 if (!empty($_GET['region']) && is_array($_GET['region'])) {
     $regions = array_map(fn($r) => "'" . mysqli_real_escape_string($conn, $r) . "'", $_GET['region']);
@@ -58,201 +40,128 @@ if (!empty($_GET['ambulance_level']) && is_array($_GET['ambulance_level'])) {
     $levels = array_map(fn($lvl) => "'" . mysqli_real_escape_string($conn, $lvl) . "'", $_GET['ambulance_level']);
     $booking_level_filter = "a.ambulance_level IN (" . implode(",", $levels) . ")";
 } else {
-    // เมื่อไม่มี checkbox ถูกเลือก
-    $booking_level_filter = "1=0"; // เงื่อนไขที่ทำให้ไม่มีข้อมูล
+    $booking_level_filter = "1=0";
 }
-
 if (!empty($_GET['gender'])) {
     $gender = mysqli_real_escape_string($conn, $_GET['gender']);
-    $booking_where_sql_ambulance .= " AND (m.member_gender = '$gender')";
-    $booking_where_sql_event .= " AND (m.member_gender = '$gender')";
-    $booking_where_sql_emergency .= " AND (ecr.order_emergency_case_patient_gender = '$gender')";
+    $booking_gender_filter = " AND m.member_gender = '$gender'";
+} else {
+    $booking_gender_filter = "";
 }
 
+// ✅ Equipment ฟิลเตอร์
 $where_clauses = [];
-if (!empty($_GET['selected_month'])) {
-    $month = mysqli_real_escape_string($conn, $_GET['selected_month']);
-    $where_clauses[] = "order_equipment_date LIKE '$month%'";
-}
+
+$where_clauses[] = "order_equipment_date BETWEEN '$start_month' AND '$end_month'";
+
 if (!empty($_GET['gender'])) {
     $gender = mysqli_real_escape_string($conn, $_GET['gender']);
     $where_clauses[] = "member_gender = '$gender'";
 }
+
 if (!empty($_GET['order_type'])) {
     $type = mysqli_real_escape_string($conn, $_GET['order_type']);
     $where_clauses[] = "order_equipment_type = '$type'";
+} else {
+    $where_clauses[] = "order_equipment_type IN ('ซื้อ', 'เช่า')";
 }
+
 if (!empty($_GET['province'])) {
     $province = mysqli_real_escape_string($conn, $_GET['province']);
     $where_clauses[] = "member_province = '$province'";
 }
+
 if (!empty($_GET['region']) && is_array($_GET['region'])) {
     $regions = array_map(function ($r) use ($conn) {
         return "'" . mysqli_real_escape_string($conn, $r) . "'";
     }, $_GET['region']);
     $where_clauses[] = "member_region IN (" . implode(",", $regions) . ")";
+} else {
+    $where_clauses[] = "1=0";
 }
-$where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses) : "";
 
-// แก้ไข SQL query หลัก
+$where_sql = "WHERE " . implode(" AND ", $where_clauses);
+
+// ✅ SQL booking แยกตามเพศ
 $sql = "
 SELECT 
     merged.source AS source_type, 
-    a.ambulance_level, 
+    m.member_gender AS gender,
     SUM(merged.reservation_price) AS total_sales
 FROM (
-    SELECT 
-        ab.member_id, 
-        ab.ambulance_id, 
-        ab.ambulance_booking_date AS booking_date, 
-        ab.ambulance_booking_province AS province, 
-        ab.ambulance_booking_region AS region, 
-        'ambulance' AS source,
-        m.member_gender,
-        ab.ambulance_booking_price AS reservation_price
+    SELECT ab.member_id, ab.ambulance_id, ab.ambulance_booking_price AS reservation_price, 'ambulance' AS source
     FROM ambulance_booking AS ab
-    JOIN member m ON ab.member_id = m.member_id
     WHERE $booking_where_sql_ambulance
 
     UNION ALL
 
-    SELECT 
-        eb.member_id, 
-        eb.ambulance_id, 
-        eb.event_booking_date AS booking_date, 
-        eb.event_booking_province AS province, 
-        eb.event_booking_region AS region, 
-        'event' AS source,
-        m.member_gender,
-        eb.event_booking_price AS reservation_price
+    SELECT eb.member_id, eb.ambulance_id, eb.event_booking_price AS reservation_price, 'event' AS source
     FROM event_booking AS eb
-    JOIN member m ON eb.member_id = m.member_id
     WHERE $booking_where_sql_event
 
     UNION ALL
 
-    SELECT 
-        ecr.order_emergency_case_id,
-        ecr.ambulance_id, 
-        ecr.order_emergency_case_date AS booking_date,
-        'กรุงเทพมหานคร' AS province,
-        'ภาคกลาง' AS region,
-        'emergency' AS source,
-        ecr.order_emergency_case_patient_gender AS member_gender,
-        ecr.order_emergency_case_price AS reservation_price
+    SELECT ecr.order_emergency_case_id AS member_id, ecr.ambulance_id, ecr.order_emergency_case_price AS reservation_price, 'emergency' AS source
     FROM order_emergency_case AS ecr
     WHERE $booking_where_sql_emergency
 ) AS merged
+LEFT JOIN member AS m ON merged.member_id = m.member_id
 LEFT JOIN ambulance AS a ON merged.ambulance_id = a.ambulance_id
-WHERE $booking_level_filter
-GROUP BY merged.source, a.ambulance_level
-ORDER BY source_type, ambulance_level
+WHERE $booking_level_filter $booking_gender_filter
+GROUP BY merged.source, m.member_gender
 ";
 
+// ✅ SQL อุปกรณ์ แยกเพศ
 $sqrt = "
-SELECT
-    COALESCE(SUM(CASE WHEN order_equipment_type = 'ซื้อ' THEN order_equipment_total ELSE 0 END), 0) AS total_purchase,
-    COALESCE(SUM(CASE WHEN order_equipment_type = 'เช่า' THEN order_equipment_total ELSE 0 END), 0) AS total_rent,
-    COUNT(*) as total_records
+SELECT 
+    member_gender AS gender,
+    SUM(CASE WHEN order_equipment_type = 'ซื้อ' THEN order_equipment_total ELSE 0 END) AS total_purchase,
+    SUM(CASE WHEN order_equipment_type = 'เช่า' THEN order_equipment_total ELSE 0 END) AS total_rent
 FROM order_equipment
-LEFT JOIN equipment ON order_equipment.equipment_id = equipment.equipment_id
-LEFT JOIN member ON order_equipment.member_id = member.member_id
+JOIN equipment ON order_equipment.equipment_id = equipment.equipment_id
+JOIN member ON order_equipment.member_id = member.member_id
 $where_sql
+GROUP BY member_gender
 ";
-
 $result_booking = mysqli_query($conn, $sql);
 $result_equipment = mysqli_query($conn, $sqrt);
 
-// Initialize variables สำหรับยอดขายแต่ละระดับ
-$ambulance_sales_level1 = 0;
-$ambulance_sales_level2 = 0;
-$ambulance_sales_level3 = 0;
-$event_sales_level1 = 0;
-$event_sales_level2 = 0;
-$event_sales_level3 = 0;
-$emergency_sales_level1 = 0;
-$emergency_sales_level2 = 0;
-$emergency_sales_level3 = 0;
+// ✅ คำนวณค่ารวม
+$result_booking = mysqli_query($conn, $sql);
+$result_equipment = mysqli_query($conn, $sqrt);
 
-// คำนวณยอดขายแยกตามระดับ Level 1, 2, 3
+// ✅ คำนวณค่ารวม
+$data = [
+    'ambulance' => ['ชาย' => 0, 'หญิง' => 0],
+    'event' => ['ชาย' => 0, 'หญิง' => 0],
+    'emergency' => ['ชาย' => 0, 'หญิง' => 0],
+    'equipment' => ['ชาย' => 0, 'หญิง' => 0],
+];
+
 while ($row = mysqli_fetch_assoc($result_booking)) {
-    if ($row['source_type'] === 'ambulance') {
-        if ($row['ambulance_level'] == 1) {
-            $ambulance_sales_level1 += $row['total_sales'];
-        } elseif ($row['ambulance_level'] == 2) {
-            $ambulance_sales_level2 += $row['total_sales'];
-        } elseif ($row['ambulance_level'] == 3) {
-            $ambulance_sales_level3 += $row['total_sales'];
-        }
-    } elseif ($row['source_type'] === 'event') {
-        if ($row['ambulance_level'] == 1) {
-            $event_sales_level1 += $row['total_sales'];
-        } elseif ($row['ambulance_level'] == 2) {
-            $event_sales_level2 += $row['total_sales'];
-        } elseif ($row['ambulance_level'] == 3) {
-            $event_sales_level3 += $row['total_sales'];
-        }
-    } elseif ($row['source_type'] === 'emergency') {
-        if ($row['ambulance_level'] == 1) {
-            $emergency_sales_level1 += $row['total_sales'];
-        } elseif ($row['ambulance_level'] == 2) {
-            $emergency_sales_level2 += $row['total_sales'];
-        } elseif ($row['ambulance_level'] == 3) {
-            $emergency_sales_level3 += $row['total_sales'];
-        }
+    $type = $row['source_type'];
+    $gender = $row['gender'] ?? 'ไม่ระบุ';
+    $amount = $row['total_sales'] ?? 0;
+
+    if (isset($data[$type][$gender])) {
+        $data[$type][$gender] += $amount;
     }
 }
 
-$ambulance_sales = 0;
-$event_sales = 0;
-$emergency_sales = 0;
-if ($result_booking && mysqli_num_rows($result_booking) > 0) {
-    while ($row = mysqli_fetch_assoc($result_booking)) {
-        if ($row['source_type'] == 'ambulance') $ambulance_sales += $row['total_sales'];
-        elseif ($row['source_type'] == 'event') $event_sales += $row['total_sales'];
-        elseif ($row['source_type'] == 'emergency') $emergency_sales += $row['total_sales'];
-    }
+// แยกข้อมูล equipment ตามเพศ
+while ($row = mysqli_fetch_assoc($result_equipment)) {
+    $gender = $row['gender'] ?? 'ไม่ระบุ';
+    $data['equipment'][$gender] += ($row['total_purchase'] ?? 0) + ($row['total_rent'] ?? 0);
 }
 
-$purchase_sales = 0;
-$rent_sales = 0;
-$has_equipment_data = false;
-
-if ($result_equipment && mysqli_num_rows($result_equipment) > 0) {
-    $row = mysqli_fetch_assoc($result_equipment);
-    if ($row['total_records'] > 0) {
-        $purchase_sales = $row['total_purchase'];
-        $rent_sales = $row['total_rent'];
-        $has_equipment_data = true;
-    }
-}
-
+// ✅ ส่งกลับแบบ JSON
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
     header('Content-Type: application/json');
-    echo json_encode([
-        // ยอดขายแยกตามประเภทงาน
-        'ambulance_sales' => $ambulance_sales,
-        'event_sales' => $event_sales,
-        'emergency_sales' => $emergency_sales,
-
-        // ยอดขายแยกตามระดับ Level 1, 2, 3 สำหรับ Ambulance, Event, Emergency
-        'ambulance_sales_level1' => $ambulance_sales_level1,
-        'ambulance_sales_level2' => $ambulance_sales_level2,
-        'ambulance_sales_level3' => $ambulance_sales_level3,
-        'event_sales_level1' => $event_sales_level1,
-        'event_sales_level2' => $event_sales_level2,
-        'event_sales_level3' => $event_sales_level3,
-        'emergency_sales_level1' => $emergency_sales_level1,
-        'emergency_sales_level2' => $emergency_sales_level2,
-        'emergency_sales_level3' => $emergency_sales_level3,
-
-        // ยอดขายอุปกรณ์
-        'purchase_sales' => $purchase_sales,
-        'rent_sales' => $rent_sales
-    ]);
+    echo json_encode($data);
     exit;
 }
 ?>
+
 
 
 <!DOCTYPE html>
@@ -274,7 +183,6 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="summary_buy.js"></script>
     <title>สรุปยอดขาย</title>
-
 
 </head>
 <style>
@@ -317,20 +225,13 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
                 <button type="button" class="close-sidebar">&times;</button>
             </div>
 
-            <form method="GET" action="summary_buy.php" id="filterForm">
-                <div class="date-range">
-                    <div>
-                        <label for="start_month">เริ่มต้น:</label>
-                        <input type="text" id="start_month" class="month-selected" name="start_month"
-                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['start_month'] ?? '' ?>">
-                    </div>
-                    <div>
-                        <label for="end_month">สิ้นสุด:</label>
-                        <input type="text" id="end_month" class="month-selected" name="end_month"
-                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['end_month'] ?? '' ?>">
-                    </div>
-                </div>
+            <form id="filterForm">
 
+                <label for="start_month">เริ่มต้น (ปี/เดือน):</label>
+                <input type="month" id="start_month" class="month-selected" name="selected_month" value="<?= $_GET['selected_month'] ?? '' ?>">
+                <br>
+                <label for="end_month">สิ้นสุด (ปี/เดือน):</label>
+                <input type="month" id="end_month" class="month-selected" name="selected_month2" value="<?= $_GET['selected_month2'] ?? '' ?>">
                 <br>
                 <label>เพศ:</label>
                 <select name="gender" class="filter-select">
@@ -476,193 +377,102 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
                     dateFormat: "Y-m",
                     altFormat: "F Y"
                 })
-            ],
-            disableMobile: true
+            ]
         };
 
         // กำหนดค่า default dates
         const today = new Date();
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-        // Initialize start_month flatpickr
-        const startMonthPicker = flatpickr("#start_month", {
+        flatpickr("#start_month", {
             ...monthSelectConfig,
             defaultDate: "<?= $_GET['start_month'] ?? date('Y-m') ?>",
-            maxDate: today,
-            onChange: function(selectedDates, dateStr) {
-                if (selectedDates[0]) {
-                    // Reset end_month configuration
-                    endMonthPicker.destroy();
-
-                    // Reinitialize end_month with updated config
-                    const endConfig = {
-                        ...monthSelectConfig,
-                        defaultDate: endMonthPicker.selectedDates[0] || selectedDates[0],
-                        minDate: selectedDates[0],
-                        maxDate: today,
-                        onChange: function(selectedDates, dateStr) {
-                            if (selectedDates[0]) {
-                                const startDate = startMonthPicker.selectedDates[0];
-                                if (startDate && selectedDates[0] < startDate) {
-                                    this.setDate(startDate);
-                                }
-                            }
-                        }
-                    };
-
-                    endMonthPicker = flatpickr("#end_month", endConfig);
-                }
-            }
+            maxDate: new Date()
         });
 
-        // Initialize end_month flatpickr
-        let endMonthPicker = flatpickr("#end_month", {
+        flatpickr("#end_month", {
             ...monthSelectConfig,
             defaultDate: "<?= $_GET['end_month'] ?? date('Y-m') ?>",
-            minDate: startMonthPicker.selectedDates[0] || "<?= $_GET['start_month'] ?? date('Y-m') ?>",
-            maxDate: today
+            maxDate: new Date()
         });
-
         //chart
-        var ctx = document.getElementById('salesChart').getContext('2d');
+        document.addEventListener("DOMContentLoaded", function() {
+            const filterForm = document.getElementById("filterForm");
+            const chartCanvas = document.getElementById("salesChart");
+            const ctx = chartCanvas.getContext("2d");
 
-        var salesChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['รับส่งผู้ป่วย', 'รับงาน Event', 'รับเคสฉุกเฉิน', 'อุปกรณ์ทางการแพทย์'],
-                datasets: [{
-                        label: 'รถระดับ 1',
-                        data: [
-                            <?php echo $ambulance_sales_level1; ?>,
-                            <?php echo $event_sales_level1; ?>,
-                            <?php echo $emergency_sales_level1; ?>,
-                            0 // Equipment ไม่มีการแยกระดับ
-                        ],
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'รถระดับ 2',
-                        data: [
-                            <?php echo $ambulance_sales_level2; ?>,
-                            <?php echo $event_sales_level2; ?>,
-                            <?php echo $emergency_sales_level2; ?>,
-                            0
-                        ],
-                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                        borderColor: 'rgba(153, 102, 255, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'รถระดับ 3',
-                        data: [
-                            <?php echo $ambulance_sales_level3; ?>,
-                            <?php echo $event_sales_level3; ?>,
-                            <?php echo $emergency_sales_level3; ?>,
-                            0
-                        ],
-                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                        borderColor: 'rgba(255, 159, 64, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'ซื้อ',
-                        data: [0, 0, 0, <?php echo $has_equipment_data ? $purchase_sales : 'null'; ?>],
-                        backgroundColor: 'rgba(248, 148, 248, 0.36)',
-                        borderColor: 'rgb(255, 39, 219)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'เช่า',
-                        data: [0, 0, 0, <?php echo $has_equipment_data ? $rent_sales : 'null'; ?>],
-                        backgroundColor: 'rgba(64, 201, 255, 0.34)',
-                        borderColor: 'rgb(0, 204, 255)',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        stacked: false,
-                        beginAtZero: true
-                    },
-                    y: {
-                        stacked: false,
-                        beginAtZero: true
-                    }
+            Chart.defaults.elements.bar.borderRadius = 5;
+
+            let salesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['รับส่งผู้ป่วย', 'รับงาน Event', 'รับเคสฉุกเฉิน', 'อุปกรณ์ทางการแพทย์'],
+                    datasets: [{
+                            label: 'ชาย',
+                            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                            data: [0, 0, 0, 0]
+                        },
+                        {
+                            label: 'หญิง',
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                            data: [0, 0, 0, 0]
+                        }
+                    ]
                 },
-                plugins: {
-                    legend: {
-                        display: true
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true
+                        }
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                if (context.raw === null) {
-                                    return context.dataset.label + ': ไม่มีข้อมูล';
-                                }
-                                return context.dataset.label + ': ' + context.raw;
-                            }
+                    plugins: {
+                        legend: {
+                            display: true
                         }
                     }
                 }
+            });
+
+            // ฟังก์ชันส่งฟอร์มด้วย AJAX
+            function updateChart() {
+                const formData = new FormData(filterForm);
+                const params = new URLSearchParams(formData).toString();
+
+                fetch(`summary_buy.php?${params}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        const categories = ['ambulance', 'event', 'emergency', 'equipment'];
+
+                        const maleData = categories.map(cat => Number(data[cat]?.ชาย ?? 0));
+                        const femaleData = categories.map(cat => Number(data[cat]?.หญิง ?? 0));
+
+                        salesChart.data.datasets[0].data = maleData;
+                        salesChart.data.datasets[1].data = femaleData;
+
+                        salesChart.update();
+                    })
+                    .catch(err => console.error("Error fetching chart data:", err));
             }
+
+            // เรียกเมื่อเปลี่ยน filter
+            const inputs = filterForm.querySelectorAll("input, select");
+            inputs.forEach(input => {
+                input.addEventListener("change", updateChart);
+            });
+
+            // โหลดครั้งแรก
+            updateChart();
         });
-
-        function updateChart() {
-            const form = document.getElementById("filterForm");
-            const formData = new FormData(form);
-            const params = new URLSearchParams(formData).toString();
-
-            // Update the URL (optional)
-            const urlParams = new URLSearchParams(formData);
-            window.history.replaceState({}, '', `?${urlParams}`);
-
-            fetch(`summary_buy.php?${params}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    // อัปเดตข้อมูลในกราฟ
-                    salesChart.data.datasets[0].data = [
-                        data.ambulance_sales_level1,
-                        data.event_sales_level1,
-                        data.emergency_sales_level1,
-                        0 // Equipment ไม่มีระดับ
-                    ];
-                    salesChart.data.datasets[1].data = [
-                        data.ambulance_sales_level2,
-                        data.event_sales_level2,
-                        data.emergency_sales_level2,
-                        0
-                    ];
-                    salesChart.data.datasets[2].data = [
-                        data.ambulance_sales_level3,
-                        data.event_sales_level3,
-                        data.emergency_sales_level3,
-                        0
-                    ];
-                    salesChart.data.datasets[3].data = [
-                        0,
-                        0,
-                        0,
-                        data.purchase_sales > 0 ? data.purchase_sales : null
-                    ];
-                    salesChart.data.datasets[4].data = [
-                        0,
-                        0,
-                        0,
-                        data.rent_sales > 0 ? data.rent_sales : null
-                    ];
-
-                    // อัปเดตกราฟ
-                    salesChart.update();
-                });
-        }
     </script>
 </body>
 
