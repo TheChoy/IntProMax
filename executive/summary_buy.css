@@ -106,7 +106,8 @@ body {
 }
 
 .filter-select{
-    width: 90%;
+    max-width: 100%;
+    width: 85%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -171,6 +172,29 @@ label{
 /* Main content */
 .main-content {
     padding: 1rem;
+}
+
+/* สไตล์สำหรับปุ่ม Reset */ 
+.filter-sidebar .reset-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #f44336; /* สีแดง */
+    color: white;
+    text-align: center;
+    font-size: 16px;
+    text-decoration: none;
+    border-radius: 5px; /* มุมโค้ง */
+    transition: background-color 0.3s ease;
+    margin-left: 12px;
+    margin-top:10px;
+}
+
+.filter-sidebar .reset-button:hover {
+    background-color: #e53935; /* สีแดงเข้มขึ้นเมื่อ hover */
+}
+
+.filter-sidebar .reset-button:active {
+    background-color: #d32f2f; /* สีแดงเข้มสุดเมื่อคลิก */
 }
 
 /* Media queries for responsiveness */
