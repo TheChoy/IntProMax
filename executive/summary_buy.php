@@ -262,6 +262,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="summary_buy.css?v=1.0">
+    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
@@ -456,6 +457,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
                 }
                 ?>
             </form>
+            <a href="summary_buy.php" class="reset-button" style="margin-left: 12px; margin-top:10px;" id="reset-button">Reset</a>
         </div>
         </div>
 
