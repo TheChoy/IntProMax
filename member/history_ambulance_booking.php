@@ -13,10 +13,12 @@ $sql = "SELECT
             ambulance_booking.ambulance_booking_id,
             ambulance_booking.ambulance_booking_location,
             ambulance_booking.ambulance_booking_hospital_waypoint,
+            ambulance_booking.ambulance_booking_province,
             ambulance_booking.ambulance_booking_date,
             ambulance_booking.ambulance_booking_start_time,
             ambulance_booking.ambulance_booking_finish_time,
             ambulance_booking.ambulance_booking_price,
+            ambulance_booking.ambulance_booking_status,
             member.member_firstname,
             member.member_lastname,
             member.member_phone,
@@ -128,7 +130,7 @@ $result = $stmt->get_result();
                             <th>ทะเบียนรถ</th>
                             <th>วันเวลาจอง</th>
                             <th>ชื่อผู้จอง</th>
-                            <th>เบอร์โทร</th>
+                            <th>สถานะการจอง</th>
                             <th>ค่าบริการ (บาท)</th>
                         </tr>
                       </thead><tbody>';
@@ -140,14 +142,14 @@ $result = $stmt->get_result();
                 $total += $row['ambulance_booking_price'];
             ?>
                 <tr>
-                    <td><?= htmlspecialchars($row['ambulance_booking_location']) ?> - <?= htmlspecialchars($row['ambulance_booking_hospital_waypoint']) ?></td>
+                    <td><?= htmlspecialchars($row['ambulance_booking_location']) ." " . htmlspecialchars($row['ambulance_booking_province'])  ?> <strong>ไป</strong>  <?= htmlspecialchars($row['ambulance_booking_hospital_waypoint']) ?></td>
                     <td><?= htmlspecialchars($row['ambulance_plate']) ?></td>
                     <td>
                         <?= htmlspecialchars($row['ambulance_booking_date']) ?><br>
                         <?= htmlspecialchars($row['ambulance_booking_start_time']) ?> - <?= htmlspecialchars($row['ambulance_booking_finish_time']) ?>
                     </td>
                     <td><?= htmlspecialchars($row['member_firstname'] . ' ' . $row['member_lastname']) ?></td>
-                    <td><?= htmlspecialchars($row['member_phone']) ?></td>
+                    <td><?= htmlspecialchars($row['ambulance_booking_status']) ?></td>
                     <td class="text-end"><?= number_format($row['ambulance_booking_price'], 2) ?></td>
 
                 </tr>

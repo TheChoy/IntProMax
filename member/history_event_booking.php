@@ -13,6 +13,7 @@ $sql = "SELECT
             event_booking.event_booking_id,
             event_booking.event_booking_type,
             event_booking.event_booking_location,
+            event_booking.event_booking_province,
             event_booking.event_booking_date,
             event_booking.event_booking_start_time,
             event_booking.event_booking_finish_time,
@@ -141,7 +142,7 @@ $result = $stmt->get_result();
             ?>
                 <tr>
                     <td><?= htmlspecialchars($row['event_booking_type']) ?></td>
-                    <td><?= htmlspecialchars($row['event_booking_location']) ?></td>
+                    <td><?= htmlspecialchars($row['event_booking_location'])." ". htmlspecialchars($row['event_booking_province']) ?></td>
                     <td><?= htmlspecialchars($row['ambulance_plate']) ?></td>
                     <td>
                         <?= htmlspecialchars($row['event_booking_date']) ?><br>
@@ -158,7 +159,7 @@ $result = $stmt->get_result();
             <?php
             $event_ids_str = implode(',', $event_ids);
             echo '<div class="print-button-wrapper">';
-            echo '<a href="print_bill.php?event_ids=' . $event_ids_str . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
+            echo '<a href="print_bill_event_booking.php?event_ids=' . $event_ids_str . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
             ?>
         <?php else: ?>
             <div class="alert alert-warning">ไม่พบรายการจองรถสำหรับรับงาน Event</div>
