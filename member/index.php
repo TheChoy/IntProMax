@@ -67,11 +67,6 @@ if (empty($_SESSION['logged_in'])) {
 </div>
 
 <body>
-
-    <div class="container">
-        <h1>ยินดีต้อนรับ <?php echo $_SESSION['user_email']; ?></h1>
-    </div>
-
 </body>
 
 </html>

@@ -37,7 +37,7 @@ $member_id = $_SESSION['user_id'];
                     <a href="profile.html">โปรไฟล์</a>
                     <a href="history.php">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
-                    <a href="logout.html">ออกจากระบบ</a>
+                    <a href="../logout.php">ออกจากระบบ</a>
                 </div>
             </div>
             <a href="index.php">
