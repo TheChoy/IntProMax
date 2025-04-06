@@ -3,7 +3,8 @@ include('username.php');
 
 // รับค่าจากฟอร์ม
 date_default_timezone_set('Asia/Bangkok');
-$selected_month = isset($_GET['month']) ? $_GET['month'] : date('Y-m');
+$selected_month1 = isset($_GET['month1']) ? $_GET['month1'] : date('Y-m');
+$selected_month2 = isset($_GET['month2']) ? $_GET['month2'] : date('Y-m');
 $selected_gender = isset($_GET['gender']) ? $_GET['gender'] : "ทั้งหมด";
 $selected_type = isset($_GET['type']) ? $_GET['type'] : "ทั้งหมด";
 $min_price = isset($_GET['min_price']) ? (int)$_GET['min_price'] : 0;
@@ -15,8 +16,8 @@ $selected_province = isset($_GET['province']) ? $_GET['province'] : "ทั้�
 // ช่วงราคาสินค้า
 $where_clause = "WHERE order_equipment_total BETWEEN $min_price AND $max_price";
 // วันที่ซื้อสินค้า
-if ($selected_month) {
-    $where_clause .= " AND DATE_FORMAT(order_equipment_date, '%Y-%m') = '$selected_month'";
+if ($selected_month1 && $selected_month2) {
+    $where_clause .= " AND DATE_FORMAT(order_equipment_date, '%Y-%m') BETWEEN '$selected_month1' AND '$selected_month2'";
 }
 // เพศ
 if ($selected_gender !== "ทั้งหมด") {
@@ -183,8 +184,9 @@ $conn->close();
                     <!-- ใส่ Filter ตรงนี้ -->
 
 
-                    <label for="calendarSelect">ปี/เดือน:</label>
-                    <input class="calendar-selected" id="calendarSelect" type="text" placeholder="เลือกเดือน" value="<?php echo $selected_month; ?>">
+                    <label for="calendarSelect">ปี/เดือน - ปี/เดือน:</label>
+                    <input class="calendar-selected" id="calendarSelect1" type="text" placeholder="เลือกเดือน" value="<?php echo $selected_month1; ?>">
+                    <input class="calendar-selected" id="calendarSelect2" type="text" placeholder="เลือกเดือน" value="<?php echo $selected_month2; ?>">
                     <br>
 
                     <label for="filter-gender">เพศ:</label>
@@ -335,7 +337,7 @@ $conn->close();
         });
 
         // ตั้งค่า Flatpickr สำหรับเลือกวันที่
-        flatpickr("#calendarSelect", {
+        flatpickr("#calendarSelect1", {
             plugins: [
                 new monthSelectPlugin({
                     shorthand: true,
@@ -343,9 +345,23 @@ $conn->close();
                     altFormat: "F Y"
                 })
             ],
-            defaultDate: "<?php echo $selected_month; ?>",
+            defaultDate: "<?php echo $selected_month1; ?>",
             onChange: function(selectedDates, dateStr, instance) {
-                document.getElementById("calendarSelect").value = dateStr; // อัปเดตค่าใน input
+                document.getElementById("calendarSelect1").value = dateStr; // อัปเดตค่าใน input
+                updateFilters(); // เรียกใช้งานฟังก์ชันอัปเดตข้อมูล
+            }
+        });
+        flatpickr("#calendarSelect2", {
+            plugins: [
+                new monthSelectPlugin({
+                    shorthand: true,
+                    dateFormat: "Y-m",
+                    altFormat: "F Y"
+                })
+            ],
+            defaultDate: "<?php echo $selected_month2; ?>",
+            onChange: function(selectedDates, dateStr, instance) {
+                document.getElementById("calendarSelect2").value = dateStr; // อัปเดตค่าใน input
                 updateFilters(); // เรียกใช้งานฟังก์ชันอัปเดตข้อมูล
             }
         });
@@ -365,7 +381,8 @@ $conn->close();
             updateFilters();
 
             // ตั้งค่า event listener ให้ฟิลเตอร์ทั้งหมด
-            document.getElementById("calendarSelect").addEventListener("change", updateFilters);
+            document.getElementById("calendarSelect1").addEventListener("change", updateFilters);
+            document.getElementById("calendarSelect2").addEventListener("change", updateFilters);
             document.getElementById("filter-gender-list").addEventListener("change", updateFilters);
             document.getElementById("filter-type-list").addEventListener("change", updateFilters);
             document.getElementById("minPrice").addEventListener("input", updateFilters);
@@ -386,7 +403,8 @@ $conn->close();
             const params = new URLSearchParams(window.location.search);
 
             // ดึงค่าฟิลเตอร์จาก URL
-            if (params.has("month")) document.getElementById("calendarSelect").value = params.get("month");
+            if (params.has("month1")) document.getElementById("calendarSelect1").value = params.get("month1");
+            if (params.has("month2")) document.getElementById("calendarSelect2").value = params.get("month2");
             if (params.has("gender")) document.getElementById("filter-gender-list").value = params.get("gender");
             if (params.has("type")) document.getElementById("filter-type-list").value = params.get("type");
             if (params.has("min_price")) document.getElementById("minPrice").value = params.get("min_price");
@@ -398,7 +416,8 @@ $conn->close();
             updateFilters();
 
             // ตั้งค่า event listener ให้ฟิลเตอร์ทั้งหมด
-            document.getElementById("calendarSelect").addEventListener("change", updateFilters);
+            document.getElementById("calendarSelect1").addEventListener("change", updateFilters);
+            document.getElementById("calendarSelect2").addEventListener("change", updateFilters);
             document.getElementById("filter-gender-list").addEventListener("change", updateFilters);
             document.getElementById("filter-type-list").addEventListener("change", updateFilters);
             document.getElementById("minPrice").addEventListener("input", updateFilters);
@@ -407,7 +426,8 @@ $conn->close();
         });
 
         function updateFilters() {
-            const month = document.getElementById("calendarSelect").value;
+            const month1 = document.getElementById("calendarSelect1").value;
+            const month2 = document.getElementById("calendarSelect2").value;
             const gender = document.getElementById("filter-gender-list").value;
             const minPrice = document.getElementById("minPrice").value;
             const maxPrice = document.getElementById("maxPrice").value;
@@ -416,7 +436,8 @@ $conn->close();
 
             // ✅ อัปเดต URL
             const params = new URLSearchParams({
-                month,
+                month1,
+                month2,
                 gender,
                 min_price: minPrice,
                 max_price: maxPrice,
@@ -443,13 +464,22 @@ $conn->close();
 
 
         document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById("calendarSelect").flatpickr({
+            document.getElementById("calendarSelect1").flatpickr({
                 plugins: [new monthSelectPlugin({
                     shorthand: true,
                     dateFormat: "Y-m",
                     altFormat: "F Y"
                 })],
-                defaultDate: "<?php echo $selected_month; ?>",
+                defaultDate: "<?php echo $selected_month1; ?>",
+                onChange: updateFilters // ทำให้ AJAX ทำงานเมื่อเปลี่ยนเดือน
+            });
+            document.getElementById("calendarSelect2").flatpickr({
+                plugins: [new monthSelectPlugin({
+                    shorthand: true,
+                    dateFormat: "Y-m",
+                    altFormat: "F Y"
+                })],
+                defaultDate: "<?php echo $selected_month2; ?>",
                 onChange: updateFilters // ทำให้ AJAX ทำงานเมื่อเปลี่ยนเดือน
             });
 
@@ -464,7 +494,8 @@ $conn->close();
         function loadFiltersFromURL() {
             const params = new URLSearchParams(window.location.search);
 
-            if (params.has("month")) document.getElementById("calendarSelect").value = params.get("month");
+            if (params.has("month1")) document.getElementById("calendarSelect1").value = params.get("month1");
+            if (params.has("month2")) document.getElementById("calendarSelect2").value = params.get("month2");
             if (params.has("gender")) document.getElementById("filter-gender-list").value = params.get("gender");
             if (params.has("type")) document.getElementById("filter-type-list").value = params.get("type");
             if (params.has("min_price")) document.getElementById("minPrice").value = params.get("min_price");
