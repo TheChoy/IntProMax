@@ -102,50 +102,70 @@ $result = $conn->query($sql);
 // เตรียมข้อมูลจากฐานข้อมูล
 $chartData = [];
 
-// ดึงข้อมูลจากฐานข้อมูล
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        // กำหนด source เป็นข้อความที่คุณต้องการ
-        $source = $row['source']; // ประเภทการจอง
+        $source = $row['source'];
         if ($source == 'emergency') {
-            $source = 'รับเคสฉุกเฉิน'; // แสดงข้อความสำหรับ emergency
+            $source = 'รับเคสฉุกเฉิน';
         } elseif ($source == 'ambulance') {
-            $source = 'รับส่งผู้ป่วย'; // แสดงข้อความสำหรับ ambulance
+            $source = 'รับส่งผู้ป่วย';
         } elseif ($source == 'event') {
-            $source = 'รับงาน EVENT'; // แสดงข้อความสำหรับ event
+            $source = 'รับงาน EVENT';
         }
 
-        $level = $row['ambulance_level'];   // ระดับรถ (1,2,3)
-
-        // ตรวจสอบว่าหมวดหมู่หลัก (source) ถูกกำหนดหรือยัง
+        $gender = $row['gender'];
+        $level = $row['ambulance_level'];
+        
         if (!isset($chartData[$source])) {
-            $chartData[$source] = ['1' => 0, '2' => 0, '3' => 0]; // ตั้งค่าเริ่มต้นที่ 0
+            $chartData[$source] = [
+                'ชาย' => ['count' => 0, 'levels' => []],
+                'หญิง' => ['count' => 0, 'levels' => []]
+            ];
         }
 
-        // เพิ่มค่าจำนวนตามระดับรถ
-        $chartData[$source][$level]++;
+        if ($gender) {
+            $chartData[$source][$gender]['count']++;
+            $chartData[$source][$gender]['levels'][] = $level;
+        }
     }
 }
 
 // สร้าง Labels และ Values สำหรับกราฟ
-$chartLabels = array_keys($chartData); // Labels: ["เคสฉุกเฉิน", "รับส่งผู้ป่วย", "รับงาน EVENT"]
+$chartLabels = array_keys($chartData);
 
-// แยกข้อมูลแต่ละ level ออกมาให้เป็น dataset
-$chartLevels = ['1' => [], '2' => [], '3' => []];
+// แยกข้อมูลแต่ละเพศออกมาให้เป็น dataset
+$maleData = [];
+$femaleData = [];
+$maleLevels = [];
+$femaleLevels = [];
 
 foreach ($chartLabels as $source) {
-    foreach ($chartLevels as $level => &$values) {
-        $values[] = $chartData[$source][$level];
-    }
+    $maleData[] = $chartData[$source]['ชาย']['count'];
+    $femaleData[] = $chartData[$source]['หญิง']['count'];
+    $maleLevels[] = array_count_values($chartData[$source]['ชาย']['levels']);
+    $femaleLevels[] = array_count_values($chartData[$source]['หญิง']['levels']);
 }
 
 // ส่งออกข้อมูลเป็น JSON สำหรับ JavaScript
 $chartDataJson = json_encode([
     'labels' => $chartLabels,
     'datasets' => [
-        ['label' => 'ระดับ 1', 'data' => $chartLevels['1'], 'backgroundColor' => 'rgba(255, 99, 132, 0.6)'],
-        ['label' => 'ระดับ 2', 'data' => $chartLevels['2'], 'backgroundColor' => 'rgba(54, 162, 235, 0.6)'],
-        ['label' => 'ระดับ 3', 'data' => $chartLevels['3'], 'backgroundColor' => 'rgba(75, 192, 192, 0.6)']
+        [
+            'label' => 'เพศชาย',
+            'data' => $maleData,
+            'backgroundColor' => 'rgba(54, 162, 235, 0.6)',
+            'borderColor' => 'rgba(54, 162, 235, 1)',
+            'borderWidth' => 1,
+            'levels' => $maleLevels
+        ],
+        [
+            'label' => 'เพศหญิง',
+            'data' => $femaleData,
+            'backgroundColor' => 'rgba(255, 99, 132, 0.6)',
+            'borderColor' => 'rgba(255, 99, 132, 1)',
+            'borderWidth' => 1,
+            'levels' => $femaleLevels
+        ]
     ]
 ]);
 
@@ -214,8 +234,8 @@ $conn->close();
                     <div class="sidebar-content">
 
                         <select class="filter-select" style="margin-left: 2%;" onchange="location = this.value;">
-                            <option value="static_car_page.php" selected>ดูสถิติรถ(รวม)</option>
-                            <option value="static_car_page_gender.php">ดูสถิติรถ(แยกเพศ)</option>
+                            <option value="static_car_page.php" >ดูสถิติรถ(รวม)</option>
+                            <option value="static_car_page_gender.php" selected>ดูสถิติรถ(แยกเพศ)</option>
                         </select>
 
                         <label for="">เลือกประเภทงาน:</label>
@@ -348,7 +368,7 @@ $conn->close();
                             placeholder="เลือกเดือน/ปี" value="<?= $_GET['end_month'] ?? '' ?>">
 
 
-                        <a href="static_car_page.php" class="reset-button" id="reset-button">Reset</a>
+                        <a href="static_car_page_gender.php" class="reset-button" id="reset-button">Reset</a>
                     </div>
                 </form>
 
@@ -461,6 +481,10 @@ $conn->close();
                             scales: {
                                 x: {
                                     stacked: false,
+                                    title: {
+                                        display: true,
+                                        text: 'ประเภทงาน'
+                                    }
                                 },
                                 y: {
                                     stacked: false,
@@ -480,9 +504,40 @@ $conn->close();
                                 },
                                 title: {
                                     display: true,
-                                    text: 'สถิติการใช้งานรถตามประเภทและระดับ'
+                                    text: 'สถิติการใช้งานรถแยกตามเพศของผู้ใช้บริการ'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const datasetLabel = context.dataset.label || '';
+                                            const value = context.parsed.y;
+                                            
+                                            // ดึงข้อมูลระดับรถ
+                                            const levels = context.dataset.levels[context.dataIndex];
+                                            let levelInfo = [];
+                                            
+                                            // ถ้ามีข้อมูลระดับรถ
+                                            if (levels) {
+                                                // วนลูปแต่ละระดับรถ
+                                                for (let level = 1; level <= 3; level++) {
+                                                    const count = levels[level] || 0;
+                                                    if (count > 0) {
+                                                        levelInfo.push(`รถระดับ ${level}: ${count} ครั้ง`);
+                                                    }
+                                                }
+                                            }
+                                            
+                                            // สร้าง array ของข้อความที่จะแสดง
+                                            const tooltipLines = [
+                                                `${datasetLabel}: ${value} ครั้ง`,
+                                                ...levelInfo
+                                            ];
+                                            
+                                            return tooltipLines;
+                                        }
+                                    }
                                 }
-                            },
+                            }
                         }
                     });
                 })
