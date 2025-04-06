@@ -1,18 +1,5 @@
 <?php
-// กำหนดค่าการเชื่อมต่อฐานข้อมูล
-$servername = "localhost"; // ชื่อเซิร์ฟเวอร์ฐานข้อมูล (localhost คือเครื่องเดียวกัน)
-$username = "root"; // ชื่อผู้ใช้ MySQL
-$password = ""; // รหัสผ่าน MySQL
-$dbname = "intpro"; // ชื่อฐานข้อมูลที่ใช้
-
-// สร้างการเชื่อมต่อกับฐานข้อมูล
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// ตรวจสอบว่าการเชื่อมต่อสำเร็จหรือไม่
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error); // แสดงข้อผิดพลาดหากเชื่อมต่อไม่ได้
-}
-echo "Connected successfully <br>";
+include 'con_repair.php';
 
 // กำหนดค่าคงที่
 session_start();
