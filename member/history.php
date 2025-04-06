@@ -19,7 +19,7 @@ $member_id = $_SESSION['user_id'];
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/cart.css">
+    <link rel="stylesheet" href="css/style_history.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <title>รายการการสั่งซื้อ</title>
@@ -34,7 +34,7 @@ $member_id = $_SESSION['user_id'];
                 <img src="image/user.png" alt="Logo" class="nav-logo">
                 <div class="dropdown-menu">
                     <a href="profile.html">โปรไฟล์</a>
-                    <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
+                    <a href="history.php">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
                     <a href="logout.html">ออกจากระบบ</a>
                 </div>

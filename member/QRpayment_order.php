@@ -114,7 +114,7 @@ foreach ($order_equipment_id as $index => $order_id) {
                 <img src="image/user.png" alt="Logo" class="nav-logo">
                 <div class="dropdown-menu">
                     <a href="profile.html">โปรไฟล์</a>
-                    <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
+                    <a href="history.php">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
                     <a href="logout.html">ออกจากระบบ</a>
                 </div>
