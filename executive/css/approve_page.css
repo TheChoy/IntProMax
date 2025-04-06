@@ -280,7 +280,7 @@ body {
   }
 
 .filter-button {
-    background: #81B3D2;
+    background: #ffa07a;
     color: #333;
     padding: 0.5rem 1rem;
     border: none;
@@ -290,7 +290,7 @@ body {
 }
 
 .filter-button:hover {
-    background:#81B3D2; /* สีที่เปลี่ยนตอน hover */
+    background:#ff8c53; /* สีที่เปลี่ยนตอน hover */
     color: white;
 }
 
