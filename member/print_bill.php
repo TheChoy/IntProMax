@@ -39,6 +39,8 @@ $params = array_merge([$member_id], $order_ids);
 $stmt->bind_param($types, ...$params);
 $stmt->execute();
 $result = $stmt->get_result();
+
+$orders = $result->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -193,56 +195,57 @@ $result = $stmt->get_result();
         </div>
 
         <!-- แสดงชื่อของลูกค้าและวันที่แยกจากตาราง -->
-        <?php
-        $order = $result->fetch_assoc(); // ดึงข้อมูลของคำสั่งซื้อแรก
-        ?>
-        <div class="detail">
-            <p><strong>เลขที่ใบเสร็จ / Receipt No.:</strong> <?= htmlspecialchars($order['order_equipment_id']) ?></p>
-            <p><strong>ลูกค้า / Customer:</strong> <?= htmlspecialchars($order['member_firstname'] . ' ' . $order['member_lastname']) ?></p>
-            <p><strong>ที่อยู่ / Address:</strong> <?= htmlspecialchars($order['member_address']) ?></p>
-            <p><strong>เบอร์โทร / Phone:</strong> <?= htmlspecialchars($order['member_phone']) ?></p>
-            <p><strong>วันที่ / Date:</strong> <?= date("d/m/Y") ?></p>
-            <p><strong>ออกโดย / Issuer:</strong> ระบบอัตโนมัติ</p>
-        </div>
+        <?php if (count($orders) > 0): ?>
+            <?php $first = $orders[0]; ?>
+            <div class="detail">
+                <p><strong>เลขที่ใบเสร็จ / Receipt No.:</strong> <?= htmlspecialchars($first['order_equipment_id']) ?></p>
+                <p><strong>ลูกค้า / Customer:</strong> <?= htmlspecialchars($first['member_firstname'] . ' ' . $first['member_lastname']) ?></p>
+                <p><strong>ที่อยู่ / Address:</strong> <?= htmlspecialchars($first['member_address']) ?></p>
+                <p><strong>เบอร์โทร / Phone:</strong> <?= htmlspecialchars($first['member_phone']) ?></p>
+                <p><strong>วันที่ / Date:</strong> <?= date("d/m/Y") ?></p>
+                <p><strong>ออกโดย / Issuer:</strong> ระบบอัตโนมัติ</p>
+            </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>ลำดับ<br>No.</th>
-                    <th>ชื่อสินค้า<br>Equipment Name</th>
-                    <th>จำนวน<br>Quantity</th>
-                    <th>ราคาต่อหน่วย<br>Unit Price</th>
-                    <th>ราคารวม<br>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $i = 1;
-                $total = 0;
-                // ดึงข้อมูลทั้งหมดจากผลลัพธ์
-                while ($order = $result->fetch_assoc()):
-                    $total += $order['order_equipment_total'];
-                ?>
+            <table>
+                <thead>
                     <tr>
-                        <td><?= $i++ ?></td>
-                        <td><?= htmlspecialchars($order['equipment_name']) ?></td>
-                        <td><?= htmlspecialchars($order['order_equipment_quantity']) ?></td>
-                        <td><?= number_format($order['order_equipment_total'] / $order['order_equipment_quantity'], 2) ?></td>
-                        <td><?= number_format($order['order_equipment_total'], 2) ?></td>
+                        <th>ลำดับ<br>No.</th>
+                        <th>ชื่อสินค้า<br>Equipment Name</th>
+                        <th>จำนวน<br>Quantity</th>
+                        <th>ราคาต่อหน่วย<br>Unit Price</th>
+                        <th>ราคารวม<br>Total</th>
                     </tr>
-                <?php endwhile; ?>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="4" style="text-align:right;"><strong>ค่าจัดส่งสินค้า (บาท)</strong></td>
-                    <td><strong>120</strong></td>
-                </tr>
-                <tr>
-                    <td colspan="4" style="text-align:right;"><strong>รวมทั้งสิ้น (บาท)</strong></td>
-                    <td><strong><?= number_format($total + 120, 2) ?></strong></td>
-                </tr>
-            </tfoot>
-        </table>
+                </thead>
+                <tbody>
+                    <?php
+                    $i = 1;
+                    $total = 0;
+                    foreach ($orders as $order):
+                        $total += $order['order_equipment_total'];
+                    ?>
+                        <tr>
+                            <td><?= $i++ ?></td>
+                            <td><?= htmlspecialchars($order['equipment_name']) ?></td>
+                            <td><?= htmlspecialchars($order['order_equipment_quantity']) ?></td>
+                            <td><?= number_format($order['order_equipment_total'] / $order['order_equipment_quantity'], 2) ?></td>
+                            <td><?= number_format($order['order_equipment_total'], 2) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" style="text-align:right;"><strong>ค่าจัดส่งสินค้า (บาท)</strong></td>
+                        <td><strong>120</strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" style="text-align:right;"><strong>รวมทั้งสิ้น (บาท)</strong></td>
+                        <td><strong><?= number_format($total + 120, 2) ?></strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        <?php else: ?>
+            <p><strong>ไม่พบข้อมูลใบเสร็จ</strong></p>
+        <?php endif; ?>
 
         <div class="signature-section">
             <div class="signature">
