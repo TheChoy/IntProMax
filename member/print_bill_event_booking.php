@@ -235,7 +235,7 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
                     ?>
                         <tr>
                             <td><?= $i++ ?></td>
-                            <td><?= htmlspecialchars($order['event_booking_location'])." ". htmlspecialchars($order['event_booking_province']) ?></td>
+                            <td><?= htmlspecialchars($order['event_booking_location']) . " " . htmlspecialchars($order['event_booking_province']) ?></td>
                             <td><?= htmlspecialchars($order['ambulance_plate']) ?></td>
                             <td><?= htmlspecialchars($order['event_booking_date']) ?><br><?= htmlspecialchars($order['event_booking_start_time']) ?> - <?= htmlspecialchars($order['event_booking_finish_time']) ?></td>
                             <td class="text-end"><?= number_format($order['event_booking_price'], 2) ?></td>
@@ -257,7 +257,7 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
         <div class="signature-section">
             <div class="signature">
                 <div class="signature-line"></div>
-                ผู้รับสินค้า / Receiver
+                ผู้รับบริการ / Receiver
             </div>
             <div class="signature">
                 <div class="signature-line"></div>
