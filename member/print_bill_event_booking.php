@@ -202,7 +202,7 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
         </div>
         <hr>
         <div class="header">
-            <h2>ใบเสร็จรับเงิน / Receipt</h2>
+            <h2>ใบเสร็จจองรถสำหรับงาน Event / Receipt Event Booking</h2>
             <p style="margin-top: -10px;">(ต้นฉบับ / Original)</p>
         </div>
 
