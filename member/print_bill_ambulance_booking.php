@@ -196,7 +196,7 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
         </div>
         <hr>
         <div class="header">
-            <h2>ใบเสร็จค่าจองรถรับส่งผู้ป่วย / Receipt Ambulance Booking</h2>
+            <h2>ใบเสร็จจองรถรับส่งผู้ป่วย / Receipt Ambulance Booking</h2>
             <p style="margin-top: -10px;">(ต้นฉบับ / Original)</p>
         </div>
 
