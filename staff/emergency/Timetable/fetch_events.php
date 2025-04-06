@@ -6,7 +6,7 @@ session_start();
 date_default_timezone_set('Asia/Bangkok');
 
 // เชื่อมต่อฐานข้อมูล
-$con = new mysqli('localhost', 'root', '1234', 'intpro');
+$con = new mysqli('localhost', 'root', '', 'intpro');
 
 // ตรวจสอบการเชื่อมต่อ
 if ($con->connect_error) {
@@ -14,12 +14,12 @@ if ($con->connect_error) {
 }
 
 // ตรวจสอบว่า login แล้วหรือยัง
-if (!isset($_SESSION['emergency_staff_id'])) {
+if (!isset($_SESSION['logged_in'])) {
     echo json_encode(['error' => 'Unauthorized']);
     exit;
 }
 
-$staff_id = $_SESSION['emergency_staff_id'];
+$staff_id = $_SESSION['user_id'];
 
 // ดึง ambulance_id ที่ assign กับเจ้าหน้าที่คนนี้
 $ambulance_ids = [];
