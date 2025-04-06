@@ -38,6 +38,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_email'] = $user['email'];
             $_SESSION['user_type'] = $user['user_type'];
 
+            if ($user['user_type'] === 'emergency_staff') {
+                $_SESSION['emergency_staff_id'] = $user['id'];
+            }
+
             // Redirect ไปยังหน้าที่เหมาะสม
             if ($user['user_type'] == 'executive') {
                 header("Location: executive\history_fixed_page.php");
@@ -52,10 +56,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             exit();
         } else {
-            $error = "❌ รหัสผ่านไม่ถูกต้อง!";
+            $error = " รหัสผ่านไม่ถูกต้อง!";
         }
     } else {
-        $error = "⚠️ ไม่พบบัญชีนี้ในระบบ!";
+        $error = " ไม่พบบัญชีนี้ในระบบ!";
     }
 }
 ?>
