@@ -1,26 +1,40 @@
 <?php
-//-----------Session and Login-------------
 session_start();
 include 'username.php';
-
-// ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
-if (empty($_SESSION['logged_in'])) {
-    header("Location: ../login.php");
-    exit();
-}
-
-// เรียก member_id จาก session มาใช้ :
-// $_SESSION['user_id'];
-//------------------------------------------
-
 // ฟังก์ชันระบุภูมิภาค
 function getRegion($province)
 {
     $regions = [
         "ภาคเหนือ" => ["เชียงใหม่", "เชียงราย", "ลำปาง", "ลำพูน", "แพร่", "น่าน", "พะเยา", "แม่ฮ่องสอน", "อุตรดิตถ์", "สุโขทัย", "พิษณุโลก", "ตาก", "เพชรบูรณ์", "นครสวรรค์", "กำแพงเพชร", "พิจิตร", "อุทัยธานี"],
-        "ภาคกลาง" => ["กรุงเทพมหานคร","สมุทรปราการ","นนทบุรี","ปทุมธานี","พระนครศรีอยุธยา","สระบุรี","ลพบุรี","อ่างทอง","ชัยนาท","สิงห์บุรี","นครนายก","นครปฐม","สุพรรณบุรี","สมุทรสาคร","สมุทรสงคราม","เพชรบุรี","ประจวบคีรีขันธ์","ราชบุรี","กาญจนบุรี",
+        "ภาคกลาง" => [
+            "กรุงเทพมหานคร",
+            "สมุทรปราการ",
+            "นนทบุรี",
+            "ปทุมธานี",
+            "พระนครศรีอยุธยา",
+            "สระบุรี",
+            "ลพบุรี",
+            "อ่างทอง",
+            "ชัยนาท",
+            "สิงห์บุรี",
+            "นครนายก",
+            "นครปฐม",
+            "สุพรรณบุรี",
+            "สมุทรสาคร",
+            "สมุทรสงคราม",
+            "เพชรบุรี",
+            "ประจวบคีรีขันธ์",
+            "ราชบุรี",
+            "กาญจนบุรี",
             // รวมภาคตะวันออก
-            "ชลบุรี","ระยอง","จันทบุรี","ตราด","ฉะเชิงเทรา","ปราจีนบุรี","สระแก้ว"],
+            "ชลบุรี",
+            "ระยอง",
+            "จันทบุรี",
+            "ตราด",
+            "ฉะเชิงเทรา",
+            "ปราจีนบุรี",
+            "สระแก้ว"
+        ],
         "ภาคตะวันออกเฉียงเหนือ" => ["ขอนแก่น", "นครราชสีมา", "อุดรธานี", "อุบลราชธานี", "หนองคาย", "มหาสารคาม", "ร้อยเอ็ด", "สุรินทร์", "บุรีรัมย์", "ศรีสะเกษ", "กาฬสินธุ์", "ชัยภูมิ", "ยโสธร", "สกลนคร", "หนองบัวลำภู", "นครพนม", "บึงกาฬ", "มุกดาหาร", "อำนาจเจริญ"],
         "ภาคใต้" => ["ภูเก็ต", "สุราษฎร์ธานี", "สงขลา", "นราธิวาส", "ยะลา", "ปัตตานี", "พังงา", "กระบี่", "ตรัง", "นครศรีธรรมราช", "พัทลุง", "ชุมพร", "ระนอง", "สตูล"]
     ];
@@ -45,6 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_POST['submit_event'])) {
         // ประมวลผลฟอร์มงาน Event
 
+
         // รับค่าระดับรถจากฟอร์ม
         if (isset($_POST['level'])) {
             $level = $_POST['level']; // รับค่าระดับที่เลือก
@@ -53,9 +68,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             echo "กรุณาเลือกระดับรถ";
             exit;
         }
-        // ดึง ambulance_id ที่ตรงกับระดับจากฐานข้อมูล
-        $sql = "SELECT ambulance_id FROM ambulance WHERE ambulance_level = '$level'AND ambulance_status = 'พร้อม'";
+        // ดึง ambulance_id ที่ตรงกับระดับและไม่ได้ถูกจองในวันที่เลือก
+        $sql = "SELECT DISTINCT a.ambulance_id 
+                FROM ambulance a 
+                WHERE a.ambulance_level = '$level' 
+                AND a.ambulance_status = 'พร้อม'
+                AND a.ambulance_id NOT IN (
+                    SELECT ambulance_id 
+                    FROM event_booking 
+                    WHERE event_booking_date = '$booking_date'
+                    AND event_booking_start_time = '$booking_start_time'
+                    UNION
+                    SELECT ambulance_id 
+                    FROM ambulance_booking 
+                    WHERE ambulance_booking_date = '$booking_date'
+                    AND ambulance_booking_start_time = '$booking_start_time'
+                )";
         $result = $conn->query($sql);
+
+        // Debug statements เพื่อตรวจสอบค่า
+        echo "<script>console.log('Date: " . $booking_date . "');</script>";
+        echo "<script>console.log('Time: " . $booking_start_time . "');</script>";
+        echo "<script>console.log('SQL: " . $sql . "');</script>";
 
         if ($result->num_rows > 0) {
             // สร้าง array สำหรับ ambulance_ids
@@ -67,7 +101,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $ambulance_id = $ambulance_ids[array_rand($ambulance_ids)];
             echo "ambulance_id ที่เลือก: " . $ambulance_id; // แสดง ambulance_id ที่สุ่ม
         } else {
-            echo "ไม่พบรถพยาบาลที่ตรงกับระดับที่เลือก";
+            echo "<script>
+                    alert('ไม่พบรถพยาบาลระดับ " . $level . " ที่ว่างในวันที่ " . $booking_date . " เวลา " . $booking_start_time . "');
+                    window.history.back();
+                  </script>";
             exit;
         }
 
@@ -75,14 +112,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $region = getRegion($province); // ตรวจสอบภูมิภาคจากจังหวัด
         $price = $_POST['calculatedPrice1'];
 
-        $place_event_location = $_POST['place_event_location'];
+        $place_event_location = $_POST['searchEventLocation'];
         $place_event_detail = $_POST['place_event_detail'];
         $type = $_POST['event_type'];
         $nurse_number = $_POST['nurse_number'];
         $ambulance_number = $_POST['ambulance_number'];
         $payment_method = $_POST['payment_method_event'];
-
-        $member_id = $_SESSION['user_id'];
+        $member_id = rand(1, 10);
 
         $sql = "INSERT INTO event_booking (member_id,ambulance_id,event_booking_date,event_booking_start_time,event_booking_province,event_booking_region,event_booking_location, event_booking_detail, event_booking_type,event_booking_amount_nurse, event_booking_amount_ambulance,event_booking_buy_type,event_booking_price) 
                 VALUES ('$member_id','$ambulance_id','$booking_date','$booking_start_time','$province','$region','$place_event_location','$place_event_detail', '$type', '$nurse_number', '$ambulance_number', '$payment_method','$price')";
@@ -106,9 +142,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             echo "กรุณาเลือกระดับรถ";
             exit;
         }
-        // ดึง ambulance_id ที่ตรงกับระดับจากฐานข้อมูล
-        $sql = "SELECT ambulance_id FROM ambulance WHERE ambulance_level = '$level'AND ambulance_status = 'พร้อม'";
+        // ดึง ambulance_id ที่ตรงกับระดับและไม่ได้ถูกจองในวันที่เลือก
+        $sql = "SELECT DISTINCT a.ambulance_id 
+                FROM ambulance a 
+                WHERE a.ambulance_level = '$level' 
+                AND a.ambulance_status = 'พร้อม'
+                AND a.ambulance_id NOT IN (
+                    SELECT ambulance_id 
+                    FROM event_booking 
+                    WHERE event_booking_date = '$booking_date'
+                    AND event_booking_start_time = '$booking_start_time'
+                    UNION
+                    SELECT ambulance_id 
+                    FROM ambulance_booking 
+                    WHERE ambulance_booking_date = '$booking_date'
+                    AND ambulance_booking_start_time = '$booking_start_time'
+                )";
         $result = $conn->query($sql);
+
+        // Debug statements เพื่อตรวจสอบค่า
+        echo "<script>console.log('Date: " . $booking_date . "');</script>";
+        echo "<script>console.log('Time: " . $booking_start_time . "');</script>";
+        echo "<script>console.log('SQL: " . $sql . "');</script>";
 
         if ($result->num_rows > 0) {
             // สร้าง array สำหรับ ambulance_ids
@@ -120,11 +175,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $ambulance_id = $ambulance_ids[array_rand($ambulance_ids)];
             echo "ambulance_id ที่เลือก: " . $ambulance_id; // แสดง ambulance_id ที่สุ่ม
         } else {
-            echo "ไม่พบรถพยาบาลที่ตรงกับระดับที่เลือก";
+            echo "<script>
+                    alert('ไม่พบรถพยาบาลระดับ " . $level . " ที่ว่างในวันที่ " . $booking_date . " เวลา " . $booking_start_time . "');
+                    window.history.back();
+                  </script>";
             exit;
         }
 
-        $pickup_location = $_POST['pickup-location'] ?? '';
+        $pickup_location = $_POST['searchPatientLocation'];
+        $place_ambulance_detail = $_POST['place_ambulance_detail'];
         $hospital = $_POST["hospital"];
         $province = $_POST["province2"];
         $symptom = $_POST["symptom"];
@@ -133,7 +192,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $region = getRegion($province); // ตรวจสอบภูมิภาคจากจังหวัด
         $price = $_POST['calculatedPrice2'];
 
-        $member_id = $_SESSION['user_id'];
+        $member_id = rand(1, 10);
         // Mapping hospital codes to names
         $hospitalMap = [
             "hospital1" => "โรงพยาบาลมหาวิทยาลัยนเรศวร",
@@ -247,8 +306,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // สร้างคำสั่ง SQL
 
         $sql = "INSERT INTO ambulance_booking 
-                    (member_id,ambulance_id,ambulance_booking_date,ambulance_booking_start_time,ambulance_booking_location, ambulance_booking_hospital_waypoint, ambulance_booking_province,ambulance_booking_region, ambulance_booking_disease, ambulance_booking_allergy_medicine,ambulance_booking_buy_type,ambulance_booking_price) 
-                    VALUES ('$member_id','$ambulance_id','$booking_date','$booking_start_time','$pickup_location', '$hospital', '$province','$region', '$symptom', '$allergy','$payment_method','$price')";
+                    (member_id,ambulance_id,ambulance_booking_date,ambulance_booking_start_time,ambulance_booking_location, ambulance_booking_hospital_waypoint, ambulance_booking_province,ambulance_booking_region, ambulance_booking_disease, ambulance_booking_allergy_medicine,ambulance_booking_buy_type,ambulance_booking_price,ambulance_booking_detail) 
+                    VALUES ('$member_id','$ambulance_id','$booking_date','$booking_start_time','$pickup_location', '$hospital', '$province','$region', '$symptom', '$allergy','$payment_method','$price','$place_ambulance_detail')";
         // บันทึกข้อมูล
         if ($conn->query($sql) === TRUE) {
             echo "ข้อมูลถูกบันทึกเรียบร้อยแล้ว";

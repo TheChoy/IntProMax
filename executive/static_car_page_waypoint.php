@@ -17,7 +17,7 @@ $date_start = isset($_POST['date_start']) ? $_POST['date_start'] : date('Y-m');
 $date_end = isset($_POST['date_end']) ? $_POST['date_end'] : date('Y-m');
 
 //sql
-// สร้าง SQL Query
+// แก้ไข SQL query เพื่อดึงข้อมูลโรงพยาบาล
 $sql = "
 SELECT 
     m.member_firstname, 
@@ -29,31 +29,29 @@ SELECT
     merged.province,
     merged.region,
     merged.source,
+    merged.hospital,
     IF(merged.source = 'emergency', 
-        merged.emergency_case_patient_gender,  -- ดึงเพศจาก emergency_case_report_patient_gender
-        m.member_gender) AS gender,  -- ดึงเพศจาก member
+        merged.emergency_case_patient_gender,
+        m.member_gender) AS gender,
     IF(merged.source = 'emergency', 
-        merged.emergency_case_patient_age,  -- ดึงอายุจาก emergency_case_patient_age
+        merged.emergency_case_patient_age,
         TIMESTAMPDIFF(YEAR, m.member_birthdate, CURDATE())) AS age,
-    a.ambulance_level -- เพิ่มข้อมูลจากตาราง ambulance
+    a.ambulance_level
 FROM (
     SELECT ab.member_id, ab.ambulance_id, ab.ambulance_booking_date AS booking_date, 
-           ab.ambulance_booking_province AS province, ab.ambulance_booking_region AS region, 
+           ab.ambulance_booking_province AS province, ab.ambulance_booking_region AS region,
+           ab.ambulance_booking_hospital_waypoint AS hospital, 
            'ambulance' AS source, NULL AS emergency_case_patient_age, NULL AS emergency_case_patient_gender
     FROM ambulance_booking AS ab
     UNION
-    SELECT eb.member_id, eb.ambulance_id, eb.event_booking_date AS booking_date, 
-           eb.event_booking_province AS province, eb.event_booking_region AS region, 
-           'event' AS source, NULL AS emergency_case_patient_age, NULL AS emergency_case_patient_gender
-    FROM event_booking AS eb
-    UNION
     SELECT ecr.order_emergency_case_id, ecr.ambulance_id, ecr.order_emergency_case_date AS booking_date, 
            'กรุงเทพมหานคร' AS province, 'ภาคกลาง' AS region,
+           ecr.order_emergency_case_hospital_waypoint AS hospital,
            'emergency' AS source, ecr.order_emergency_case_patient_age, ecr.order_emergency_case_patient_gender
     FROM order_emergency_case AS ecr
 ) AS merged
 LEFT JOIN member AS m ON merged.member_id = m.member_id
-LEFT JOIN ambulance AS a ON merged.ambulance_id = a.ambulance_id -- เชื่อมกับตาราง ambulance
+LEFT JOIN ambulance AS a ON merged.ambulance_id = a.ambulance_id
 WHERE 1=1
 ";
 
@@ -94,7 +92,6 @@ if (!empty($region)) {
 }
 
 // กรองวันที่การจอง
-// $sql .= " AND merged.booking_date BETWEEN '$date_start-01' AND '$date_end-31'";
 $sql .= " AND DATE_FORMAT(merged.booking_date, '%Y-%m') BETWEEN '$date_start' AND '$date_end'";
 
 $result = $conn->query($sql);
@@ -105,47 +102,56 @@ $chartData = [];
 // ดึงข้อมูลจากฐานข้อมูล
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        // กำหนด source เป็นข้อความที่คุณต้องการ
-        $source = $row['source']; // ประเภทการจอง
-        if ($source == 'emergency') {
-            $source = 'รับเคสฉุกเฉิน'; // แสดงข้อความสำหรับ emergency
-        } elseif ($source == 'ambulance') {
-            $source = 'รับส่งผู้ป่วย'; // แสดงข้อความสำหรับ ambulance
-        } elseif ($source == 'event') {
-            $source = 'รับงาน EVENT'; // แสดงข้อความสำหรับ event
+        $hospital = $row['hospital'];
+        $source = $row['source'];
+
+        if (!isset($chartData[$hospital])) {
+            $chartData[$hospital] = [
+                'emergency' => 0,
+                'ambulance' => 0
+            ];
         }
 
-        $level = $row['ambulance_level'];   // ระดับรถ (1,2,3)
-
-        // ตรวจสอบว่าหมวดหมู่หลัก (source) ถูกกำหนดหรือยัง
-        if (!isset($chartData[$source])) {
-            $chartData[$source] = ['1' => 0, '2' => 0, '3' => 0]; // ตั้งค่าเริ่มต้นที่ 0
-        }
-
-        // เพิ่มค่าจำนวนตามระดับรถ
-        $chartData[$source][$level]++;
+        $chartData[$hospital][$source]++;
     }
 }
 
+// จัดเรียงข้อมูลตามจำนวนการใช้งานรวมมากที่สุด
+uasort($chartData, function ($a, $b) {
+    $total_a = array_sum($a);
+    $total_b = array_sum($b);
+    return $total_b <=> $total_a;
+});
+
+// จำกัดจำนวนโรงพยาบาลที่แสดง (10 อันดับแรก)
+$chartData = array_slice($chartData, 0, 10, true);
+
 // สร้าง Labels และ Values สำหรับกราฟ
-$chartLabels = array_keys($chartData); // Labels: ["เคสฉุกเฉิน", "รับส่งผู้ป่วย", "รับงาน EVENT"]
+$chartLabels = array_keys($chartData);
+$chartValues = [
+    'emergency' => [],
+    'ambulance' => []
+];
 
-// แยกข้อมูลแต่ละ level ออกมาให้เป็น dataset
-$chartLevels = ['1' => [], '2' => [], '3' => []];
-
-foreach ($chartLabels as $source) {
-    foreach ($chartLevels as $level => &$values) {
-        $values[] = $chartData[$source][$level];
-    }
+foreach ($chartLabels as $hospital) {
+    $chartValues['emergency'][] = $chartData[$hospital]['emergency'];
+    $chartValues['ambulance'][] = $chartData[$hospital]['ambulance'];
 }
 
 // ส่งออกข้อมูลเป็น JSON สำหรับ JavaScript
 $chartDataJson = json_encode([
     'labels' => $chartLabels,
     'datasets' => [
-        ['label' => 'ระดับ 1', 'data' => $chartLevels['1'], 'backgroundColor' => 'rgba(255, 99, 132, 0.6)'],
-        ['label' => 'ระดับ 2', 'data' => $chartLevels['2'], 'backgroundColor' => 'rgba(54, 162, 235, 0.6)'],
-        ['label' => 'ระดับ 3', 'data' => $chartLevels['3'], 'backgroundColor' => 'rgba(75, 192, 192, 0.6)']
+        [
+            'label' => 'รับเคสฉุกเฉิน',
+            'data' => $chartValues['emergency'],
+            'backgroundColor' => 'rgba(255, 99, 132, 0.6)'
+        ],
+        [
+            'label' => 'รับส่งผู้ป่วย',
+            'data' => $chartValues['ambulance'],
+            'backgroundColor' => 'rgba(54, 162, 235, 0.6)'
+        ]
     ]
 ]);
 
@@ -214,9 +220,9 @@ $conn->close();
                     <div class="sidebar-content">
 
                         <select class="filter-select" style="margin-left: 2%;" onchange="location = this.value;">
-                            <option value="static_car_page.php" selected>ดูสถิติรถ(รวม)</option>
+                            <option value="static_car_page.php">ดูสถิติรถ(รวม)</option>
                             <option value="static_car_page_gender.php">ดูสถิติรถ(แยกเพศ)</option>
-                            <option value="static_car_page_waypoint.php">ดูสถิติรถ(โรงพยาบาลที่ส่งผู้ป่วย)</option>
+                            <option value="static_car_page_waypoint.php" selected>ดูสถิติรถ(โรงพยาบาลที่ส่งผู้ป่วย)</option>
                         </select>
 
                         <label for="">เลือกประเภทงาน:</label>
@@ -224,8 +230,8 @@ $conn->close();
                         <br>
                         <input type="checkbox" name="source[]" value="ambulance" checked> รับส่งผู้ป่วย
                         <br>
-                        <input type="checkbox" name="source[]" value="event" checked> รับงาน EVENT
-                        <br>
+                        <!-- <input type="checkbox" name="source[]" value="event" checked> รับงาน EVENT
+                        <br> -->
 
                         <label for="">เลือกระดับรถ:</label>
                         <input type="checkbox" name="level[]" value="1" checked> ระดับ 1
@@ -411,6 +417,14 @@ $conn->close();
         }
     });
 
+    // Initialize end_month flatpickr
+    let endMonthPicker = flatpickr("#end_month", {
+        ...monthSelectConfig,
+        defaultDate: "<?= $_GET['end_month'] ?? date('Y-m') ?>",
+        minDate: startMonthPicker.selectedDates[0] || "<?= $_GET['start_month'] ?? date('Y-m') ?>",
+        maxDate: today
+    });
+
     function handleRegionFilter() {
         const provinceSelect = document.querySelector('select[name="province"]');
         const regionCheckboxes = document.querySelectorAll('input[name="region[]"]');
@@ -445,14 +459,6 @@ $conn->close();
             toggleRegionCheckboxes(true);
         }
     }
-
-    // Initialize end_month flatpickr
-    let endMonthPicker = flatpickr("#end_month", {
-        ...monthSelectConfig,
-        defaultDate: "<?= $_GET['end_month'] ?? date('Y-m') ?>",
-        minDate: startMonthPicker.selectedDates[0] || "<?= $_GET['start_month'] ?? date('Y-m') ?>",
-        maxDate: today
-    });
 
     //กราฟ
     document.addEventListener('DOMContentLoaded', function() {
@@ -495,19 +501,24 @@ $conn->close();
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            indexAxis: 'y',
                             scales: {
                                 x: {
-                                    stacked: false,
-                                },
-                                y: {
-                                    stacked: false,
+                                    stacked: true,
                                     beginAtZero: true,
                                     title: {
                                         display: true,
-                                        text: 'จำนวน (ครั้ง)'
+                                        text: 'จำนวนครั้ง'
                                     },
                                     ticks: {
                                         precision: 0
+                                    }
+                                },
+                                y: {
+                                    stacked: true,
+                                    title: {
+                                        display: true,
+                                        text: 'โรงพยาบาล'
                                     }
                                 }
                             },
@@ -517,7 +528,7 @@ $conn->close();
                                 },
                                 title: {
                                     display: true,
-                                    text: 'สถิติการใช้งานรถตามประเภทและระดับ'
+                                    text: 'สถิติการใช้งานรถแยกตามประเภทงานและโรงพยาบาล (10 อันดับแรก)'
                                 }
                             },
                         }
