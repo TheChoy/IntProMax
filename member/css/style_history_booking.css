@@ -183,11 +183,10 @@ tbody td {
 }
 
 td img {
-  width: 100px;  /* ปรับขนาดความกว้างของภาพ */
-  height: auto;  /* รักษาอัตราส่วนภาพ */
-  object-fit: cover;  /* ปรับขนาดภาพให้เต็มช่องโดยไม่ให้บิดเบี้ยว */
+  width: 100px; /* ปรับขนาดความกว้างของภาพ */
+  height: auto; /* รักษาอัตราส่วนภาพ */
+  object-fit: cover; /* ปรับขนาดภาพให้เต็มช่องโดยไม่ให้บิดเบี้ยว */
 }
-
 
 tbody tr:hover {
   background-color: #f1f7fb;
@@ -216,4 +215,29 @@ a.btn-primary:hover {
   width: 100% !important;
   text-align: right !important;
   margin-top: 10px;
+}
+
+.custom-dropdown {
+  display: flex;
+  justify-content: flex-end; /* จัดให้อยู่ทางขวา */
+  margin-bottom: 5px;
+  padding-top: 20px;
+  padding-right: 50px;
+}
+
+.dropdown-select {
+  padding: 8px 16px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 250px;
+}
+
+.dropdown-select:hover {
+  border-color: #ffa07a;
+  box-shadow: 0 0 5px rgba(255, 160, 122, 0.6);
 }

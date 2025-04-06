@@ -39,7 +39,7 @@ $result = $stmt->get_result();
 <head>
     <meta charset="UTF-8">
     <title>ประวัติคำสั่งซื้อ</title>
-    <link rel="stylesheet" href="css/style_history.css">
+    <link rel="stylesheet" href="css/style_history_booking.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -104,9 +104,6 @@ $result = $stmt->get_result();
             if ($eventDate != $currentDate):
                 if ($currentDate != "") {
                     // แสดงค่าบริการ + ราคารวมกลุ่มก่อนหน้า
-                    echo '<tr><td colspan="5" style="text-align:right;"><strong>ค่าบริการ (บาท)</strong></td><td><strong>' . number_format(120, 2) . '</strong></td><td></td></tr>';
-                    echo '<tr><td colspan="5" style="text-align:right;"><strong>ราคารวม (บาท)</strong></td><td><strong>' . number_format($total + 120, 2) . '</strong></td><td></td></tr>';
-
                     echo '</tbody></table>';
                     $event_ids_str = implode(',', $event_ids);
                     echo '<div class="print-button-wrapper">';
@@ -121,8 +118,8 @@ $result = $stmt->get_result();
                 echo '<div id="print-section-' . $index . '" class="mb-4">';
                 echo "<h4 class='mt-4 mb-3'>วันที่จอง: <strong>$eventDate</strong></h4>";
                 echo '<div class="table-responsive">';
-                echo '<table class="table table-bordered table-striped">';
-                echo '<thead class="table-dark text-center">
+                echo '<table class="custom-table">';
+                echo '<thead>
                         <tr>
                             <th>ประเภทงาน</th>
                             <th>สถานที่</th>
@@ -160,8 +157,6 @@ $result = $stmt->get_result();
         $event_ids_str = implode(',', $event_ids);
         echo '<div class="print-button-wrapper">';
         echo '<a href="print_bill.php?event_ids=' . $event_ids_str . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
-        echo '</div>';
-        echo '</div>';
         ?>
     <?php else: ?>
         <div class="alert alert-warning">ไม่พบรายการจองรถสำหรับรับงาน Event</div>
