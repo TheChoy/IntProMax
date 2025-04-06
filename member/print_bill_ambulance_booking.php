@@ -251,7 +251,7 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
         <div class="signature-section">
             <div class="signature">
                 <div class="signature-line"></div>
-                ผู้รับสินค้า / Receiver
+                ผู้รับบริการ / Receiver
             </div>
             <div class="signature">
                 <div class="signature-line"></div>
