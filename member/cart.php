@@ -145,33 +145,34 @@ $member_id = $_SESSION['user_id'];
         <a href="shopping.php" class="add-to-cart">เลือกสินค้า</a>
         <!-- <a href="QRpayment_order.php" class="confirm-order">ยืนยันการสั่งซื้อ</a> -->
 
-        <!-- เป็นฟอร์ม submit ไป insert_order.php -->
-        <form method="post" action="insert_order_cart.php" style="display:inline;">
-            <input type="hidden" name="price_total" value="<?= $sumPrice + 120 ?>">
-            <button type="submit" class="confirm-order">ยืนยันการสั่งซื้อ</button>
-        </form>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('.update-cart').click(function() {
-                const id = $(this).data('id');
-                const action = $(this).data('action');
+        <!-- ปุ่มอยู่ขวาล่าง -->
+        <div class="order-buttons-wrapper">
+            <form method="post" action="insert_order_cart.php" style="display:inline;">
+                <input type="hidden" name="price_total" value="<?= $sumPrice + 120 ?>">
+                <button type="submit" class="confirm-order">ยืนยันการสั่งซื้อ</button>
+            </form>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('.update-cart').click(function() {
+                    const id = $(this).data('id');
+                    const action = $(this).data('action');
 
-                $.ajax({
-                    url: 'order_cart.php',
-                    type: 'POST',
-                    data: {
-                        id: id,
-                        action: action
-                    },
-                    success: function(response) {
-                        location.reload(); // หรือจะอัปเดตแค่บางส่วนของตารางก็ได้
-                    }
+                    $.ajax({
+                        url: 'order_cart.php',
+                        type: 'POST',
+                        data: {
+                            id: id,
+                            action: action
+                        },
+                        success: function(response) {
+                            location.reload(); // หรือจะอัปเดตแค่บางส่วนของตารางก็ได้
+                        }
+                    });
                 });
             });
-        });
-    </script>
+        </script>
 </body>
 
 </html>

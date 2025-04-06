@@ -40,6 +40,7 @@ $result = $stmt->get_result();
     <meta charset="UTF-8">
     <title>ประวัติคำสั่งซื้อ</title>
     <link rel="stylesheet" href="css/style_history_booking.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -55,7 +56,7 @@ $result = $stmt->get_result();
                     <a href="history.php">ประวัติคำสั่งซื้อ</a>
                     <a href="history_ambulance_booking.php">ประวัติการจองรถ</a>
                     <a href="claim.php">เคลมสินค้า</a>
-                    <a href="../logout.php">ออกจากระบบ</a>
+                    <a href="logout.html">ออกจากระบบ</a>
                 </div>
             </div>
             <a href="index.php">
@@ -80,6 +81,7 @@ $result = $stmt->get_result();
             </a>
         </div>
     </div>
+
     <div class="custom-dropdown">
         <select class="dropdown-select" onchange="window.location.href=this.value;">
             <option value="" selected hidden>เลือกประเภทการจอง</option>
@@ -89,37 +91,37 @@ $result = $stmt->get_result();
     </div>
 
     <div class="content container mt-5">
-    <h3 class="mb-4">ประวัติการจองรถสำหรับรับงาน Event</h3>
-    <?php if ($result->num_rows > 0): ?>
-        <?php
-        $currentDate = "";
-        $index = 0;
-        $event_ids = [];
-        $total = 0;
+        <h3 class="mb-4">ประวัติการจองรถสำหรับรับงาน Event</h3>
+        <?php if ($result->num_rows > 0): ?>
+            <?php
+            $currentDate = "";
+            $index = 0;
+            $event_ids = [];
+            $total = 0;
 
-        while ($row = $result->fetch_assoc()):
-            $eventDate = date("d/m/Y", strtotime($row['event_booking_date']));
+            while ($row = $result->fetch_assoc()):
+                $eventDate = date("d/m/Y", strtotime($row['event_booking_date']));
 
-            // ถ้าเปลี่ยนกลุ่ม
-            if ($eventDate != $currentDate):
-                if ($currentDate != "") {
-                    // แสดงค่าบริการ + ราคารวมกลุ่มก่อนหน้า
-                    echo '</tbody></table>';
-                    $event_ids_str = implode(',', $event_ids);
-                    echo '<div class="print-button-wrapper">';
-                    echo '<a href="print_bill.php?event_ids=' . $event_ids_str . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
-                    echo '</div>';
-                    echo '</div><br>'; // ปิดกล่อง
-                    $event_ids = [];
-                    $total = 0;
-                }
+                // ถ้าเปลี่ยนกลุ่ม
+                if ($eventDate != $currentDate):
+                    if ($currentDate != "") {
+                        // แสดงค่าบริการ + ราคารวมกลุ่มก่อนหน้า
+                        echo '</tbody></table>';
+                        $event_ids_str = implode(',', $event_ids);
+                        echo '<div class="print-button-wrapper">';
+                        echo '<a href="print_bill.php?event_ids=' . $event_ids_str . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
+                        echo '</div>';
+                        echo '</div><br>'; // ปิดกล่อง
+                        $event_ids = [];
+                        $total = 0;
+                    }
 
-                $index++;
-                echo '<div id="print-section-' . $index . '" class="mb-4">';
-                echo "<h4 class='mt-4 mb-3'>วันที่จอง: <strong>$eventDate</strong></h4>";
-                echo '<div class="table-responsive">';
-                echo '<table class="custom-table">';
-                echo '<thead>
+                    $index++;
+                    echo '<div id="print-section-' . $index . '" class="mb-4">';
+                    echo "<h4 class='mt-4 mb-3'>วันที่จอง: <strong>$eventDate</strong></h4>";
+                    echo '<div class="table-responsive">';
+                    echo '<table class="custom-table">';
+                    echo '<thead>
                         <tr>
                             <th>ประเภทงาน</th>
                             <th>สถานที่</th>
@@ -131,37 +133,37 @@ $result = $stmt->get_result();
                         </tr>
                       </thead><tbody>';
 
-                $currentDate = $eventDate;
-            endif;
+                    $currentDate = $eventDate;
+                endif;
 
-            $event_ids[] = $row['event_booking_id'];
-            $total += $row['event_booking_price'];
-        ?>
-            <tr>
-                <td><?= htmlspecialchars($row['event_booking_type']) ?></td>
-                <td><?= htmlspecialchars($row['event_booking_location']) ?></td>
-                <td><?= htmlspecialchars($row['ambulance_plate']) ?></td>
-                <td>
-                    <?= htmlspecialchars($row['event_booking_date']) ?><br>
-                    <?= htmlspecialchars($row['event_booking_start_time']) ?> - <?= htmlspecialchars($row['event_booking_finish_time']) ?>
-                </td>
-                <td><?= htmlspecialchars($row['member_firstname'] . ' ' . $row['member_lastname']) ?></td>
-                <td><?= htmlspecialchars($row['member_phone']) ?></td>
-                <td class="text-end"><?= number_format($row['event_booking_price'], 2) ?></td>
-            </tr>
-        <?php endwhile; ?>
+                $event_ids[] = $row['event_booking_id'];
+                $total += $row['event_booking_price'];
+            ?>
+                <tr>
+                    <td><?= htmlspecialchars($row['event_booking_type']) ?></td>
+                    <td><?= htmlspecialchars($row['event_booking_location']) ?></td>
+                    <td><?= htmlspecialchars($row['ambulance_plate']) ?></td>
+                    <td>
+                        <?= htmlspecialchars($row['event_booking_date']) ?><br>
+                        <?= htmlspecialchars($row['event_booking_start_time']) ?> - <?= htmlspecialchars($row['event_booking_finish_time']) ?>
+                    </td>
+                    <td><?= htmlspecialchars($row['member_firstname'] . ' ' . $row['member_lastname']) ?></td>
+                    <td><?= htmlspecialchars($row['member_phone']) ?></td>
+                    <td class="text-end"><?= number_format($row['event_booking_price'], 2) ?></td>
+                </tr>
+            <?php endwhile; ?>
 
-        </tbody>
-        </table>
-        <?php
-        $event_ids_str = implode(',', $event_ids);
-        echo '<div class="print-button-wrapper">';
-        echo '<a href="print_bill.php?event_ids=' . $event_ids_str . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
-        ?>
-    <?php else: ?>
-        <div class="alert alert-warning">ไม่พบรายการจองรถสำหรับรับงาน Event</div>
-    <?php endif; ?>
-</div>
+            </tbody>
+            </table>
+            <?php
+            $event_ids_str = implode(',', $event_ids);
+            echo '<div class="print-button-wrapper">';
+            echo '<a href="print_bill.php?event_ids=' . $event_ids_str . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
+            ?>
+        <?php else: ?>
+            <div class="alert alert-warning">ไม่พบรายการจองรถสำหรับรับงาน Event</div>
+        <?php endif; ?>
+    </div>
 
 </body>
 

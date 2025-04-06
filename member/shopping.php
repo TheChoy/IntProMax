@@ -90,7 +90,7 @@ $result = mysqli_stmt_get_result($stmt);
             <div><a href="shopping.php" style="color: #E88B71;">ซื้อ/เช่าอุปกรณ์ทางการแพทย์</a></div>
         </nav>
         <div class="cart-icon">
-            <a href="cart.html">
+            <a href="cart.php">
                 <i class="fas fa-shopping-cart"></i>
             </a>
         </div>

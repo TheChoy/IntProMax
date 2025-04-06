@@ -159,7 +159,7 @@
     bottom: 20px; /* ห่างจากขอบล่าง 20px */
     right: 20px; /* ห่างจากขอบขวา 20px */
     display: flex;
-    padding-left: 200px;
+    padding-left: 900px;
     gap: 15px;
     z-index: 100;
   }
