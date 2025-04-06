@@ -18,7 +18,7 @@ $stmt->bind_param("i", $member_id);
 $stmt->execute();
 $result = $stmt->get_result();
 ?>
-
+ 
 <!DOCTYPE html>
 <html lang="th">
 
