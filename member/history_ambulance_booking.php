@@ -157,7 +157,7 @@ $result = $stmt->get_result();
             <?php
             $booking_ids_str = implode(',', $booking_ids);
             echo '<div class="print-button-wrapper">';
-            echo '<a href="print_bill.php?booking_ids=' . $booking_ids_str . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
+            echo '<a href="print_bill_ambulance_booking.php?booking_ids=' . $booking_ids_str . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
             echo '</div>';
             echo '</div>';
             ?>

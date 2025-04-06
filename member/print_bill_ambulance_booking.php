@@ -9,33 +9,37 @@ if (empty($_SESSION['logged_in'])) {
 
 $member_id = $_SESSION['user_id'];
 
-if (!isset($_GET['order_ids'])) {
+if (!isset($_GET['booking_ids'])) {
     echo "ไม่พบรหัสคำสั่งซื้อ";
     exit();
-}  
+}
 
-$order_ids = explode(',', $_GET['order_ids']);
-$order_ids = array_map('intval', $order_ids);
-$placeholders = implode(',', array_fill(0, count($order_ids), '?'));
+$booking_ids = explode(',', $_GET['booking_ids']);
+$booking_ids = array_map('intval', $booking_ids);
+$placeholders = implode(',', array_fill(0, count($booking_ids), '?'));
 
 $sql = "SELECT 
-            order_equipment.order_equipment_id, 
-            order_equipment.order_equipment_quantity, 
-            order_equipment.order_equipment_total, 
-            equipment.equipment_name,
+            ambulance_booking.ambulance_booking_id,
+            ambulance_booking.ambulance_booking_location,
+            ambulance_booking.ambulance_booking_hospital_waypoint,
+            ambulance_booking.ambulance_booking_date,
+            ambulance_booking.ambulance_booking_start_time,
+            ambulance_booking.ambulance_booking_finish_time,
+            ambulance_booking.ambulance_booking_price,
             member.member_firstname,
-            member.member_lastname, 
+            member.member_lastname,
             member.member_address,
-            member.member_phone
-        FROM order_equipment
-        JOIN equipment ON order_equipment.equipment_id = equipment.equipment_id
-        JOIN member ON order_equipment.member_id = member.member_id
-        WHERE order_equipment.member_id = ? AND order_equipment.order_equipment_id IN ($placeholders)";
+            member.member_phone,
+            ambulance.ambulance_plate
+        FROM ambulance_booking
+        JOIN member ON ambulance_booking.member_id = member.member_id
+        JOIN ambulance ON ambulance_booking.ambulance_id = ambulance.ambulance_id
+        WHERE ambulance_booking.member_id = ? AND ambulance_booking.ambulance_booking_id IN ($placeholders)
+        ORDER BY ambulance_booking.ambulance_booking_date DESC";
 
 $stmt = $conn->prepare($sql);
-
-$types = str_repeat('i', count($order_ids) + 1);
-$params = array_merge([$member_id], $order_ids);
+$types = str_repeat('i', count($booking_ids) + 1); // Include member_id as the first parameter
+$params = array_merge([$member_id], $booking_ids);
 $stmt->bind_param($types, ...$params);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -45,12 +49,7 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
 
 <!DOCTYPE html>
 <html lang="th">
-
-<head>
-    <meta charset="UTF-8">
-    <title>ใบเสร็จรับเงิน</title>
-    <link rel="stylesheet" href="css/style_bill.css">
-    <style>
+<style>
         body {
             font-family: Tahoma, sans-serif;
             padding: 5px;
@@ -177,7 +176,13 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
         }
     </style>
 </head>
-
+    <meta charset="UTF-8">
+    <title>ใบเสร็จรับเงิน</title>
+    <link rel="stylesheet" href="css/style_bill.css">
+    <style>
+        /* Your existing CSS code */
+    </style>
+</head>
 <body onload="window.print()">
     <div class="receipt">
         <div class="clearfix">
@@ -190,7 +195,7 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
         </div>
         <hr>
         <div class="header">
-            <h2>ใบเสร็จรับเงิน / Receipt</h2>
+            <h2>ใบเสร็จค่าจองรถรับส่งผู้ป่วย / Receipt Ambulance Booking</h2>
             <p style="margin-top: -10px;">(ต้นฉบับ / Original)</p>
         </div>
 
@@ -198,9 +203,8 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
         <?php if (count($orders) > 0): ?>
             <?php $first = $orders[0]; ?>
             <div class="detail">
-                <p><strong>เลขที่ใบเสร็จ / Receipt No.:</strong> <?= htmlspecialchars($first['order_equipment_id']) ?></p>
+                <p><strong>เลขที่ใบเสร็จ / Receipt No.:</strong> <?= htmlspecialchars($first['ambulance_booking_id']) ?></p>
                 <p><strong>ลูกค้า / Customer:</strong> <?= htmlspecialchars($first['member_firstname'] . ' ' . $first['member_lastname']) ?></p>
-                <p><strong>ที่อยู่ / Address:</strong> <?= htmlspecialchars($first['member_address']) ?></p>
                 <p><strong>เบอร์โทร / Phone:</strong> <?= htmlspecialchars($first['member_phone']) ?></p>
                 <p><strong>วันที่ / Date:</strong> <?= date("d/m/Y") ?></p>
                 <p><strong>ออกโดย / Issuer:</strong> ระบบอัตโนมัติ</p>
@@ -210,9 +214,9 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
                 <thead>
                     <tr>
                         <th>ลำดับ<br>No.</th>
-                        <th>ชื่อสินค้า<br>Equipment Name</th>
-                        <th>จำนวน<br>Quantity</th>
-                        <th>ราคาต่อหน่วย<br>Unit Price</th>
+                        <th>เส้นทาง<br>Route</th>
+                        <th>เลขทะเบียนรถ<br>Vehicle registration number</th>
+                        <th>วันเวลาเดินทาง<br>Travel date and time</th>
                         <th>ราคารวม<br>Total</th>
                     </tr>
                 </thead>
@@ -221,25 +225,21 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
                     $i = 1;
                     $total = 0;
                     foreach ($orders as $order):
-                        $total += $order['order_equipment_total'];
+                        $total += $order['ambulance_booking_price'];
                     ?>
                         <tr>
                             <td><?= $i++ ?></td>
-                            <td><?= htmlspecialchars($order['equipment_name']) ?></td>
-                            <td><?= htmlspecialchars($order['order_equipment_quantity']) ?></td>
-                            <td><?= number_format($order['order_equipment_total'] / $order['order_equipment_quantity'], 2) ?></td>
-                            <td><?= number_format($order['order_equipment_total'], 2) ?></td>
+                            <td><?= htmlspecialchars($order['ambulance_booking_location']) ?> <strong>ไป</strong> <?= htmlspecialchars($order['ambulance_booking_hospital_waypoint']) ?></td>
+                            <td><?= htmlspecialchars($order['ambulance_plate']) ?></td>
+                            <td><?= htmlspecialchars($order['ambulance_booking_date']) ?><br><?= htmlspecialchars($order['ambulance_booking_start_time']) ?> - <?= htmlspecialchars($order['ambulance_booking_finish_time']) ?></td>
+                            <td class="text-end"><?= number_format($order['ambulance_booking_price'], 2) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="4" style="text-align:right;"><strong>ค่าจัดส่งสินค้า (บาท)</strong></td>
-                        <td><strong>120</strong></td>
-                    </tr>
-                    <tr>
                         <td colspan="4" style="text-align:right;"><strong>รวมทั้งสิ้น (บาท)</strong></td>
-                        <td><strong><?= number_format($total + 120, 2) ?></strong></td>
+                        <td><strong><?= number_format($total , 2) ?></strong></td>
                     </tr>
                 </tfoot>
             </table>
@@ -263,5 +263,4 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
         </div>
     </div>
 </body>
-
 </html>
