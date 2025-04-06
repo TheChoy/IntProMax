@@ -12,7 +12,7 @@ $member_id = $_SESSION['user_id'];
 if (!isset($_GET['order_ids'])) {
     echo "ไม่พบรหัสคำสั่งซื้อ";
     exit();
-}  
+}
 
 $order_ids = explode(',', $_GET['order_ids']);
 $order_ids = array_map('intval', $order_ids);
@@ -183,9 +183,9 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
         <div class="clearfix">
             <img src="image/Logo.png" alt="Logo" class="logo">
             <div class="company-info">
-                <strong>บริษัท บริการการแพทย์ไทย จำกัด</strong><br>
+                <strong>บริษัท Sky Medical Service จำกัด</strong><br>
                 123 ถนนสุขภาพดี แขวงใจดี เขตปลอดภัย กรุงเทพฯ 10200<br>
-                โทร: 02-123-4567 | อีเมล: info@medservice.co.th
+                โทร: 097-20-30-555| อีเมล: skymedicalservice@gmail.com
             </div>
         </div>
         <hr>

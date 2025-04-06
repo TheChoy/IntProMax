@@ -50,147 +50,148 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
 <!DOCTYPE html>
 <html lang="th">
 <style>
+    body {
+        font-family: Tahoma, sans-serif;
+        padding: 5px;
+        background: #fff;
+    }
+
+    .receipt {
+        max-width: 900px;
+        margin: auto;
+        padding: 30px;
+    }
+
+    .header,
+    .footer {
+        text-align: center;
+    }
+
+    .company-info {
+        float: right;
+        text-align: right;
+    }
+
+    .logo {
+        width: 120px;
+    }
+
+    .clearfix::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 5px;
+        font-size: 12px;
+    }
+
+    th,
+    td {
+        padding: 10px;
+        text-align: center;
+        font-size: 12px;
+        border-right: 1px solid #000;
+        /* เส้นคั่นแนวตั้ง */
+    }
+
+    /* ปรับเส้นคั่นแนวตั้งสำหรับคอลัมน์แรก */
+    th:first-child,
+    td:first-child {
+        border-left: 1px solid #000;
+        /* เส้นคั่นทางด้านซ้ายของคอลัมน์แรก */
+    }
+
+    th {
+        border-top: 2px solid #000;
+        /* เส้นคั่นด้านบนหัวตาราง */
+        border-bottom: 2px solid #000;
+        /* เส้นคั่นด้านล่างหัวตาราง */
+    }
+
+    td {
+        border-bottom: none;
+        /* ลบเส้นคั่นแนวนอนในแถวข้อมูล */
+    }
+
+    tfoot td {
+        border-top: 2px solid #000;
+        /* เส้นคั่นด้านบนของตารางรวม */
+        border-bottom: 2px solid #000;
+        /* เพิ่มเส้นคั่นด้านล่างในแถวสุดท้าย */
+    }
+
+    .no-border {
+        border: none;
+    }
+
+    .signature-section {
+        margin-top: 40px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .signature {
+        width: 40%;
+        text-align: center;
+    }
+
+    .signature-line {
+        margin-top: 60px;
+        border-top: 1px dotted #000;
+    }
+
+    /* ซ่อนข้อมูลที่ไม่ต้องการแสดงตอนพิมพ์ */
+    @media print {
         body {
-            font-family: Tahoma, sans-serif;
-            padding: 5px;
-            background: #fff;
+            visibility: hidden;
         }
 
         .receipt {
-            max-width: 900px;
-            margin: auto;
-            padding: 30px;
+            visibility: visible;
+            position: absolute;
+            top: 0;
         }
 
-        .header,
         .footer {
-            text-align: center;
+            display: none;
         }
 
-        .company-info {
-            float: right;
-            text-align: right;
+        /* ซ่อน URL หรือข้อความไม่ต้องการแสดง */
+        footer {
+            display: none;
         }
 
-        .logo {
-            width: 120px;
+        /* ซ่อนข้อความหรือคำสั่งที่เกี่ยวข้องกับการพิมพ์ที่ขอบล่างซ้าย */
+        @page {
+            margin: 0;
         }
 
-        .clearfix::after {
-            content: "";
-            display: table;
-            clear: both;
+        .receipt {
+            margin-bottom: 0;
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 5px;
-            font-size: 12px;
-        }
-
-        th,
-        td {
-            padding: 10px;
-            text-align: center;
-            font-size: 12px;
-            border-right: 1px solid #000;
-            /* เส้นคั่นแนวตั้ง */
-        }
-
-        /* ปรับเส้นคั่นแนวตั้งสำหรับคอลัมน์แรก */
-        th:first-child,
-        td:first-child {
-            border-left: 1px solid #000;
-            /* เส้นคั่นทางด้านซ้ายของคอลัมน์แรก */
-        }
-
-        th {
-            border-top: 2px solid #000;
-            /* เส้นคั่นด้านบนหัวตาราง */
-            border-bottom: 2px solid #000;
-            /* เส้นคั่นด้านล่างหัวตาราง */
-        }
-
-        td {
-            border-bottom: none;
-            /* ลบเส้นคั่นแนวนอนในแถวข้อมูล */
-        }
-
-        tfoot td {
-            border-top: 2px solid #000;
-            /* เส้นคั่นด้านบนของตารางรวม */
-            border-bottom: 2px solid #000;
-            /* เพิ่มเส้นคั่นด้านล่างในแถวสุดท้าย */
-        }
-
-        .no-border {
-            border: none;
-        }
-
-        .signature-section {
-            margin-top: 40px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .signature {
-            width: 40%;
-            text-align: center;
-        }
-
-        .signature-line {
-            margin-top: 60px;
-            border-top: 1px dotted #000;
-        }
-
-        /* ซ่อนข้อมูลที่ไม่ต้องการแสดงตอนพิมพ์ */
-        @media print {
-            body {
-                visibility: hidden;
-            }
-
-            .receipt {
-                visibility: visible;
-                position: absolute;
-                top: 0;
-            }
-
-            .footer {
-                display: none;
-            }
-
-            /* ซ่อน URL หรือข้อความไม่ต้องการแสดง */
-            footer {
-                display: none;
-            }
-
-            /* ซ่อนข้อความหรือคำสั่งที่เกี่ยวข้องกับการพิมพ์ที่ขอบล่างซ้าย */
-            @page {
-                margin: 0;
-            }
-
-            .receipt {
-                margin-bottom: 0;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
-    <meta charset="UTF-8">
-    <title>ใบเสร็จรับเงิน</title>
-    <link rel="stylesheet" href="css/style_bill.css">
-    <style>
-        /* Your existing CSS code */
-    </style>
+<meta charset="UTF-8">
+<title>ใบเสร็จรับเงิน</title>
+<link rel="stylesheet" href="css/style_bill.css">
+<style>
+    /* Your existing CSS code */
+</style>
 </head>
+
 <body onload="window.print()">
     <div class="receipt">
         <div class="clearfix">
             <img src="image/Logo.png" alt="Logo" class="logo">
             <div class="company-info">
-                <strong>บริษัท บริการการแพทย์ไทย จำกัด</strong><br>
+                <strong>บริษัท Sky Medical Service จำกัด</strong><br>
                 123 ถนนสุขภาพดี แขวงใจดี เขตปลอดภัย กรุงเทพฯ 10200<br>
-                โทร: 02-123-4567 | อีเมล: info@medservice.co.th
+                โทร: 097-20-30-555| อีเมล: skymedicalservice@gmail.com
             </div>
         </div>
         <hr>
@@ -239,7 +240,7 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
                 <tfoot>
                     <tr>
                         <td colspan="4" style="text-align:right;"><strong>รวมทั้งสิ้น (บาท)</strong></td>
-                        <td><strong><?= number_format($total , 2) ?></strong></td>
+                        <td><strong><?= number_format($total, 2) ?></strong></td>
                     </tr>
                 </tfoot>
             </table>
@@ -263,4 +264,5 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
         </div>
     </div>
 </body>
+
 </html>
