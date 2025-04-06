@@ -269,6 +269,7 @@ body {
     background: rgba(255, 184, 152, 1);
     color: #333;
 }
+<<<<<<< HEAD
 .filter-button {
     padding: 10px 20px;
     font-size: 14px;
@@ -315,6 +316,8 @@ body {
     transform: scale(0.97);
 }
 
+=======
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 
 .select{
     font-weight: regular;

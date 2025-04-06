@@ -1,6 +1,23 @@
 <?php
 
+<<<<<<< HEAD
 require("username.php");
+=======
+//-----------Session and Login-------------
+session_start();
+include 'username.php';
+
+// ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
+if (empty($_SESSION['logged_in'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+// เรียก member_id จาก session มาใช้ :
+// $_SESSION['user_id'];
+//------------------------------------------
+
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 $equipment_name = $_GET['equipment_name'];
 $equipment_name = mysqli_real_escape_string($conn, $equipment_name); //ป้องกัน sql injection พวกเครื่องหมายต่างๆ
 
@@ -40,7 +57,11 @@ $row  = mysqli_fetch_assoc($result);
                 <a href="profile.html">โปรไฟล์</a>
                 <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
                 <a href="claim.php">เคลมสินค้า</a>
+<<<<<<< HEAD
                 <a href="logout.html">ออกจากระบบ</a>
+=======
+                <a href="../logout.php">ออกจากระบบ</a>
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
             </div>
         </div>
         <a href="index.php">

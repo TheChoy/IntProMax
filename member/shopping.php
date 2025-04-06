@@ -1,7 +1,25 @@
 <?php
+<<<<<<< HEAD
 include 'username.php'; // เชื่อมต่อฐานข้อมูล
 
 // // รับค่าจาก URL
+=======
+//-----------Session and Login-------------
+session_start();
+include 'username.php';
+
+// ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
+if (empty($_SESSION['logged_in'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+// เรียก member_id จาก session มาใช้ :
+// $_SESSION['user_id'];
+//------------------------------------------
+
+// รับค่าจาก URL
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 $searchQuery = isset($_GET['q']) ? trim($_GET['q']) : '';
 $categoryFilter = isset($_GET['category']) ? trim($_GET['category']) : '';
 $minPrice = isset($_GET['minPrice']) ? (int)$_GET['minPrice'] : 0;
@@ -69,7 +87,11 @@ $result = mysqli_stmt_get_result($stmt);
                     <a href="profile.html">โปรไฟล์</a>
                     <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
+<<<<<<< HEAD
                     <a href="logout.html">ออกจากระบบ</a>
+=======
+                    <a href="../logout.php">ออกจากระบบ</a>
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
                 </div>
             </div>
             <a href="index.php">
@@ -89,7 +111,11 @@ $result = mysqli_stmt_get_result($stmt);
             <div><a href="shopping.php" style="color: #E88B71;">ซื้อ/เช่าอุปกรณ์ทางการแพทย์</a></div>
         </nav>
         <div class="cart-icon">
+<<<<<<< HEAD
             <a href="cart.html">
+=======
+            <a href="cart.php">
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
                 <i class="fas fa-shopping-cart"></i>
             </a>
         </div>
@@ -143,7 +169,11 @@ $result = mysqli_stmt_get_result($stmt);
                 <input type="range" id="maxPriceRange" min="0" max="1000000" step="100" value="1000000" oninput="updateMaxPrice()">
                 <input type="number" id="maxPrice" placeholder="สูงสุด" min="0" max="1000000" value="1000000">
             </div>
+<<<<<<< HEAD
             <button class="filter-button" id="filterSidebar"onclick="applyFilters()">ใช้ตัวกรอง</button>
+=======
+            <button onclick="applyFilters()">ใช้ตัวกรอง</button>
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 
         </div>
     </div>

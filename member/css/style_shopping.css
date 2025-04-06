@@ -300,6 +300,7 @@ body {
     /* เปลี่ยนสีไอคอนเมื่อเมาส์ไปวาง */
 }
 
+<<<<<<< HEAD
 .filter-button {
     background-color: rgba(159, 228, 222, 1);
     color: #333333;
@@ -332,6 +333,8 @@ body {
     color: #333333;
 }
 
+=======
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 a {
     text-decoration: none;
     /* ลบเส้นใต้ */

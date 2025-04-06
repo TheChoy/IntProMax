@@ -156,10 +156,17 @@ if (!empty($order_by)) {
                         <option value="อุปกรณ์ปฐมพยาบาล" <?php echo ($equipment_type == "อุปกรณ์ปฐมพยาบาล") ? "selected" : ""; ?>>อุปกรณ์ปฐมพยาบาล</option>
 
                     </select>
+<<<<<<< HEAD
                     
                         <button id="btnApplyFilter" class="filter-button">ใช้ตัวกรอง</button>
                         <button id="btnReset" class="filter-button">รีเซ็ต</button>
                 
+=======
+                    <button id="btnApplyFilter" class="filter-button" style="margin-top: 10px;">ใช้ตัวกรอง</button>
+                    <button id="btnReset" class="filter-button" style="margin-top: 10px;">รีเซ็ต</button>
+
+                    
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 
                 </form>
                

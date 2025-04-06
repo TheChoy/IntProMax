@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 session_start();
 
 // ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
@@ -8,6 +9,23 @@ session_start();
 // }
 
 // $user_id = $_SESSION['user_id']; // ดึงค่า user_id จาก session
+=======
+
+//-----------Session and Login-------------
+session_start();
+include 'username.php';
+
+// ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
+if (empty($_SESSION['logged_in'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+// เรียก member_id จาก session มาใช้ :
+// $_SESSION['user_id'];
+//------------------------------------------
+
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 ?>
 
 <html lang="th">
@@ -23,6 +41,10 @@ session_start();
 </head>
 <div class="top-navbar">
     <nav class="nav-links">
+<<<<<<< HEAD
+=======
+        
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
         <div><a href="order_emergency.php">ชำระเงินเคสฉุกเฉิน</a></div>
         <div><a href="contact.html">ติดต่อเรา</a></div>
         <div class="dropdown">
@@ -31,7 +53,11 @@ session_start();
                 <a href="profile.html">โปรไฟล์</a>
                 <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
                 <a href="claim.php?user_id=<?php echo $user_id; ?>">เคลมสินค้า</a>
+<<<<<<< HEAD
                 <a href="logout.html">ออกจากระบบ</a>
+=======
+                <a href="../logout.php">ออกจากระบบ</a>
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
             </div>
         </div>
         <a href="index.php">
@@ -53,7 +79,11 @@ session_start();
     </nav>
 
     <div class="cart-icon">
+<<<<<<< HEAD
         <a href="cart.html">
+=======
+        <a href="cart.php">
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
             <i class="fas fa-shopping-cart"></i>
         </a>
     </div>
@@ -61,6 +91,13 @@ session_start();
 
 <body>
 
+<<<<<<< HEAD
+=======
+    <div class="container">
+        <h1>ยินดีต้อนรับ <?php echo $_SESSION['user_email']; ?></h1>
+    </div>
+
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 </body>
 
 </html>

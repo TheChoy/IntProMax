@@ -1,5 +1,22 @@
 <?php
+<<<<<<< HEAD
 include 'username.php';
+=======
+//-----------Session and Login-------------
+session_start();
+include 'username.php';
+
+// ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
+if (empty($_SESSION['logged_in'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+// เรียก member_id จาก session มาใช้ :
+// $_SESSION['user_id'];
+//------------------------------------------
+
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 $ids = $_GET['id'];
 
 // get medical_equipment table
@@ -17,8 +34,13 @@ if ($row['equipment_quantity'] == 0) {
 }
 
 // get member
+<<<<<<< HEAD
 $random_memeber = $_GET['member_id'];
 $member_sql = "SELECT * FROM member WHERE member_id = $random_memeber";
+=======
+$member_id = $_GET['member_id'];
+$member_sql = "SELECT * FROM member WHERE member_id = $member_id";
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 $result_member = mysqli_query($conn, $member_sql);
 $row_result_member = mysqli_fetch_assoc($result_member);
 ?>
@@ -46,7 +68,11 @@ $row_result_member = mysqli_fetch_assoc($result_member);
                     <a href="profile.html">โปรไฟล์</a>
                     <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
+<<<<<<< HEAD
                     <a href="logout.html">ออกจากระบบ</a>
+=======
+                    <a href="../logout.php">ออกจากระบบ</a>
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
                 </div>
             </div>
             <a href="index.php">
@@ -66,7 +92,11 @@ $row_result_member = mysqli_fetch_assoc($result_member);
         </nav>
 
         <div class="cart-icon">
+<<<<<<< HEAD
             <a href="cart.html">
+=======
+            <a href="cart.php">
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
                 <i class="fas fa-shopping-cart"></i>
             </a>
         </div>
@@ -149,12 +179,17 @@ $row_result_member = mysqli_fetch_assoc($result_member);
                 <p>ค่าจัดส่ง <span class="delivery">฿ 120</span></p>
                 <p>ยอดชำระทั้งหมด <span class="totalprice">฿ 6,020</span></p>
             </div>
+<<<<<<< HEAD
             <a class="order-button2" id="tbtn" href="QRpayment_order.php">สั่งสินค้า</a>
+=======
+            <button class="order-button2" id="tbtn">สั่งสินค้า</button>
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
         </div>
     </section>
 
 
     <script>
+<<<<<<< HEAD
       document.getElementById("tbtn").addEventListener("click", function() {
     let totalOrderPrice = parseFloat(document.querySelector('.summary .totalprice').textContent.replace('฿', '').trim());
 
@@ -165,6 +200,36 @@ $row_result_member = mysqli_fetch_assoc($result_member);
     // ส่ง price_total + equipment_id ไปหน้า QRpayment
     this.href = `QRpayment_order.php?price_total=${totalOrderPrice}&id=${equipmentId}`;
 });
+=======
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTotalPrice(); // คำนวณราคา
+
+            // ตรวจสอบว่า stock เหลือ 0 หรือไม่ (จาก PHP ฝังไว้)
+            const stockLeft = <?= $row['equipment_quantity'] ?>;
+
+            if (stockLeft <= 0) {
+                alert("สินค้าหมดแล้ว");
+                window.location.href = "shopping.php";
+            }
+        });
+
+
+        document.getElementById("tbtn").addEventListener("click", function() {
+            let totalOrderPrice = parseFloat(document.querySelector('.summary .totalprice').textContent.replace('฿', '').trim());
+            const payment_quantity = parseInt(document.querySelector(".quantity-input").value || 1); // จำนวนสินค้าที่เลือก
+            // ดึง equipment_id จาก URL (ถ้ามี)
+            const urlParams = new URLSearchParams(window.location.search);
+            const equipmentId = urlParams.get("id"); // เช่นจาก shopping.php?id=5
+
+            // ส่ง price_total + equipment_id ไปหน้า QRpayment
+            fetch_order_equipment(formData).then((response) => {
+                const orderId = response.order_equipment_id;
+                window.location.href = `QRpayment_order.php?price_total=${totalOrderPrice}&id=${equipmentId}&quantity=${payment_quantity}&order_equipment_id=${orderId}`;
+            });
+
+
+        });
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 
         // 1. ประกาศราคาต่อชิ้นจากฐานข้อมูล
         const pricePerItem = parseFloat("<?= $row['equipment_price_per_unit'] ?>"); // ราคาต่อชิ้นจากฐานข้อมูล
@@ -322,6 +387,7 @@ $row_result_member = mysqli_fetch_assoc($result_member);
 
         // รับข้อมูล
         document.getElementById("tbtn").addEventListener("click", function() {
+<<<<<<< HEAD
             let payment_quantity = parseInt(document.querySelector(".quantity-input").value);
             let payment_cost = parseInt(document.querySelector(".cost").textContent.replace("฿", "").trim()) / payment_quantity;
             let payment_rent_months = parseInt(document.querySelector(".installment-input").value)
@@ -376,6 +442,52 @@ $row_result_member = mysqli_fetch_assoc($result_member);
                 });
 
         }
+=======
+            let totalOrderPrice = parseFloat(document.querySelector('.summary .totalprice').textContent.replace('฿', '').trim());
+            const payment_quantity = parseInt(document.querySelector(".quantity-input").value || 1);
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const equipmentId = urlParams.get("id");
+            const member_id = urlParams.get("member_id");
+
+            // ✅ คำนวณราคาต่อหน่วยใหม่ก่อนใช้
+            let payment_cost = pricePerItem;
+            let payment_rent_months = parseInt(document.querySelector(".installment-input").value || 0);
+
+            let formData = {
+                "member_id": member_id,
+                "equipment_id": equipmentId,
+                "order_equipment_type": payment_purchase,
+                "order_equipment_price": payment_cost,
+                "order_equipment_quantity": payment_quantity,
+                "order_equipment_total": totalOrderPrice,
+                "order_equipment_buy_type": payment_type,
+                "order_equipment_months": payment_rent_months
+            };
+
+            // ✅ ส่งข้อมูล แล้ว redirect พร้อม order_equipment_id
+            fetch('insert_order.php', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        const order_equipment_id = data.order_equipment_id;
+                        window.location.href = `QRpayment_order.php?price_total=${totalOrderPrice}&id=${equipmentId}&quantity=${payment_quantity}&order_equipment_id=${order_equipment_id}`;
+                    } else {
+                        alert("เกิดข้อผิดพลาดในการสั่งซื้อ");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("เชื่อมต่อกับเซิร์ฟเวอร์ไม่ได้");
+                });
+        });
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
     </script>
 </body>
 

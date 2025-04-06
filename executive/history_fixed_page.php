@@ -128,7 +128,11 @@ foreach ($notReady_ambu_data as $num) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<<<<<<< HEAD
   <script src="history_script copy.js?ts=<?php echo time(); ?>"></script>
+=======
+  <script src="history_script.js?ts=<?php echo time(); ?>"></script>
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <title>ประวัติการส่งซ่อมรถและอุปกรณ์การแพทย์</title>
 

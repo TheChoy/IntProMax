@@ -1,3 +1,22 @@
+<<<<<<< HEAD
+=======
+<?php 
+//-----------Session and Login-------------
+session_start();
+include 'username.php';
+
+// ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
+if (empty($_SESSION['logged_in'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+// เรียก member_id จาก session มาใช้ :
+// $_SESSION['user_id'];
+//------------------------------------------
+?>
+
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,7 +43,11 @@
                     <a href="profile.html">โปรไฟล์</a>
                     <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
+<<<<<<< HEAD
                     <a href="logout.html">ออกจากระบบ</a>
+=======
+                    <a href="../logout.php">ออกจากระบบ</a>
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
                 </div>
             </div>
             <a href="index.php">
@@ -45,7 +68,11 @@
         </nav>
 
         <div class="cart-icon">
+<<<<<<< HEAD
             <a href="cart.html">
+=======
+            <a href="cart.php">
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
                 <i class="fas fa-shopping-cart"></i>
             </a>
         </div>
@@ -88,8 +115,13 @@
 
         <!-- ปุ่มที่ให้ผู้ใช้เพิ่มสินค้าลงในตะกร้า หรือยืนยันการสั่งซื้อ -->
         <div class="order-buttons">
+<<<<<<< HEAD
             <a class="add-to-cart">เพิ่มไปยังตะกร้า</a> <!-- ปุ่มเพิ่มสินค้าลงในตะกร้า -->
             <a href="payment.php?id=<?= $row['equipment_id'] ?>&member_id=<?= rand(1, 10) ?>">ยืนยันการสั่งซื้อ</a> <!-- ปุ่มยืนยันการสั่งซื้อ -->
+=======
+            <a class="add-to-cart" href="order.php?id=<?= $row['equipment_id'] ?>">เพิ่มไปยังตะกร้า</a> <!-- ปุ่มเพิ่มสินค้าลงในตะกร้า -->
+            <a href="payment.php?id=<?= $row['equipment_id'] ?>&member_id=<?= $_SESSION['user_id'] ?>">ยืนยันการสั่งซื้อ</a> <!-- ปุ่มยืนยันการสั่งซื้อ -->
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
             <!-- <a href="paymenttest.php?id=<?= $row['equipment_id'] ?>&member_id=1">ยืนยันการสั่งซื้อ</a> -->
         </div>
     </section>

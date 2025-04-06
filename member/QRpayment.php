@@ -26,7 +26,11 @@ $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
                     <a href="profile.html">โปรไฟล์</a>
                     <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
+<<<<<<< HEAD
                     <a href="logout.html">ออกจากระบบ</a>
+=======
+                    <a href="../logout.php">ออกจากระบบ</a>
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
                 </div>
             </div>
             <a href="index.php">
@@ -46,7 +50,11 @@ $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
         </nav>
 
         <div class="cart-icon">
+<<<<<<< HEAD
             <a href="cart.html">
+=======
+            <a href="cart.php">
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
                 <i class="fas fa-shopping-cart"></i>
             </a>
         </div>

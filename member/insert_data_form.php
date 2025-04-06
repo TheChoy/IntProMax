@@ -1,6 +1,23 @@
 <?php
+<<<<<<< HEAD
 session_start();
 include 'username.php';
+=======
+//-----------Session and Login-------------
+session_start();
+include 'username.php';
+
+// ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
+if (empty($_SESSION['logged_in'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+// เรียก member_id จาก session มาใช้ :
+// $_SESSION['user_id'];
+//------------------------------------------
+
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 // ฟังก์ชันระบุภูมิภาค
 function getRegion($province)
 {
@@ -70,7 +87,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $ambulance_number = $_POST['ambulance_number'];
         $payment_method = $_POST['payment_method_event'];
 
+<<<<<<< HEAD
         $member_id = rand(1, 10);
+=======
+        $member_id = $_SESSION['user_id'];
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 
         $sql = "INSERT INTO event_booking (member_id,ambulance_id,event_booking_date,event_booking_start_time,event_booking_province,event_booking_region,event_booking_location, event_booking_detail, event_booking_type,event_booking_amount_nurse, event_booking_amount_ambulance,event_booking_buy_type,event_booking_price) 
                 VALUES ('$member_id','$ambulance_id','$booking_date','$booking_start_time','$province','$region','$place_event_location','$place_event_detail', '$type', '$nurse_number', '$ambulance_number', '$payment_method','$price')";
@@ -121,7 +142,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $region = getRegion($province); // ตรวจสอบภูมิภาคจากจังหวัด
         $price = $_POST['calculatedPrice2'];
 
+<<<<<<< HEAD
         $member_id = rand(1, 10);
+=======
+        $member_id = $_SESSION['user_id'];
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
         // Mapping hospital codes to names
         $hospitalMap = [
             "hospital1" => "โรงพยาบาลมหาวิทยาลัยนเรศวร",

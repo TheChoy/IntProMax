@@ -1,5 +1,21 @@
 <?php
+<<<<<<< HEAD
 include("username.php"); // ตรวจสอบว่าไฟล์นี้มีการเชื่อมต่อฐานข้อมูลด้วย $conn
+=======
+//-----------Session and Login-------------
+session_start();
+include 'username.php';
+
+// ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
+if (empty($_SESSION['logged_in'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+// เรียก member_id จาก session มาใช้
+$member_id = $_SESSION['user_id'];
+//------------------------------------------
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
 
 // ตรวจสอบว่ามีการกดปุ่มค้นหาหรือไม่
 $search = isset($_POST['search']) ? trim($_POST['search']) : "";
@@ -44,7 +60,11 @@ if ($hasSearched) {
                     <a href="profile.html">โปรไฟล์</a>
                     <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
+<<<<<<< HEAD
                     <a href="logout.html">ออกจากระบบ</a>
+=======
+                    <a href="../logout.php">ออกจากระบบ</a>
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
                 </div>
             </div>
             <a href="index.php">
@@ -64,7 +84,11 @@ if ($hasSearched) {
             <div><a href="shopping.php">ซื้อ/เช่าอุปกรณ์ทางการแพทย์</a></div>
         </nav>
         <div class="cart-icon">
+<<<<<<< HEAD
             <a href="cart.html">
+=======
+            <a href="cart.php">
+>>>>>>> b8baf0e802209a1a4d139e119c1a87fe62d73857
                 <i class="fas fa-shopping-cart"></i>
             </a>
         </div>
