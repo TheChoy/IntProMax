@@ -261,60 +261,38 @@ body {
 }
 
 .btn-approve {
-    background: rgba(159, 228, 222, 1);
+    background: #81B3D2;
     color: #333;
 }
 
-.btn-reject {
-    background: rgba(255, 184, 152, 1);
-    color: #333;
+.btn-approve:hover {
+    background:#81B3D2; /* สีที่เปลี่ยนตอน hover */
+    color: white;
 }
+
+
+.button-container {
+    display: flex;
+    justify-content: center;  /* จัดปุ่มให้อยู่ตรงกลางแนวนอน */
+    gap: 10px;                 /* ระยะห่างระหว่างปุ่ม */
+    margin-top: 10px;
+    width: 100%;              /* สำคัญมาก ให้ container กว้างเต็มพื้นที่ */
+  }
+
 .filter-button {
-    padding: 10px 20px;
-    font-size: 14px;
-    font-family: 'Roboto', sans-serif;
+    background: #81B3D2;
+    color: #333;
+    padding: 0.5rem 1rem;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    margin-left: 10px;
-    min-width: 100px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
 }
 
-/* ปุ่มใช้ตัวกรอง */
-#btnApplyFilter {
-    background-color: rgba(159, 228, 222, 1);
-    color: #333333;
+.filter-button:hover {
+    background:#81B3D2; /* สีที่เปลี่ยนตอน hover */
+    color: white;
 }
-
-#btnApplyFilter:hover {
-    background-color: #5BAA98;
-    transform: translateY(-2px);
-}
-
-#btnApplyFilter:active {
-    background-color: #4C9C8C;
-    transform: scale(0.97);
-}
-
-/* ปุ่มรีเซ็ต */
-#btnReset {
-    background-color: #e0e0e0;
-    color: #333333;
-    margin-left: 30px;
-}
-
-#btnReset:hover {
-    background-color: #cfcfcf;
-    transform: translateY(-2px);
-}
-
-#btnReset:active {
-    background-color: #bcbcbc;
-    transform: scale(0.97);
-}
-
 
 .select{
     font-weight: regular;

@@ -300,6 +300,38 @@ body {
     /* เปลี่ยนสีไอคอนเมื่อเมาส์ไปวาง */
 }
 
+.filter-button {
+    background-color: #81B3D2;
+    color: #ffffff;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 60%;
+    margin-top: 40px; 
+    min-width: 50px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filter-button:hover {
+    background-color: #4a7b99;
+    transform: translateY(-2px);
+}
+
+.filter-button:active {
+    background-color: #81B3D2;
+    transform: scale(0.97);
+}
+
+/* ปุ่มใช้ตัวกรอง */
+#btnApplyFilter {
+    background-color: rgba(159, 228, 222, 1);
+    color: #333333;
+}
+
 a {
     text-decoration: none;
     /* ลบเส้นใต้ */

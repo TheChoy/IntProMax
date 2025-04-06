@@ -1,13 +1,14 @@
 <?php 
 include_once 'username.php';
+
 // รับค่าจาก GET (ถ้ามี)
-$start_date = $_POST['start_date'] ?? '';
-$end_date = $_POST['end_date'] ?? '';
-$order_quantity = $_POST['order_equipment_quantity'] ?? '';
-$order_price = $_POST['order_equipment_price'] ?? '';
-$min_price = $_POST['min_price'] ?? '';
-$max_price = $_POST['max_price'] ?? '';
-$equipment_type = $_POST['equipment_type'] ?? '';
+$start_date = $_GET['start_date'] ?? '';
+$end_date = $_GET['end_date'] ?? '';
+$order_quantity = $_GET['order_equipment_quantity'] ?? '';
+$order_price = $_GET['order_equipment_price'] ?? '';
+$min_price = $_GET['min_price'] ?? '';
+$max_price = $_GET['max_price'] ?? '';
+$equipment_type = $_GET['equipment_type'] ?? '';
 
 $sql = "SELECT * FROM order_equipment a 
         inner join equipment e on a.equipment_id = e.equipment_id 
@@ -46,8 +47,8 @@ if (!empty($order_by)) {
     $sql .= " ORDER BY " . implode(", ", $order_by);
 }
 
-
 ?>
+
 
 
 
@@ -155,12 +156,13 @@ if (!empty($order_by)) {
                         <option value="อุปกรณ์ปฐมพยาบาล" <?php echo ($equipment_type == "อุปกรณ์ปฐมพยาบาล") ? "selected" : ""; ?>>อุปกรณ์ปฐมพยาบาล</option>
 
                     </select>
-                        <div id="productList">
-                            <!-- รายการสินค้าจะถูกโหลดตรงนี้ -->
-                         </div>
 
-                    <!-- <button id="btnApplyFilter" class="filter-button" style="margin-top: 10px;">ใช้ตัวกรอง</button>
-                    <button id="btnReset" class="filter-button" style="margin-top: 10px;">รีเซ็ต</button> -->
+                    
+                    <div class="button-container">
+                        <button id="btnApplyFilter" class="filter-button">ใช้ตัวกรอง</button>
+                        <button id="btnReset" class="filter-button">รีเซ็ต</button>
+                    </div>
+
 
                     
 

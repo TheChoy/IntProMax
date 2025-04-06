@@ -106,42 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
             `&max_price=${maxPriceRange}`+
             `&equipment_type=${equipmentFilter}`; 
         }
-
-            // 🔄 ฟังก์ชันโหลดสินค้าแบบ AJAX
-            const fetchProducts = () => {
-                const formData = new FormData();
-                formData.append('start_date', objStartDate.value);
-                formData.append('end_date', objEndDate.value);
-                formData.append('order_equipment_price', objFilterPriceList.value);
-                formData.append('min_price', objMinPriceRange.value);
-                formData.append('max_price', objMaxPriceRange.value);
-                formData.append('equipment_type', objEquipMentFilterList.value);
-
-                fetch('approve_page.php', { // ✅ แก้ให้ดึงจากไฟล์ใหม่
-                    method: 'POST',
-                    body: formData
-                })
-                .then(res => res.text())
-                .then(data => {
-                    productList.innerHTML = data;
-                })
-                .catch(err => {
-                    console.error("โหลดสินค้าไม่สำเร็จ", err);
-                });
-            };
-
-            // 🔄 เรียกใช้เมื่อ filter มีการเปลี่ยนแปลง
-            objMinPriceRange.addEventListener('input', fetchProducts);
-            objMaxPriceRange.addEventListener('input', fetchProducts);
-            objEquipMentFilterList.addEventListener('change', fetchProducts);
-            objFilterPriceList.addEventListener('change', fetchProducts);
-            objStartDate.addEventListener('change', fetchProducts);
-            objEndDate.addEventListener('change', fetchProducts);
-
-            // ✅ โหลดสินค้าครั้งแรก
-            fetchProducts();
-
-
 });
 
 
