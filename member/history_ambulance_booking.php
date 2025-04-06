@@ -79,6 +79,15 @@ $result = $stmt->get_result();
             </a>
         </div>
     </div>
+
+    <div class="custom-dropdown">
+        <select class="dropdown-select" onchange="window.location.href=this.value;">
+            <option value="" selected hidden>เลือกประเภทการจอง</option>
+            <option value="history_ambulance_booking.php">จองรถสำหรับผู้ป่วย</option>
+            <option value="history_event_booking.php">จองรถสำหรับงาน Event</option>
+        </select>
+    </div>
+
     <!-- HTML แสดงตาราง -->
     <div class="table-responsive mt-4">
         <table class="table table-bordered table-striped">
