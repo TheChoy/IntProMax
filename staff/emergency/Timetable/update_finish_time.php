@@ -5,7 +5,7 @@ date_default_timezone_set('Asia/Bangkok');
 session_start();
 
 // เชื่อมต่อฐานข้อมูล MySQL
-$con = new mysqli('localhost', 'root', '1234', 'intpro'); // ใช้ database intpro
+$con = new mysqli('localhost', 'root', '', 'intpro'); // ใช้ database intpro
 
 // ตรวจสอบการเชื่อมต่อฐานข้อมูล ถ้าล้มเหลวจะแสดงข้อความข้อผิดพลาด
 if ($con->connect_error) {
