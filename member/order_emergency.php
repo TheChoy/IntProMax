@@ -54,7 +54,7 @@ if ($hasSearched) {
                 <img src="image/user.png" alt="User" class="nav-logo">
                 <div class="dropdown-menu">
                     <a href="profile.html">โปรไฟล์</a>
-                    <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
+                    <a href="history.php">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
                     <a href="../logout.php">ออกจากระบบ</a>
                 </div>

@@ -79,7 +79,7 @@ $result = mysqli_stmt_get_result($stmt);
                 <img src="image/user.png" alt="User" class="nav-logo">
                 <div class="dropdown-menu">
                     <a href="profile.html">โปรไฟล์</a>
-                    <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
+                    <a href="history.php">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
                     <a href="logout.html">ออกจากระบบ</a>
                 </div>
