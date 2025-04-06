@@ -68,6 +68,7 @@ $result = mysqli_stmt_get_result($stmt);
                 <div class="dropdown-menu">
                     <a href="profile.html">โปรไฟล์</a>
                     <a href="history.php">ประวัติคำสั่งซื้อ</a>
+                    <a href="history_ambulance_booking.php">ประวัติการจองรถ</a>
                     <a href="claim.php">เคลมสินค้า</a>
                     <a href="logout.html">ออกจากระบบ</a>
                 </div>

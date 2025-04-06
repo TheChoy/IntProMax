@@ -25,6 +25,7 @@ $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
                 <div class="dropdown-menu">
                     <a href="profile.html">โปรไฟล์</a>
                     <a href="history.php">ประวัติคำสั่งซื้อ</a>
+                    <a href="history_ambulance_booking.php">ประวัติการจองรถ</a>
                     <a href="claim.php">เคลมสินค้า</a>
                     <a href="../logout.php">ออกจากระบบ</a>
                 </div>
