@@ -495,6 +495,7 @@ body {
     /* จำกัดความกว้างสูงสุด */
 }
 
+
 #place_event_detail {
     border-radius: 10px;
     /* ทำให้ขอบมน */
@@ -520,6 +521,32 @@ body {
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
     /* เพิ่มเงาขณะโฟกัส */
 }
+#place_ambulance_detail {
+    border-radius: 10px;
+    /* ทำให้ขอบมน */
+    padding: 10px;
+    /* เพิ่มระยะห่างด้านใน */
+    border: 1px solid #ccc;
+    /* สีขอบ */
+    width: 50%;
+    /* ขยายเต็มความกว้าง */
+    box-sizing: border-box;
+    /* รวม padding กับ border */
+    font-family: Arial, sans-serif;
+    /* กำหนดฟอนต์ */
+    font-size: 14px;
+    /* ขนาดตัวอักษร */
+}
+
+#place_ambulance_detail:focus {
+    outline: none;
+    /* ลบกรอบขอบขณะโฟกัส */
+    border-color: #007BFF;
+    /* เปลี่ยนสีขอบขณะโฟกัส */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    /* เพิ่มเงาขณะโฟกัส */
+}
+
 
 
 .current-date-time {
@@ -628,3 +655,4 @@ body {
     margin-right: 10px;
     /* ปรับระยะห่างจากช่องกรอกข้อมูล */
 }
+
