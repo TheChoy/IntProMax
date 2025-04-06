@@ -12,7 +12,7 @@ $member_id = $_SESSION['user_id'];
 if (!isset($_GET['order_ids'])) {
     echo "ไม่พบรหัสคำสั่งซื้อ";
     exit();
-}
+}  
 
 $order_ids = explode(',', $_GET['order_ids']);
 $order_ids = array_map('intval', $order_ids);
