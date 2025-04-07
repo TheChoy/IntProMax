@@ -1,5 +1,16 @@
 <?php
+session_start();
 include 'username.php';
+
+// ถ้าไม่ได้ล็อกอิน ให้ redirect กลับไปหน้า login
+if (empty($_SESSION['logged_in'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+// เรียก member_id จาก session มาใช้
+$member_id = $_SESSION['user_id'];
+//------------------------------------------
 
 // รับค่าจาก URL หรือ POST
 $booking_date = $_GET['booking_date'] ?? 'ไม่มีวันที่';
@@ -82,10 +93,10 @@ $conn->close();
                 <img src="image/user.png" alt="Logo" class="nav-logo">
                 <div class="dropdown-menu">
                     <a href="profile.html">โปรไฟล์</a>
-                    <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
+                    <a href="history.php">ประวัติคำสั่งซื้อ</a>
                     <a href="history_ambulance_booking.php">ประวัติการจองรถ</a>
                     <a href="claim.php">เคลมสินค้า</a>
-                    <a href="logout.html">ออกจากระบบ</a>
+                    <a href="../logout.php">ออกจากระบบ</a>
                 </div>
             </div>
             <a href="index.html">

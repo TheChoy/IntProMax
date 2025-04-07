@@ -47,7 +47,7 @@ $row_result_member = mysqli_fetch_assoc($result_member);
                     <a href="history.php">ประวัติคำสั่งซื้อ</a>
                     <a href="history_ambulance_booking.php">ประวัติการจองรถ</a>
                     <a href="claim.php">เคลมสินค้า</a>
-                    <a href="logout.html">ออกจากระบบ</a>
+                    <a href="../logout.php">ออกจากระบบ</a>
                 </div>
             </div>
             <a href="index.php">
