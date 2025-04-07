@@ -39,6 +39,19 @@ $stmt_exec = $conn->prepare($sql_exec);
 $stmt_exec->execute();
 $result_exec = $stmt_exec->get_result();
 $executive = $result_exec->fetch_assoc();
+
+// ตรวจสอบข้อมูลผู้บริหาร
+if ($executive) {
+    $executive_id = $executive['executive_id'];
+    $executive_firstname = $executive['executive_firstname'];
+    $executive_lastname = $executive['executive_lastname'];
+} else {
+    $executive_id = null;  // หรือกำหนดเป็นค่าเริ่มต้น
+    $executive_firstname = "ไม่พบข้อมูลผู้บริหาร";
+    $executive_lastname = "";
+}
+echo "executive_id: " . $executive_id;
+
 ?>
 
 <!DOCTYPE html>
@@ -166,7 +179,7 @@ $executive = $result_exec->fetch_assoc();
             <?php
             $booking_ids_str = implode(',', $booking_ids);
             echo '<div class="print-button-wrapper">';
-            echo '<a href="print_bill_ambulance_booking.php?booking_ids=' . $booking_ids_str . '&executive_id=' . $executive['executive_id'] . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
+            echo '<a href="print_bill_ambulance_booking.php?booking_ids=' . $booking_ids_str . '&executive_id=' . $executive_id . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
             echo '</div>';
             echo '</div>';
             ?>

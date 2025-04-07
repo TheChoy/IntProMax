@@ -236,6 +236,7 @@ if ($executive_id) {
                 <p><strong>เบอร์โทร / Phone:</strong> <?= htmlspecialchars($first['member_phone']) ?></p>
                 <p><strong>วันที่ เวลา ที่ออกใบเสร็จ / Date time of receipt issue:</strong> <?= date("d/m/Y H:i") ?></p>
                 <p><strong>ออกโดย / Issuer:</strong> <?= htmlspecialchars($executive_firstname) ?> <?= htmlspecialchars($executive_lastname) ?></p>
+                
                 </div>
 
             <table>
@@ -264,14 +265,19 @@ if ($executive_id) {
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
+                <?php $vat = ($total * 7)/100 ; ?>
                 <tfoot>
                     <tr>
                         <td colspan="4" style="text-align:right;"><strong>ค่าจัดส่งสินค้า (บาท)</strong></td>
                         <td><strong>120</strong></td>
                     </tr>
                     <tr>
+                        <td colspan="4" style="text-align:right;"><strong>Vat 7%</strong></td>
+                        <td><strong><?= number_format($vat, 2) ?></strong></td>
+                    </tr>
+                    <tr>
                         <td colspan="4" style="text-align:right;"><strong>รวมทั้งสิ้น (บาท)</strong></td>
-                        <td><strong><?= number_format($total + 120, 2) ?></strong></td>
+                        <td><strong><?= number_format($total + 120 + $vat, 2) ?></strong></td>
                     </tr>
                 </tfoot>
             </table>

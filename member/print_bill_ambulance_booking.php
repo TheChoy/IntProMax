@@ -13,8 +13,6 @@ if (!isset($_GET['booking_ids'])) {
     echo "ไม่พบรหัสคำสั่งซื้อ";
     exit();
 }
-$executive_id = isset($_GET['executive_id']) ? $_GET['executive_id'] : null;
-
 $booking_ids = explode(',', $_GET['booking_ids']);
 $booking_ids = array_map('intval', $booking_ids);
 $placeholders = implode(',', array_fill(0, count($booking_ids), '?'));
@@ -48,22 +46,29 @@ $result = $stmt->get_result();
 $orders = $result->fetch_all(MYSQLI_ASSOC);
 date_default_timezone_set("Asia/Bangkok");
 
+// รับค่า executive_id จาก URL
+$executive_id = isset($_GET['executive_id']) ? $_GET['executive_id'] : null;
+
 if ($executive_id) {
-    // ดึงข้อมูลผู้บริหารจากฐานข้อมูล
+    // ถ้า executive_id มีค่า
     $sql_exec = "SELECT executive_firstname, executive_lastname FROM executive WHERE executive_id = ?";
     $stmt_exec = $conn->prepare($sql_exec);
     $stmt_exec->bind_param("i", $executive_id);
     $stmt_exec->execute();
     $result_exec = $stmt_exec->get_result();
 
-    // ถ้ามีข้อมูลของผู้บริหาร
     if ($executive = $result_exec->fetch_assoc()) {
         $executive_firstname = $executive['executive_firstname'];
         $executive_lastname = $executive['executive_lastname'];
     } else {
+        // ถ้าผู้บริหารไม่พบ
         $executive_firstname = "ไม่พบข้อมูลผู้บริหาร";
         $executive_lastname = "";
     }
+} else {
+    // ถ้า executive_id ไม่มีค่าหรือไม่ได้ส่งมา
+    $executive_firstname = "ไม่พบข้อมูลผู้บริหาร";
+    $executive_lastname = "";
 }
 
 ?>
