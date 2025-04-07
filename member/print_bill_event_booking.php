@@ -266,7 +266,7 @@ if ($executive_id) {
                             <td><?= htmlspecialchars($order['event_booking_distance']) ?></td>
                             <td>3.5</td>
                             <td><?= htmlspecialchars($order['ambulance_plate']) ?></td>
-                            <td><?= htmlspecialchars($order['event_booking_date']) ?><br><?= htmlspecialchars($order['event_booking_start_time']) ?> - <?= htmlspecialchars($order['event_booking_finish_time']) ?></td>
+                            <td><?= htmlspecialchars($order['event_booking_date']) ?><br><?= htmlspecialchars($order['event_booking_start_time']) ?></td>
                             <td class="text-end"><?= number_format($order['event_booking_price'], 2) ?></td>
 
                         </tr>
@@ -275,11 +275,11 @@ if ($executive_id) {
                 <?php $vat = ($total * 7) / 100; ?>
                 <tfoot>
                     <tr>
-                        <td colspan="4" style="text-align:right;"><strong>Vat 7%</strong></td>
+                        <td colspan="6" style="text-align:right;"><strong>Vat 7%</strong></td>
                         <td><strong><?= number_format($vat, 2) ?></strong></td>
                     </tr>
                     <tr>
-                        <td colspan="4" style="text-align:right;"><strong>รวมทั้งสิ้น (บาท)</strong></td>
+                        <td colspan="6" style="text-align:right;"><strong>รวมทั้งสิ้น (บาท)</strong></td>
                         <td><strong><?= number_format($total + 120 + $vat, 2) ?></strong></td>
                     </tr>
                 </tfoot>
