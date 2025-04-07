@@ -52,6 +52,7 @@ $conn->close();
             margin-right: 10px;
             /* ระยะห่างระหว่าง input กับปุ่ม */
         }
+
         #searchEventLocation+button,
         #searchPatientLocation+button {
             padding: 10px 20px;
@@ -65,6 +66,7 @@ $conn->close();
             margin-left: 10px;
             /* ระยะห่างที่ต้องการให้ปุ่มขยับไปทางขวา */
         }
+
         #searchEventLocation+button:hover {
             background-color: #0056b3;
         }
@@ -74,16 +76,14 @@ $conn->close();
 <body>
     <div class="top-navbar">
         <nav class="nav-links">
-        <div><a href="order_emergency.php">ชำระเงินเคสฉุกเฉิน</a></div>
             <div><a href="contact.html">ติดต่อเรา</a></div>
             <div class="dropdown">
                 <img src="image/user.png" alt="Logo" class="nav-logo">
                 <div class="dropdown-menu">
                     <a href="profile.html">โปรไฟล์</a>
-                    <a href="history.php">ประวัติคำสั่งซื้อ</a>
-                    <a href="history_ambulance_booking.php">ประวัติการจองรถ</a>
+                    <a href="order-history.html">ประวัติคำสั่งซื้อ</a>
                     <a href="claim.php">เคลมสินค้า</a>
-                    <a href="../logout.php">ออกจากระบบ</a>
+                    <a href="logout.html">ออกจากระบบ</a>
                 </div>
             </div>
             <a href="index.html">
@@ -103,7 +103,7 @@ $conn->close();
         </nav>
 
         <div class="cart-icon">
-            <a href="cart.php">
+            <a href="cart.html">
                 <i class="fas fa-shopping-cart"></i>
             </a>
         </div>
@@ -289,11 +289,12 @@ $conn->close();
 
             <!-- แสดงราคาค่าบริการ -->
             <div class="form-group">
-                <p id="priceDisplay1" style="text-align: center; font-size: 18px;">ราคาค่าบริการ : 0 บาท</p>
+                <p id="priceDisplay1" style="text-align: left; font-size: 18px;">ราคาค่าบริการ : 0 บาท</p>
             </div>
 
             <!-- เก็บราคาสำหรับส่งไปยัง Backend -->
             <input type="hidden" id="calculatedPrice1" name="calculatedPrice1">
+            <input type="hidden" id="calculatedDistance1" name="calculatedDistance1">
 
             <div class="form-submit">
                 <button type="button" id="cancel-button" class="cancel-button"
@@ -568,11 +569,12 @@ $conn->close();
 
             <!-- แสดงราคาค่าบริการ -->
             <div class="form-group">
-                <p id="priceDisplay2" style="text-align: center; font-size: 18px;">ราคาค่าบริการ: 0 บาท</p>
+                <p id="priceDisplay2" style="text-align: left; font-size: 18px;">ราคาค่าบริการ: 0 บาท</p>
             </div>
 
             <!-- เก็บราคาสำหรับส่งไปยัง Backend -->
             <input type="hidden" id="calculatedPrice2" name="calculatedPrice2">
+            <input type="hidden" id="calculatedDistance2" name="calculatedDistance2">
 
             <div class="form-submit">
                 <button type="button" id="cancel-button" class="cancel-button"
@@ -868,7 +870,7 @@ $conn->close();
             let locationName = document.getElementById(inputId).value;
             if (!locationName) {
                 alert("กรุณากรอกชื่อสถานที่");
-            return;
+                return;
             }
 
             let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`;
@@ -879,22 +881,28 @@ $conn->close();
                         let lat = parseFloat(data[0].lat);
                         let lon = parseFloat(data[0].lon);
 
-                    if (type === 'event') {
-                        map.setView([lat, lon], 15);
-                        marker.setLatLng([lat, lon]);
-                        updateEventLocation({ lat, lng: lon });
-                    } else if (type === 'patient') {
-                        patientMap.setView([lat, lon], 15);
-                        patientMarker.setLatLng([lat, lon]);
-                     updatePatientLocation({ lat, lng: lon });
+                        if (type === 'event') {
+                            map.setView([lat, lon], 15);
+                            marker.setLatLng([lat, lon]);
+                            updateEventLocation({
+                                lat,
+                                lng: lon
+                            });
+                        } else if (type === 'patient') {
+                            patientMap.setView([lat, lon], 15);
+                            patientMarker.setLatLng([lat, lon]);
+                            updatePatientLocation({
+                                lat,
+                                lng: lon
+                            });
+                        }
+                    } else {
+                        alert("ไม่พบสถานที่ที่ค้นหา");
                     }
-                } else {
-                    alert("ไม่พบสถานที่ที่ค้นหา");
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching location:", error);
-            });
+                })
+                .catch(error => {
+                    console.error("Error fetching location:", error);
+                });
         }
 
         // เปลี่ยนแผนที่ตามฟอร์มที่เลือก
@@ -931,7 +939,7 @@ $conn->close();
 
         const nursePrice = 100;
         const eventMultiplier = 1.5;
-
+        
         function calculateDistance(lat1, lon1, lat2, lon2) {
             const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -944,49 +952,8 @@ $conn->close();
         }
 
         function calculatePrice() {
-            const eventLocation = document.getElementById('').value;
-            if (!eventLocation) {
-                // alert("กรุณาเลือกตำแหน่งบนแผนที่");
-                return;
-            }
-
-            const [lat, lon] = eventLocation.split(',').map(coord => parseFloat(coord));
-            const distance = calculateDistance(bangkokCoordinates[0], bangkokCoordinates[1], lat, lon);
-            const distanceCost = distance * fuelCostPerKm;
-
-            const selectedVehicleLevel = document.querySelector('input[name="level"]:checked');
-            if (!selectedVehicleLevel) {
-                // alert("กรุณาเลือกระดับรถ");
-                return;
-            }
-
-            const vehicleLevel = selectedVehicleLevel.value;
-            const vehicleLevelCost = vehicleLevelPrices[vehicleLevel];
-
-            // รับค่าพยาบาลและรถพยาบาลจาก input
-            const nurseCount = parseInt(document.getElementById("nurse_number").value) || 0;
-            const ambulanceCount = parseInt(document.getElementById("ambulance_number").value) || 0;
-
-            // ราคาของรถพยาบาลตามจำนวนและระดับรถ
-            const ambulanceCost = ambulanceCount * vehicleLevelCost;
-
-            // ค่าพยาบาลทั้งหมด (ไม่คูณกับจำนวนรถ)
-            const nurseCost = nurseCount * nursePrice;
-
-            // รวมค่าใช้จ่ายเพิ่มเติม
-            const extraCost = (nurseCount * nursePrice * ambulanceCount) + ambulanceCost;
-            // ราคารวมทั้งหมด
-            const totalPrice = (distanceCost + extraCost) * eventMultiplier;
-
-
-            document.getElementById("priceDisplay1").innerText = `ราคาค่าบริการ: ${totalPrice.toFixed(2)} บาท`;
-            document.getElementById("calculatedPrice1").value = totalPrice.toFixed(2);
-        }
-
-        function calculatePrice() {
             const eventLocation = document.getElementById('place_event_location').value;
             if (!eventLocation) {
-                // alert("กรุณาเลือกตำแหน่งบนแผนที่");
                 return;
             }
 
@@ -996,31 +963,38 @@ $conn->close();
 
             const selectedVehicleLevel = document.querySelector('input[name="level"]:checked');
             if (!selectedVehicleLevel) {
-                // alert("กรุณาเลือกระดับรถ");
                 return;
             }
 
             const vehicleLevel = selectedVehicleLevel.value;
             const vehicleLevelCost = vehicleLevelPrices[vehicleLevel];
 
-            // รับค่าพยาบาลและรถพยาบาลจาก input
             const nurseCount = parseInt(document.getElementById("nurse_number").value) || 0;
             const ambulanceCount = parseInt(document.getElementById("ambulance_number").value) || 0;
 
-            // ราคาของรถพยาบาลตามจำนวนและระดับรถ
             const ambulanceCost = ambulanceCount * vehicleLevelCost;
-
-            // ค่าพยาบาลทั้งหมด (ไม่คูณกับจำนวนรถ)
             const nurseCost = nurseCount * nursePrice;
 
-            // รวมค่าใช้จ่ายเพิ่มเติม
             const extraCost = (nurseCount * nursePrice * ambulanceCount) + ambulanceCost;
-            // ราคารวมทั้งหมด
             const totalPrice = (distanceCost + extraCost) * eventMultiplier;
 
 
-            document.getElementById("priceDisplay1").innerText = `ราคาค่าบริการ: ${totalPrice.toFixed(0)} บาท`;
+            // อัปเดตค่าระยะทางในฟิลด์ hidden
+            document.getElementById("calculatedDistance1").value = distance.toFixed(2);
+            // สร้างข้อความรายละเอียดการคำนวณ
+            const details = `
+                ระยะทาง: ${distance.toFixed(2)} กม. ค่าน้ำมันต่อกม: ${fuelCostPerKm} บาท/กม.<br>
+                ราคารวมทั้งหมด: ${totalPrice.toFixed(2)} บาท
+            `;
+
+            // แสดงผลในหน้าเว็บ
+            document.getElementById("priceDisplay1").innerHTML = `
+                ราคาค่าบริการ: ${totalPrice.toFixed()} บาท<br>
+                <small>${details}</small>
+            `;
             document.getElementById("calculatedPrice1").value = totalPrice.toFixed(2);
+   
+
         }
 
         function updateMapByProvince(type) {
@@ -1057,7 +1031,6 @@ $conn->close();
     </script>
 
     <script>
-        // ข้อมูลโรงพยาบาลพร้อมละติจูดและลองจิจูด
         // ข้อมูลโรงพยาบาลพร้อมละติจูดและลองจิจูด
         const hospitalsByProvince = {
         "กรุงเทพมหานคร": [
@@ -1594,6 +1567,7 @@ $conn->close();
         ]
         };
 
+
         // อัปเดต Dropdown โรงพยาบาลเมื่อเลือกจังหวัด
         document.getElementById('destinationProvince').addEventListener('change', function() {
             const selectedProvince = this.value;
@@ -1664,13 +1638,7 @@ $conn->close();
             const pickupLocation = document.getElementById('pickup-location').value;
             const selectedHospital = document.getElementById('hospitalLatLon').value;
 
-            if (!pickupLocation) {
-                // alert("กรุณาเลือกตำแหน่งบนแผนที่");
-                return;
-            }
-
-            if (!selectedHospital) {
-                // alert("กรุณาเลือกโรงพยาบาล");
+            if (!pickupLocation || !selectedHospital) {
                 return;
             }
 
@@ -1679,35 +1647,36 @@ $conn->close();
 
             const distanceCost = distance * fuelCostPerKm;
 
-            // คำนวณราคาตามระดับรถ
             const selectedVehicleLevel = document.querySelector('input[name="level"]:checked');
             if (!selectedVehicleLevel) {
-                // alert("กรุณาเลือกระดับรถ");
                 return;
             }
             const vehicleLevelCost = vehicleLevelPrices[selectedVehicleLevel.value];
 
-            // รับค่าพยาบาลและรถพยาบาลจาก input
             const nurseCount = parseInt(document.getElementById("nurse_number").value) || 0;
             const ambulanceCount = parseInt(document.getElementById("ambulance_number").value) || 1;
 
-            // ราคาของรถพยาบาลตามจำนวนและระดับรถ
             const ambulanceCost = ambulanceCount * vehicleLevelCost;
-
-            // ค่าพยาบาลทั้งหมด (ไม่คูณกับจำนวนรถ)
             const nurseCost = nurseCount * nursePrice;
 
-            // รวมค่าใช้จ่ายเพิ่มเติม
             const extraCost = (nurseCount * nursePrice * ambulanceCount) + ambulanceCost;
-
-            // ราคารวมทั้งหมด
             const totalPrice = (distanceCost + extraCost);
 
-            // แสดงราคาค่าบริการ
-            document.getElementById("priceDisplay2").innerText = `ราคาค่าบริการ: ${totalPrice.toFixed(0)} บาท`;
-            document.getElementById("calculatedPrice2").value = totalPrice.toFixed(0);
-        }
+            // อัปเดตค่าระยะทางในฟิลด์ hidden
+            document.getElementById("calculatedDistance2").value = distance.toFixed(2);
+            // สร้างข้อความรายละเอียดการคำนวณ
+            const details = `
+                 ระยะทาง: ${distance.toFixed(2)} กม. ค่าน้ำมันต่อกม: ${fuelCostPerKm} บาท/กม.<br>
+                ราคารวมทั้งหมด: ${totalPrice.toFixed(2)} บาท
+            `;
 
+            // แสดงผลในหน้าเว็บ
+            document.getElementById("priceDisplay2").innerHTML = `
+                ราคาค่าบริการ: ${totalPrice.toFixed(0)} บาท<br>
+                <small>${details}</small>
+            `;
+            document.getElementById("calculatedPrice2").value = totalPrice.toFixed(2);
+        }
         // เพิ่ม Event Listener ให้กับ Dropdown ของโรงพยาบาล
         document.getElementById('hospital').addEventListener('change', function() {
             calculatePatientPrice(); // คำนวณราคาใหม่เมื่อเลือกโรงพยาบาล

@@ -111,7 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $province = $_POST['province1'];
         $region = getRegion($province); // ตรวจสอบภูมิภาคจากจังหวัด
         $price = $_POST['calculatedPrice1'];
-
+        $distance = $_POST['calculatedDistance1'];
         $place_event_location = $_POST['searchEventLocation'];
         $place_event_detail = $_POST['place_event_detail'];
         $type = $_POST['event_type'];
@@ -120,8 +120,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $payment_method = $_POST['payment_method_event'];
         $member_id = rand(1, 10);
 
-        $sql = "INSERT INTO event_booking (member_id,ambulance_id,event_booking_date,event_booking_start_time,event_booking_province,event_booking_region,event_booking_location, event_booking_detail, event_booking_type,event_booking_amount_nurse, event_booking_amount_ambulance,event_booking_buy_type,event_booking_price) 
-                VALUES ('$member_id','$ambulance_id','$booking_date','$booking_start_time','$province','$region','$place_event_location','$place_event_detail', '$type', '$nurse_number', '$ambulance_number', '$payment_method','$price')";
+        $sql = "INSERT INTO event_booking (member_id,ambulance_id,event_booking_date,event_booking_start_time,event_booking_province,event_booking_region,event_booking_location, event_booking_detail, event_booking_type,event_booking_amount_nurse, event_booking_amount_ambulance,event_booking_buy_type,event_booking_price,event_booking_distance) 
+                VALUES ('$member_id','$ambulance_id','$booking_date','$booking_start_time','$province','$region','$place_event_location','$place_event_detail', '$type', '$nurse_number', '$ambulance_number', '$payment_method','$price','$distance')";
 
 
         if ($conn->query($sql) === TRUE) {
@@ -191,7 +191,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $payment_method = $_POST['payment_method_hospital'];
         $region = getRegion($province); // ตรวจสอบภูมิภาคจากจังหวัด
         $price = $_POST['calculatedPrice2'];
-
+        $distance = $_POST['calculatedDistance2'];
         $member_id = rand(1, 10);
         // Mapping hospital codes to names
         $hospitalMap = [
@@ -306,8 +306,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // สร้างคำสั่ง SQL
 
         $sql = "INSERT INTO ambulance_booking 
-                    (member_id,ambulance_id,ambulance_booking_date,ambulance_booking_start_time,ambulance_booking_location, ambulance_booking_hospital_waypoint, ambulance_booking_province,ambulance_booking_region, ambulance_booking_disease, ambulance_booking_allergy_medicine,ambulance_booking_buy_type,ambulance_booking_price,ambulance_booking_detail) 
-                    VALUES ('$member_id','$ambulance_id','$booking_date','$booking_start_time','$pickup_location', '$hospital', '$province','$region', '$symptom', '$allergy','$payment_method','$price','$place_ambulance_detail')";
+                    (member_id,ambulance_id,ambulance_booking_date,ambulance_booking_start_time,ambulance_booking_location, ambulance_booking_hospital_waypoint, ambulance_booking_province,ambulance_booking_region, ambulance_booking_disease, ambulance_booking_allergy_medicine,ambulance_booking_buy_type,ambulance_booking_price,ambulance_booking_detail,ambulance_booking_distance) 
+                    VALUES ('$member_id','$ambulance_id','$booking_date','$booking_start_time','$pickup_location', '$hospital', '$province','$region', '$symptom', '$allergy','$payment_method','$price','$place_ambulance_detail','$distance')";
         // บันทึกข้อมูล
         if ($conn->query($sql) === TRUE) {
             echo "ข้อมูลถูกบันทึกเรียบร้อยแล้ว";
