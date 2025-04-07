@@ -23,6 +23,14 @@ if ($emergency_id) {
 } else {
     echo "ไม่มีค่า emergency_id";
 }
+$sql_exec = "SELECT executive_id, executive_firstname, executive_lastname FROM executive ORDER BY RAND() LIMIT 1";
+$stmt_exec = $conn->prepare($sql_exec);
+$stmt_exec->execute();
+$result_exec = $stmt_exec->get_result();
+$executive = $result_exec->fetch_assoc();
+$executive_firstname = $executive['executive_firstname'];
+$executive_lastname = $executive['executive_lastname'];
+
 ?>
 
 <!DOCTYPE html>
@@ -182,6 +190,8 @@ if ($emergency_id) {
                 <p><strong>ผู้ติดต่อ / Contact person:</strong> <?= htmlspecialchars($row['order_emergency_case_communicant']) ?></p>
                 <p><strong>เบอร์โทร / Phone:</strong> <?= htmlspecialchars($row['order_emergency_case_communicant_phone']) ?></p>
                 <p><strong>วันที่ เวลา ที่ออกใบเสร็จ / Date time of receipt issue:</strong> <?= date("d/m/Y H:i") ?></p>
+                <p><strong>ออกโดย / Issuer:</strong> <?= htmlspecialchars($executive_firstname) ?> <?= htmlspecialchars($executive_lastname) ?></p>
+
             </div>
 
             <table>
