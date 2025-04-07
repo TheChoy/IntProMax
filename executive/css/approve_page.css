@@ -251,6 +251,7 @@ body {
     display: flex;
     gap: 0.5rem;
     justify-content: end;
+    margin-bottom: 2rem; /* เพิ่มบรรทัดนี้เพื่อเว้นห่างด้านล่าง */
 }
 
 .btn {
