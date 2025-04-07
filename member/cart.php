@@ -115,7 +115,12 @@ $member_id = $_SESSION['user_id'];
                                             <?php } ?>
                                             <?= $_SESSION['strQty'][$i] ?>
                                             <!-- ปุ่มเพิ่มจำนวน -->
-                                            <button type="button" class="btn btn-outline-primary update-cart" data-id="<?= $row_equip['equipment_id'] ?>" data-action="increase">+</button>
+                                            <?php if ($_SESSION['strQty'][$i] < $row_equip['equipment_quantity']) { ?>
+                                                <button type="button" class="btn btn-outline-primary update-cart" data-id="<?= $row_equip['equipment_id'] ?>" data-action="increase">+</button>
+                                            <?php } else { ?>
+                                                <button type="button" class="btn btn-outline-secondary" disabled>+</button>
+                                            <?php } ?>
+
                                         <td><?= number_format($sum, 2) ?></td>
                                         <td><a href="equipment_delete.php?Line=<?= $i ?>"><img src="image/delete.png" width="30"></a></td>
                                     </tr>
