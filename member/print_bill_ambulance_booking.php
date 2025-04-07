@@ -244,8 +244,10 @@ if ($executive_id) {
                     <tr>
                         <th>ลำดับ<br>No.</th>
                         <th>เส้นทาง<br>Route</th>
+                        <th>ระยะทาง(กิโลเมตร)<br>Route</th>
+                        <th>ราคา (บาท/กิโลเมตร)<br>Route</th>
                         <th>เลขทะเบียนรถ<br>Vehicle registration number</th>
-                        <th>วันเวลาเดินทาง<br>Travel date and time</th>
+                        <th>วันเวลาที่เดินทาง<br>Travel date and time</th>
                         <th>ราคารวม<br>Total</th>
                     </tr>
                 </thead>
@@ -259,11 +261,14 @@ if ($executive_id) {
                         <tr>
                             <td><?= $i++ ?></td>
                             <td><?= htmlspecialchars($order['ambulance_booking_location']) ?> <strong>ไป</strong> <?= htmlspecialchars($order['ambulance_booking_hospital_waypoint']) ?></td>
+                            <td><?= htmlspecialchars($order['ambulance_booking_distance']) ?></td>
+                            <td>3.5</td>
                             <td><?= htmlspecialchars($order['ambulance_plate']) ?></td>
                             <td><?= htmlspecialchars($order['ambulance_booking_date']) ?><br><?= htmlspecialchars($order['ambulance_booking_start_time']) ?> - <?= htmlspecialchars($order['ambulance_booking_finish_time']) ?></td>
                             <td class="text-end"><?= number_format($order['ambulance_booking_price'], 2) ?></td>
                         </tr>
                     <?php endforeach; ?>
+                    
                 </tbody>
                 <?php $vat = ($total * 7) / 100; ?>
                 <tfoot>

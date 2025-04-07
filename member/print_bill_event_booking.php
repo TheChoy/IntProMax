@@ -246,6 +246,8 @@ if ($executive_id) {
                     <tr>
                         <th>ลำดับ<br>No.</th>
                         <th>สถานที่จัด Event<br>Event location</th>
+                        <th>ระยะทาง(กิโลเมตร)<br>Route</th>
+                        <th>ราคา (บาท/กิโลเมตร)<br>Route</th>
                         <th>เลขทะเบียนรถ<br>Vehicle registration number</th>
                         <th>วันเวลาเดินทาง<br>Travel date and time</th>
                         <th>ราคารวม<br>Total</th>
@@ -261,6 +263,8 @@ if ($executive_id) {
                         <tr>
                             <td><?= $i++ ?></td>
                             <td><?= htmlspecialchars($order['event_booking_location']) . " " . htmlspecialchars($order['event_booking_province']) ?></td>
+                            <td><?= htmlspecialchars($order['event_booking_distance']) ?></td>
+                            <td>3.5</td>
                             <td><?= htmlspecialchars($order['ambulance_plate']) ?></td>
                             <td><?= htmlspecialchars($order['event_booking_date']) ?><br><?= htmlspecialchars($order['event_booking_start_time']) ?> - <?= htmlspecialchars($order['event_booking_finish_time']) ?></td>
                             <td class="text-end"><?= number_format($order['event_booking_price'], 2) ?></td>
