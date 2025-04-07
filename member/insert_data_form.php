@@ -118,7 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $nurse_number = $_POST['nurse_number'];
         $ambulance_number = $_POST['ambulance_number'];
         $payment_method = $_POST['payment_method_event'];
-        $member_id = rand(1, 10);
+        $member_id = $_SESSION['user_id']; // ได้ค่า member_id จริงที่ล็อกอิน
 
         $sql = "INSERT INTO event_booking (member_id,ambulance_id,event_booking_date,event_booking_start_time,event_booking_province,event_booking_region,event_booking_location, event_booking_detail, event_booking_type,event_booking_amount_nurse, event_booking_amount_ambulance,event_booking_buy_type,event_booking_price,event_booking_distance) 
                 VALUES ('$member_id','$ambulance_id','$booking_date','$booking_start_time','$province','$region','$place_event_location','$place_event_detail', '$type', '$nurse_number', '$ambulance_number', '$payment_method','$price','$distance')";
