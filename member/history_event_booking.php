@@ -116,7 +116,7 @@ $executive = $result_exec->fetch_assoc();
                         echo '</tbody></table>';
                         $event_ids_str = implode(',', $event_ids);
                         echo '<div class="print-button-wrapper">';
-                        echo '<a href="print_bill_event_booking.php?event_ids=' . $event_ids_str . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
+                        echo '<a href="print_bill_event_booking.php?event_ids=' . $event_ids_str .'&executive_id=' . $executive['executive_id'] . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
                         echo '</div>';
                         echo '</div><br>'; // ปิดกล่อง
                         $event_ids = [];
