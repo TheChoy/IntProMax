@@ -244,7 +244,7 @@ $executive_lastname = $executive['executive_lastname'];
                         <td><strong><?= number_format($vat, 2) ?></strong></td>
                     </tr>
                     <tr>
-                        <td colspan="6" style="text-align:right;"><strong>รวมทั้งสิ้น (บาท)</strong></td>
+                        <td colspan="6" style="text-align:right;"><strong>ยอดชำระทั้งหมด (บาท)</strong></td>
                         <td><strong><?= number_format($total, 2) ?></strong></td>
                     </tr>
                 </tfoot>

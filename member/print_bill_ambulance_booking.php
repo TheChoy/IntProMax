@@ -26,11 +26,14 @@ $sql = "SELECT
             ambulance_booking.ambulance_booking_finish_time,
             ambulance_booking.ambulance_booking_price,
             ambulance_booking.ambulance_booking_distance,
+            ambulance_booking.ambulance_booking_detail,
+            ambulance_booking.ambulance_booking_province,
             member.member_firstname,
             member.member_lastname,
             member.member_address,
             member.member_phone,
-            ambulance.ambulance_plate
+            ambulance.ambulance_plate,
+            ambulance.ambulance_level
         FROM ambulance_booking
         JOIN member ON ambulance_booking.member_id = member.member_id
         JOIN ambulance ON ambulance_booking.ambulance_id = ambulance.ambulance_id
@@ -242,12 +245,11 @@ if ($executive_id) {
             <table>
                 <thead>
                     <tr>
-                        <th>ลำดับ<br>No.</th>
                         <th>เส้นทาง<br>Route</th>
-                        <th>ระยะทาง(กิโลเมตร)<br>distance</th>
-                        <th>ราคา (บาท/กิโลเมตร)<br>Price</th>
                         <th>เลขทะเบียนรถ<br>Vehicle registration number</th>
                         <th>วันเวลาที่เดินทาง<br>Travel date and time</th>
+                        <th>ระยะทาง(กิโลเมตร)<br>distance</th>
+                        <th>ราคา (บาท/กิโลเมตร)<br>Price</th>
                         <th>ราคารวม<br>Total</th>
                     </tr>
                 </thead>
@@ -256,29 +258,49 @@ if ($executive_id) {
                     $i = 1;
                     $total = 0;
                     foreach ($orders as $order):
-                        $total += $order['ambulance_booking_price'];
+                        $total += $order['ambulance_booking_price'] / 1.07;
                     ?>
                         <tr>
-                            <td><?= $i++ ?></td>
-                            <td><?= htmlspecialchars($order['ambulance_booking_location']) ?> <strong>ไป</strong> <?= htmlspecialchars($order['ambulance_booking_hospital_waypoint']) ?></td>
-                            <td><?= htmlspecialchars($order['ambulance_booking_distance']) ?></td>
-                            <td>3.5</td>
+                            <td><?= htmlspecialchars($order['ambulance_booking_detail']) . " " . htmlspecialchars($order['ambulance_booking_province'])  ?> <strong>ไป</strong> <?= htmlspecialchars($order['ambulance_booking_hospital_waypoint']) ?></td>
                             <td><?= htmlspecialchars($order['ambulance_plate']) ?></td>
                             <td><?= htmlspecialchars($order['ambulance_booking_date']) ?><br><?= htmlspecialchars($order['ambulance_booking_start_time']) ?></td>
-                            <td class="text-end"><?= number_format($order['ambulance_booking_price'], 2) ?></td>
+                            <td><?= htmlspecialchars($order['ambulance_booking_distance']) ?></td>
+                            <td>3.5</td>
+                            <td class="text-end"><?= number_format($order['ambulance_booking_distance'] * 3.5, 2) ?></td>
                         </tr>
                     <?php endforeach; ?>
-                    
+
                 </tbody>
                 <?php $vat = ($total * 7) / 100; ?>
                 <tfoot>
+                    <?php
+                    $level_price = 0;
+                    if ($order['ambulance_level'] == 1) {
+                        $level_price = 600;
+                    } elseif ($order['ambulance_level'] == 2) {
+                        $level_price = 1000;
+                    } elseif ($order['ambulance_level'] == 3) {
+                        $level_price = 1400;
+                    }
+                    ?>
+
                     <tr>
-                        <td colspan="6" style="text-align:right;"><strong>Vat 7%</strong></td>
+                        <td colspan="5" style="text-align:right;">
+                            ระดับรถ <?= htmlspecialchars($order['ambulance_level']) ?>
+                        </td>
+                        <td><?= number_format($level_price, 2) ?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="text-align:right;"><strong>ราคารวม</strong></td>
+                        <td><strong><?= number_format($level_price + $order['ambulance_booking_distance'] * 3.5, 2) ?></strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="text-align:right;"><strong>Vat 7%</strong></td>
                         <td><strong><?= number_format($vat, 2) ?></strong></td>
                     </tr>
                     <tr>
-                        <td colspan="6" style="text-align:right;"><strong>รวมทั้งสิ้น (บาท)</strong></td>
-                        <td><strong><?= number_format($total + 120 + $vat, 2) ?></strong></td>
+                        <td colspan="5" style="text-align:right;"><strong>ยอดชำระทั้งหมด (บาท)</strong></td>
+                        <td><strong><?= number_format($total + $vat, 2) ?></strong></td>
                     </tr>
                 </tfoot>
             </table>
