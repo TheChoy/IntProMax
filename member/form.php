@@ -76,6 +76,7 @@ $conn->close();
 <body>
     <div class="top-navbar">
         <nav class="nav-links">
+            <div><a href="order_emergency.php">ชำระเงินเคสฉุกเฉิน</a></div>
             <div><a href="contact.html">ติดต่อเรา</a></div>
             <div class="dropdown">
                 <img src="image/user.png" alt="Logo" class="nav-logo">
@@ -237,21 +238,20 @@ $conn->close();
                 </select>
             </div>
             <div class="form-group">
-                <label for="searchEventLocation">ค้นหาสถานที่งาน Event:</label>
-                <input type="text" id="searchEventLocation" name="searchEventLocation" placeholder="เช่น ชื่อสถานที่, อำเภอ, ตำบล">
+                <label for="place_event_detail">รายละเอียดสถานที่</label>
+                <textarea id="place_event_detail" name="place_event_detail" rows="4" cols="50" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="searchEventLocation">ค้นหาชื่อสถานที่</label>
+                <input type="text" id="searchEventLocation" name="searchEventLocation" placeholder="เช่น ชื่อสถานที่">
                 <button onclick="searchLocation('searchEventLocation', 'event')">ค้นหา</button>
             </div>
-
             <div class="form-group">
                 <label for="place_event_location">สถานที่รับงาน</label>
                 <div id="map"></div>
                 <input type="hidden" id="place_event_location" name="place_event_location">
             </div>
 
-            <div class="form-group">
-                <label for="place_event_detail">รายละเอียดสถานที่</label>
-                <textarea id="place_event_detail" name="place_event_detail" rows="4" cols="50" required></textarea>
-            </div>
 
             <div class="form-group">
                 <label for="type">ประเภทงาน</label>
@@ -428,18 +428,19 @@ $conn->close();
                 </select>
             </div>
             <div class="form-group">
-                <label for="searchPatientLocation">ค้นหาสถานที่รับส่งผู้ป่วย:</label>
-                <input type="text" id="searchPatientLocation" name="searchPatientLocation" placeholder="เช่น ชื่อสถานที่, อำเภอ, ตำบล">
+                <label for="place_ambulance_detail">รายละเอียดสถานที่</label>
+                <textarea id="place_ambulance_detail" name="place_ambulance_detail" rows="4" cols="50" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="searchPatientLocation">ค้นหาชื่อสถานที่:</label>
+                <input type="text" id="searchPatientLocation" name="searchPatientLocation" placeholder="เช่น ชื่อสถานที่">
                 <button type="button" onclick="searchLocation('searchPatientLocation', 'patient')">ค้นหา</button>
             </div>
+
             <div class="form-group">
                 <label for="pickup-location">สถานที่รับงาน</label>
                 <div id="patientMap"></div>
                 <input type="hidden" id="pickup-location" name="pickup-location">
-            </div>
-            <div class="form-group">
-                <label for="place_ambulance_detail">รายละเอียดสถานที่</label>
-                <textarea id="place_ambulance_detail" name="place_ambulance_detail" rows="4" cols="50" required></textarea>
             </div>
             <div class="form-group">
                 <label for="destinationProvince">จังหวัดจุดหมายปลายทาง</label>
@@ -874,7 +875,7 @@ $conn->close();
                 return;
             }
 
-            let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`;
+            let url = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=TH&q=${encodeURIComponent(locationName)}`;
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
@@ -940,6 +941,8 @@ $conn->close();
 
         const nursePrice = 100;
         const eventMultiplier = 1.5;
+        const vat = 0.07; // VAT 7%
+
 
         function calculateDistance(lat1, lon1, lat2, lon2) {
             const R = 6371;
@@ -977,21 +980,20 @@ $conn->close();
             const nurseCost = nurseCount * nursePrice;
 
             const extraCost = (nurseCount * nursePrice * ambulanceCount) + ambulanceCost;
-            const totalPrice = (distanceCost + extraCost) * eventMultiplier;
-
-
+            const subtotal = (distanceCost + extraCost) * eventMultiplier; // ราคารวมก่อน VAT
+            const vatAmount = subtotal * vat; // คำนวณ VAT 7%
+            const totalPrice = subtotal + vatAmount; // ราคารวมหลัง VAT
             // อัปเดตค่าระยะทางในฟิลด์ hidden
             document.getElementById("calculatedDistance1").value = distance.toFixed(2);
             // สร้างข้อความรายละเอียดการคำนวณ
             const details = `
                 ระยะทาง: ${distance.toFixed(2)} กม. ค่าน้ำมันต่อกม: ${fuelCostPerKm} บาท/กม.<br>
-                ราคารวมทั้งหมด: ${totalPrice.toFixed(2)} บาท
             `;
 
             // แสดงผลในหน้าเว็บ
             document.getElementById("priceDisplay1").innerHTML = `
-                ราคาค่าบริการ: ${totalPrice.toFixed()} บาท<br>
                 <small>${details}</small>
+                ยอดชำระทั้งหมด: ${totalPrice.toFixed(2)} บาท<br>
             `;
             document.getElementById("calculatedPrice1").value = totalPrice.toFixed(2);
 
@@ -3104,21 +3106,23 @@ $conn->close();
             const ambulanceCost = ambulanceCount * vehicleLevelCost;
             const nurseCost = nurseCount * nursePrice;
 
+
             const extraCost = (nurseCount * nursePrice * ambulanceCount) + ambulanceCost;
-            const totalPrice = (distanceCost + extraCost);
+            const subtotal = distanceCost + extraCost; // ราคารวมก่อน VAT
+            const vatAmount = subtotal * vat; // คำนวณ VAT 7%
+            const totalPrice = subtotal + vatAmount; // ราคารวมหลัง VAT
 
             // อัปเดตค่าระยะทางในฟิลด์ hidden
             document.getElementById("calculatedDistance2").value = distance.toFixed(2);
             // สร้างข้อความรายละเอียดการคำนวณ
             const details = `
                  ระยะทาง: ${distance.toFixed(2)} กม. ค่าน้ำมันต่อกม: ${fuelCostPerKm} บาท/กม.<br>
-                ราคารวมทั้งหมด: ${totalPrice.toFixed(2)} บาท
             `;
 
             // แสดงผลในหน้าเว็บ
             document.getElementById("priceDisplay2").innerHTML = `
-                ราคาค่าบริการ: ${totalPrice.toFixed(0)} บาท<br>
                 <small>${details}</small>
+                ยอดชำระทั้งหมด: ${totalPrice.toFixed(2)} บาท<br>
             `;
             document.getElementById("calculatedPrice2").value = totalPrice.toFixed(2);
         }
