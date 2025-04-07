@@ -148,7 +148,8 @@ $row_result_member = mysqli_fetch_assoc($result_member);
             <div class="summary">
                 <p>รวมคำสั่งซื้อ <span class="sumprice">฿ 5,900</span></p>
                 <p>ค่าจัดส่ง <span class="delivery">฿ 120</span></p>
-                <p>ยอดชำระทั้งหมด <span class="totalprice">฿ 6,020</span></p>
+                <p>Vat 7 % <span class="vat">฿ 413</span> </p>
+                <p>ยอดชำระทั้งหมด <span class="totalprice">฿ 6,433</span></p>
             </div>
             <button class="order-button2" id="tbtn">สั่งสินค้า</button>
         </div>
@@ -192,6 +193,7 @@ $row_result_member = mysqli_fetch_assoc($result_member);
         const totalPriceElement = document.querySelector('.cost'); // ตารางที่แสดงราคารวม
         const totalPriceSum = document.querySelector('.summary .sumprice'); // ตารางที่แสดงราคารวม
         const totalOrderPriceElement = document.querySelector('.summary .totalprice'); // ราคารวมคำสั่งซื้อในส่วนของ summary (ยอดชำระทั้งหมด)
+        const vatElement = document.querySelector('.summary .vat'); // ตารางแสดง VAT
 
         // 2. ฟังก์ชันคำนวณราคารวม
         function updateTotalPrice() {
@@ -200,11 +202,16 @@ $row_result_member = mysqli_fetch_assoc($result_member);
 
             totalPriceElement.textContent = `฿ ${totalPrice.toFixed(2)}`; // อัพเดตราคารวมสินค้า
 
-            // คำนวณยอดชำระทั้งหมด (รวมค่าจัดส่ง)
-            const totalOrderPrice = totalPrice + shippingCost; // รวมราคาสินค้าและค่าจัดส่ง
+            // คำนวณ VAT 7%
+            const vat = totalPrice * 0.07; // คำนวณภาษีมูลค่าเพิ่ม (7%)
+            vatElement.textContent = `฿ ${vat.toFixed(2)}`; // อัพเดตค่า VAT
+
+            // คำนวณยอดชำระทั้งหมด (รวมค่าจัดส่งและ VAT)
+            const totalOrderPrice = totalPrice + shippingCost + vat; // รวมราคาสินค้า, ค่าจัดส่ง, และ VAT
             totalPriceSum.textContent = `฿ ${totalPrice.toFixed(2)}`; // อัพเดตราคารวมสินค้าใน sumprice
             totalOrderPriceElement.textContent = `฿ ${totalOrderPrice.toFixed(2)}`; // อัพเดตยอดรวมคำสั่งซื้อ (ยอดชำระทั้งหมด)
         }
+
 
         // ฟังก์ชันเพิ่ม/ลดจำนวนสินค้า
         const decreaseButton = document.querySelector('.btn-decrease');
