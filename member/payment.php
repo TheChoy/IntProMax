@@ -141,7 +141,7 @@ $row_result_member = mysqli_fetch_assoc($result_member);
                 <div class="payment-method">
                     <p>วิธีชำระเงิน :</p>
                     <button type="button" id="payment-qr" class="payment-button">QR Promptpay</button>
-                    <button type="button" id="payment-credit" class="payment-button">บัตรเครดิต</button>
+                    <button type="button" id="payment-credit" class="payment-button" disabled>บัตรเครดิต</button>
                 </div>
             </div>
 
