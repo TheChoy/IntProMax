@@ -45,6 +45,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 $orders = $result->fetch_all(MYSQLI_ASSOC);
+date_default_timezone_set("Asia/Bangkok");
 ?>
 
 <!DOCTYPE html>
@@ -207,7 +208,7 @@ $orders = $result->fetch_all(MYSQLI_ASSOC);
                 <p><strong>เลขที่ใบเสร็จ / Receipt No.:</strong> <?= htmlspecialchars($first['ambulance_booking_id']) ?></p>
                 <p><strong>ลูกค้า / Customer:</strong> <?= htmlspecialchars($first['member_firstname'] . ' ' . $first['member_lastname']) ?></p>
                 <p><strong>เบอร์โทร / Phone:</strong> <?= htmlspecialchars($first['member_phone']) ?></p>
-                <p><strong>วันที่ / Date:</strong> <?= date("d/m/Y") ?></p>
+                <p><strong>วันที่ เวลา ที่ออกใบเสร็จ / Date time of receipt issue:</strong> <?= date("d/m/Y H:i") ?></p>
                 <p><strong>ออกโดย / Issuer:</strong> ระบบอัตโนมัติ</p>
             </div>
 

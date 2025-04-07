@@ -142,7 +142,7 @@ $result = $stmt->get_result();
                 $total += $row['ambulance_booking_price'];
             ?>
                 <tr>
-                    <td><?= htmlspecialchars($row['ambulance_booking_location']) ." " . htmlspecialchars($row['ambulance_booking_province'])  ?> <strong>ไป</strong>  <?= htmlspecialchars($row['ambulance_booking_hospital_waypoint']) ?></td>
+                    <td><?= htmlspecialchars($row['ambulance_booking_location']) . " " . htmlspecialchars($row['ambulance_booking_province'])  ?> <strong>ไป</strong> <?= htmlspecialchars($row['ambulance_booking_hospital_waypoint']) ?></td>
                     <td><?= htmlspecialchars($row['ambulance_plate']) ?></td>
                     <td>
                         <?= htmlspecialchars($row['ambulance_booking_date']) ?><br>
@@ -169,6 +169,6 @@ $result = $stmt->get_result();
         <?php endif; ?>
     </div>
 
-</body>
 
+</body>
 </html>
