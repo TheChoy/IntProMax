@@ -230,7 +230,7 @@ if ($executive_id) {
         <?php if (count($orders) > 0): ?>
             <?php $first = $orders[0]; ?>
             <div class="detail">
-                <p><strong>เลขที่ใบเสร็จ / Receipt No.:</strong> <?= htmlspecialchars($first['order_equipment_id']) ?></p>
+                <p><strong>เลขที่ใบเสร็จ / Receipt No.:</strong> 0021<?= htmlspecialchars($first['order_equipment_id']) ?></p>
                 <p><strong>ลูกค้า / Customer:</strong> <?= htmlspecialchars($first['member_firstname'] . ' ' . $first['member_lastname']) ?></p>
                 <p><strong>ที่อยู่ / Address:</strong> <?= htmlspecialchars($first['member_address']) ?></p>
                 <p><strong>เบอร์โทร / Phone:</strong> <?= htmlspecialchars($first['member_phone']) ?></p>

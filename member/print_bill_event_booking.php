@@ -236,7 +236,7 @@ if ($executive_id) {
         <?php if (count($orders) > 0): ?>
             <?php $first = $orders[0]; ?>
             <div class="detail">
-                <p><strong>เลขที่ใบเสร็จ / Receipt No.:</strong> <?= htmlspecialchars($first['event_booking_id']) ?></p>
+                <p><strong>เลขที่ใบเสร็จ / Receipt No.:</strong> 0013<?= htmlspecialchars($first['event_booking_id']) ?></p>
                 <p><strong>ลูกค้า / Customer:</strong> <?= htmlspecialchars($first['member_firstname'] . ' ' . $first['member_lastname']) ?></p>
                 <p><strong>เบอร์โทร / Phone:</strong> <?= htmlspecialchars($first['member_phone']) ?></p>
                 <p><strong>วันที่ เวลา ที่ออกใบเสร็จ / Date time of receipt issue:</strong> <?= date("d/m/Y H:i") ?></p>
