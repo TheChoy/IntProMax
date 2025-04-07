@@ -5,6 +5,20 @@
     box-sizing: border-box;
     font-family: sans-serif;
 }
+.chart {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+canvas {
+    max-width: 700px;
+    max-height: 300px;
+    width: 100%;
+    height: auto;
+}
 
 /* Responsive font */
 body {
@@ -178,7 +192,7 @@ label{
 .filter-sidebar .reset-button {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #fe8b5e; /* สีส้ม */
+    background-color: #f44336; /* สีแดง */
     color: white;
     text-align: center;
     font-size: 16px;
@@ -190,11 +204,11 @@ label{
 }
 
 .filter-sidebar .reset-button:hover {
-    background-color: #fc7f40; /* สีแดงเข้มขึ้นเมื่อ hover */
+    background-color: #e53935; /* สีแดงเข้มขึ้นเมื่อ hover */
 }
 
 .filter-sidebar .reset-button:active {
-    background-color: #ff6a1f; /* สีแดงเข้มสุดเมื่อคลิก */
+    background-color: #d32f2f; /* สีแดงเข้มสุดเมื่อคลิก */
 }
 
 /* Media queries for responsiveness */

@@ -1,7 +1,6 @@
 <?php
 include 'username.php';
 
-// ✅ ดึงช่วงเดือนอย่างถูกต้อง
 $start_month = mysqli_real_escape_string($conn, $_GET['selected_month'] ?? '') . "-01";
 $end_raw = mysqli_real_escape_string($conn, $_GET['selected_month2'] ?? '') . "-01";
 $end_month = date("Y-m-t", strtotime($end_raw));
@@ -10,7 +9,6 @@ $booking_where_sql_ambulance = "1=1";
 $booking_where_sql_event = "1=1";
 $booking_where_sql_emergency = "1=1";
 
-// ✅ เงื่อนไขวันที่แบบเดียวกันทั้ง booking และ equipment
 if (!empty($_GET['selected_month']) && !empty($_GET['selected_month2'])) {
     $booking_where_sql_ambulance .= " AND ab.ambulance_booking_date BETWEEN '$start_month' AND '$end_month'";
     $booking_where_sql_event .= " AND eb.event_booking_date BETWEEN '$start_month' AND '$end_month'";
@@ -27,7 +25,6 @@ if (!isset($_GET['region'])) {
     $_GET['region'] = ['ภาคเหนือ', 'ภาคกลาง', 'ภาคตะวันออกเฉียงเหนือ', 'ภาคใต้'];
 }
 
-
 if (!empty($_GET['region']) && is_array($_GET['region'])) {
     $regions = array_map(fn($r) => "'" . mysqli_real_escape_string($conn, $r) . "'", $_GET['region']);
     $in_region = implode(",", $regions);
@@ -40,78 +37,64 @@ if (!empty($_GET['ambulance_level']) && is_array($_GET['ambulance_level'])) {
     $levels = array_map(fn($lvl) => "'" . mysqli_real_escape_string($conn, $lvl) . "'", $_GET['ambulance_level']);
     $booking_level_filter = "a.ambulance_level IN (" . implode(",", $levels) . ")";
 } else {
-    $booking_level_filter = "1=0";
+    $booking_level_filter = "1=1";
 }
+
+$gender_filter_booking = '';
+$gender_filter_emergency = '';
 if (!empty($_GET['gender'])) {
     $gender = mysqli_real_escape_string($conn, $_GET['gender']);
-    $booking_gender_filter = " AND m.member_gender = '$gender'";
-} else {
-    $booking_gender_filter = "";
+    $gender_filter_booking = " AND m.member_gender = '$gender'";
+    $gender_filter_emergency = " AND ecr.order_emergency_case_patient_gender = '$gender'";
 }
 
-// ✅ Equipment ฟิลเตอร์
-$where_clauses = [];
-
-$where_clauses[] = "order_equipment_date BETWEEN '$start_month' AND '$end_month'";
-
-if (!empty($_GET['gender'])) {
-    $gender = mysqli_real_escape_string($conn, $_GET['gender']);
-    $where_clauses[] = "member_gender = '$gender'";
-}
-
+$where_clauses = ["order_equipment_date BETWEEN '$start_month' AND '$end_month'"];
+if (!empty($_GET['gender'])) $where_clauses[] = "member_gender = '$gender'";
 if (!empty($_GET['order_type'])) {
     $type = mysqli_real_escape_string($conn, $_GET['order_type']);
     $where_clauses[] = "order_equipment_type = '$type'";
 } else {
     $where_clauses[] = "order_equipment_type IN ('ซื้อ', 'เช่า')";
 }
-
-if (!empty($_GET['province'])) {
-    $province = mysqli_real_escape_string($conn, $_GET['province']);
-    $where_clauses[] = "member_province = '$province'";
-}
-
+if (!empty($_GET['province'])) $where_clauses[] = "member_province = '$province'";
 if (!empty($_GET['region']) && is_array($_GET['region'])) {
-    $regions = array_map(function ($r) use ($conn) {
-        return "'" . mysqli_real_escape_string($conn, $r) . "'";
-    }, $_GET['region']);
+    $regions = array_map(fn($r) => "'" . mysqli_real_escape_string($conn, $r) . "'", $_GET['region']);
     $where_clauses[] = "member_region IN (" . implode(",", $regions) . ")";
 } else {
     $where_clauses[] = "1=0";
 }
-
 $where_sql = "WHERE " . implode(" AND ", $where_clauses);
 
-// ✅ SQL booking แยกตามเพศ
 $sql = "
 SELECT 
     merged.source AS source_type, 
-    m.member_gender AS gender,
+    merged.gender,
     SUM(merged.reservation_price) AS total_sales
 FROM (
-    SELECT ab.member_id, ab.ambulance_id, ab.ambulance_booking_price AS reservation_price, 'ambulance' AS source
+    SELECT ab.ambulance_booking_price AS reservation_price, 'ambulance' AS source, m.member_gender AS gender
     FROM ambulance_booking AS ab
-    WHERE $booking_where_sql_ambulance
+    JOIN member m ON ab.member_id = m.member_id
+    JOIN ambulance a ON ab.ambulance_id = a.ambulance_id
+    WHERE $booking_where_sql_ambulance $gender_filter_booking AND $booking_level_filter
 
     UNION ALL
 
-    SELECT eb.member_id, eb.ambulance_id, eb.event_booking_price AS reservation_price, 'event' AS source
+    SELECT eb.event_booking_price AS reservation_price, 'event' AS source, m.member_gender AS gender
     FROM event_booking AS eb
-    WHERE $booking_where_sql_event
+    JOIN member m ON eb.member_id = m.member_id
+    JOIN ambulance a ON eb.ambulance_id = a.ambulance_id
+    WHERE $booking_where_sql_event $gender_filter_booking AND $booking_level_filter
 
     UNION ALL
 
-    SELECT ecr.order_emergency_case_id AS member_id, ecr.ambulance_id, ecr.order_emergency_case_price AS reservation_price, 'emergency' AS source
+    SELECT ecr.order_emergency_case_price AS reservation_price, 'emergency' AS source, ecr.order_emergency_case_patient_gender AS gender
     FROM order_emergency_case AS ecr
-    WHERE $booking_where_sql_emergency
+    JOIN ambulance a ON ecr.ambulance_id = a.ambulance_id
+    WHERE $booking_where_sql_emergency $gender_filter_emergency AND $booking_level_filter
 ) AS merged
-LEFT JOIN member AS m ON merged.member_id = m.member_id
-LEFT JOIN ambulance AS a ON merged.ambulance_id = a.ambulance_id
-WHERE $booking_level_filter $booking_gender_filter
-GROUP BY merged.source, m.member_gender
+GROUP BY merged.source, merged.gender
 ";
 
-// ✅ SQL อุปกรณ์ แยกเพศ
 $sqrt = "
 SELECT 
     member_gender AS gender,
@@ -123,14 +106,72 @@ JOIN member ON order_equipment.member_id = member.member_id
 $where_sql
 GROUP BY member_gender
 ";
+
+$sql_region_all = "
+SELECT 
+    region_data.region,
+    SUM(region_data.total) AS total_sales
+FROM (
+    SELECT ab.ambulance_booking_region AS region, ab.ambulance_booking_price AS total
+    FROM ambulance_booking ab
+    LEFT JOIN member m ON ab.member_id = m.member_id
+    LEFT JOIN ambulance a ON ab.ambulance_id = a.ambulance_id
+    WHERE $booking_where_sql_ambulance $gender_filter_booking AND $booking_level_filter
+
+    UNION ALL
+
+    SELECT eb.event_booking_region AS region, eb.event_booking_price AS total
+    FROM event_booking eb
+    LEFT JOIN member m ON eb.member_id = m.member_id
+    LEFT JOIN ambulance a ON eb.ambulance_id = a.ambulance_id
+    WHERE $booking_where_sql_event $gender_filter_booking AND $booking_level_filter
+
+    UNION ALL
+
+    SELECT 'ภาคกลาง' AS region, ecr.order_emergency_case_price AS total
+    FROM order_emergency_case ecr
+    LEFT JOIN ambulance a ON ecr.ambulance_id = a.ambulance_id
+    WHERE $booking_where_sql_emergency $gender_filter_emergency AND $booking_level_filter
+) AS region_data
+GROUP BY region_data.region
+";
+
+$sql_equipment_region = "
+SELECT member_region AS region, SUM(order_equipment_total) AS total_sales
+FROM order_equipment
+JOIN member ON order_equipment.member_id = member.member_id
+$where_sql
+GROUP BY member_region
+";
+
+$region_totals = [
+    'ภาคเหนือ' => 0,
+    'ภาคกลาง' => 0,
+    'ภาคตะวันออกเฉียงเหนือ' => 0,
+    'ภาคใต้' => 0
+];
+
+$result_region_booking = mysqli_query($conn, $sql_region_all);
+while ($row = mysqli_fetch_assoc($result_region_booking)) {
+    $region = $row['region'];
+    $amount = $row['total_sales'];
+    if (isset($region_totals[$region])) {
+        $region_totals[$region] += $amount;
+    }
+}
+
+$result_region_equipment = mysqli_query($conn, $sql_equipment_region);
+while ($row = mysqli_fetch_assoc($result_region_equipment)) {
+    $region = $row['region'];
+    $amount = $row['total_sales'];
+    if (isset($region_totals[$region])) {
+        $region_totals[$region] += $amount;
+    }
+}
+
 $result_booking = mysqli_query($conn, $sql);
 $result_equipment = mysqli_query($conn, $sqrt);
 
-// ✅ คำนวณค่ารวม
-$result_booking = mysqli_query($conn, $sql);
-$result_equipment = mysqli_query($conn, $sqrt);
-
-// ✅ คำนวณค่ารวม
 $data = [
     'ambulance' => ['ชาย' => 0, 'หญิง' => 0],
     'event' => ['ชาย' => 0, 'หญิง' => 0],
@@ -142,27 +183,25 @@ while ($row = mysqli_fetch_assoc($result_booking)) {
     $type = $row['source_type'];
     $gender = $row['gender'] ?? 'ไม่ระบุ';
     $amount = $row['total_sales'] ?? 0;
-
     if (isset($data[$type][$gender])) {
         $data[$type][$gender] += $amount;
     }
 }
 
-// แยกข้อมูล equipment ตามเพศ
 while ($row = mysqli_fetch_assoc($result_equipment)) {
     $gender = $row['gender'] ?? 'ไม่ระบุ';
     $data['equipment'][$gender] += ($row['total_purchase'] ?? 0) + ($row['total_rent'] ?? 0);
 }
 
-// ✅ ส่งกลับแบบ JSON
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
     header('Content-Type: application/json');
-    echo json_encode($data);
+    echo json_encode([
+        'category_gender' => $data,
+        'region_total_sales' => $region_totals
+    ]);
     exit;
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="th">
@@ -173,7 +212,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
     <link rel="stylesheet" href="summary_buy.css?v=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css"> -->
     <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -181,18 +220,11 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="summary_buy.js"></script>
     <title>สรุปยอดขาย</title>
 
 </head>
-<style>
-    .chart {
-        width: 900px;
-        height: 100px;
-        margin: auto;
-        margin-top: 20px;
-    }
-</style>
 
 <body>
     <header class="header">
@@ -225,7 +257,8 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
                 <button type="button" class="close-sidebar">&times;</button>
             </div>
 
-            <form id="filterForm">
+            <form method="GET" action="summary_buy.php" id="filterForm">
+
 
                 <label for="start_month">เริ่มต้น (ปี/เดือน):</label>
                 <input type="month" id="start_month" class="month-selected" name="selected_month" value="<?= $_GET['selected_month'] ?? '' ?>">
@@ -357,13 +390,14 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
                 }
                 ?>
             </form>
-            <div>
-                <a href="summary_buy.php" class="reset-button" id="reset-button">Reset</a>
-            </div>
         </div>
+        </div>
+        <div class="chart" id="chart">
+            <canvas class="bar_chart" id="salesChart"></canvas>
+            <canvas class="donut_chart" id="regionChart"></canvas>
         </div>
 
-        <canvas class="chart" id="salesChart"></canvas>
+
 
     </main>
     <script>
@@ -400,10 +434,10 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
         document.addEventListener("DOMContentLoaded", function() {
             const filterForm = document.getElementById("filterForm");
             const chartCanvas = document.getElementById("salesChart");
+            const regionCanvas = document.getElementById("regionChart");
             const ctx = chartCanvas.getContext("2d");
 
-            Chart.defaults.elements.bar.borderRadius = 5;
-
+            // สร้างกราฟเริ่มต้น
             let salesChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -417,17 +451,61 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
                             label: 'หญิง',
                             backgroundColor: 'rgba(255, 99, 132, 0.7)',
                             data: [0, 0, 0, 0]
+                        },
+                        {
+                            label: 'รวมยอดขายทั้งชายและหญิง',
+                            backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                            data: [0, 0, 0, 0]
                         }
-                    ]
+                    ],
                 },
                 options: {
                     responsive: true,
                     scales: {
                         x: {
-                            stacked: true
+                            beginAtZero: true
                         },
                         y: {
-                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'ยอดขายตามเพศของผู้บริการ (บาท)'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    }
+                }
+            });
+            let regionChart = new Chart(regionCanvas, {
+                type: 'bar',
+                data: {
+                    labels: ['ภาคเหนือ', 'ภาคกลาง', 'ภาคตะวันออกเฉียงเหนือ', 'ภาคใต้'],
+                    datasets: [{
+                        label: 'ยอดขายรวมตามภูมิภาค',
+                        data: [0, 0, 0, 0],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'ยอดขายตามภูมิภาคของผู้บริการ (บาท)'
+                            },
                             beginAtZero: true
                         }
                     },
@@ -439,8 +517,10 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
                 }
             });
 
+
             // ฟังก์ชันส่งฟอร์มด้วย AJAX
             function updateChart() {
+
                 const formData = new FormData(filterForm);
                 const params = new URLSearchParams(formData).toString();
 
@@ -451,26 +531,43 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
                     })
                     .then(res => res.json())
                     .then(data => {
-                        const categories = ['ambulance', 'event', 'emergency', 'equipment'];
+                        console.log(data);
 
-                        const maleData = categories.map(cat => Number(data[cat]?.ชาย ?? 0));
-                        const femaleData = categories.map(cat => Number(data[cat]?.หญิง ?? 0));
+                        const purchase = Number(data.purchase_sales); // ✅ แปลงเป็นตัวเลข
+                        const rent = Number(data.rent_sales); // ✅ แปลงเป็นตัวเลข
+
+                        const categories = ['ambulance', 'event', 'emergency', 'equipment'];
+                        const maleData = categories.map(cat => Number(data.category_gender[cat]?.ชาย ?? 0));
+                        const femaleData = categories.map(cat => Number(data.category_gender[cat]?.หญิง ?? 0));
+                        const totalData = categories.map((_, i) => maleData[i] + femaleData[i]);
 
                         salesChart.data.datasets[0].data = maleData;
                         salesChart.data.datasets[1].data = femaleData;
+                        salesChart.data.datasets[2].data = totalData;
 
                         salesChart.update();
+
+                        const regionLabels = ['ภาคเหนือ', 'ภาคกลาง', 'ภาคตะวันออกเฉียงเหนือ', 'ภาคใต้'];
+                        const regionSales = regionLabels.map(region => Number(data.region_total_sales[region] ?? 0));
+
+                        // ✅ เอาแค่ชื่อภาค ไม่แสดงเปอร์เซ็นต์ใน label
+                        regionChart.data.labels = regionLabels;
+                        regionChart.data.datasets[0].data = regionSales;
+                        regionChart.update();
+
+
                     })
+
                     .catch(err => console.error("Error fetching chart data:", err));
             }
 
-            // เรียกเมื่อเปลี่ยน filter
+            // เรียก updateChart เมื่อเปลี่ยนค่า filter ใด ๆ
             const inputs = filterForm.querySelectorAll("input, select");
             inputs.forEach(input => {
                 input.addEventListener("change", updateChart);
             });
 
-            // โหลดครั้งแรก
+            // เรียกครั้งแรกเมื่อโหลดหน้า
             updateChart();
         });
     </script>
