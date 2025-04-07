@@ -18,8 +18,7 @@ $booking_start_time = $_GET['booking_start_time'] ?? 'ไม่มีเวล�
 
 $sql = "SELECT member_firstname, member_lastname 
         FROM member 
-        ORDER BY RAND() 
-        LIMIT 1";
+        WHERE member_id = '$member_id'";
 
 $result = $conn->query($sql);
 

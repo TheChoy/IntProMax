@@ -10,7 +10,7 @@ if (empty($_SESSION['logged_in'])) {
 }
 
 // เรียก member_id จาก session มาใช้ :
-// $_SESSION['user_id'];
+$_SESSION['user_id'];
 //------------------------------------------
 ?>
 
