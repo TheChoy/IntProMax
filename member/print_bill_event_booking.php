@@ -13,6 +13,7 @@ if (!isset($_GET['event_ids'])) {
     echo "ไม่พบรหัสคำสั่งซื้อ";
     exit();
 }
+$executive_id = isset($_GET['executive_id']) ? $_GET['executive_id'] : null;
 
 $event_ids = explode(',', $_GET['event_ids']);
 $event_ids = array_map('intval', $event_ids);
@@ -54,6 +55,26 @@ $result = $stmt->get_result();
 
 $orders = $result->fetch_all(MYSQLI_ASSOC);
 date_default_timezone_set("Asia/Bangkok");
+
+
+if ($executive_id) {
+    // ดึงข้อมูลผู้บริหารจากฐานข้อมูล
+    $sql_exec = "SELECT executive_firstname, executive_lastname FROM executive WHERE executive_id = ?";
+    $stmt_exec = $conn->prepare($sql_exec);
+    $stmt_exec->bind_param("i", $executive_id);
+    $stmt_exec->execute();
+    $result_exec = $stmt_exec->get_result();
+
+    // ถ้ามีข้อมูลของผู้บริหาร
+    if ($executive = $result_exec->fetch_assoc()) {
+        $executive_firstname = $executive['executive_firstname'];
+        $executive_lastname = $executive['executive_lastname'];
+    } else {
+        $executive_firstname = "ไม่พบข้อมูลผู้บริหาร";
+        $executive_lastname = "";
+    }
+}
+
 
 ?>
 
@@ -215,7 +236,8 @@ date_default_timezone_set("Asia/Bangkok");
                 <p><strong>ลูกค้า / Customer:</strong> <?= htmlspecialchars($first['member_firstname'] . ' ' . $first['member_lastname']) ?></p>
                 <p><strong>เบอร์โทร / Phone:</strong> <?= htmlspecialchars($first['member_phone']) ?></p>
                 <p><strong>วันที่ เวลา ที่ออกใบเสร็จ / Date time of receipt issue:</strong> <?= date("d/m/Y H:i") ?></p>
-                <p><strong>ออกโดย / Issuer:</strong> ระบบอัตโนมัติ</p>
+                <p><strong>ออกโดย / Issuer:</strong> <?= htmlspecialchars($executive_firstname) ?> <?= htmlspecialchars($executive_lastname) ?></p>
+
             </div>
 
             <table>

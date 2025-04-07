@@ -14,6 +14,8 @@ if (!isset($_GET['order_ids'])) {
     exit();
 }
 
+
+
 $order_ids = explode(',', $_GET['order_ids']);
 $order_ids = array_map('intval', $order_ids);
 $placeholders = implode(',', array_fill(0, count($order_ids), '?'));
@@ -43,7 +45,35 @@ $result = $stmt->get_result();
 $orders = $result->fetch_all(MYSQLI_ASSOC);
 date_default_timezone_set("Asia/Bangkok");
 
+// รับค่า executive_id จาก URL
+$executive_id = isset($_GET['executive_id']) ? $_GET['executive_id'] : null;
+
+if ($executive_id) {
+    // ดึงข้อมูลผู้บริหารจากฐานข้อมูล
+    $sql_exec = "SELECT executive_firstname, executive_lastname FROM executive WHERE executive_id = ?";
+    $stmt_exec = $conn->prepare($sql_exec);
+    $stmt_exec->bind_param("i", $executive_id);
+    $stmt_exec->execute();
+    $result_exec = $stmt_exec->get_result();
+
+    // ถ้าหากข้อมูลผู้บริหารถูกดึงมา
+    if ($executive = $result_exec->fetch_assoc()) {
+        $executive_firstname = $executive['executive_firstname'];
+        $executive_lastname = $executive['executive_lastname'];
+    } else {
+        // ถ้าไม่พบข้อมูลของผู้บริหาร
+        $executive_firstname = "ไม่พบข้อมูลผู้บริหาร";
+        $executive_lastname = "";
+    }
+} else {
+    // ถ้า executive_id ไม่ถูกส่งมา
+    $executive_firstname = "ไม่พบข้อมูลผู้บริหาร";
+    $executive_lastname = "";
+}
+
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="th">
@@ -205,8 +235,8 @@ date_default_timezone_set("Asia/Bangkok");
                 <p><strong>ที่อยู่ / Address:</strong> <?= htmlspecialchars($first['member_address']) ?></p>
                 <p><strong>เบอร์โทร / Phone:</strong> <?= htmlspecialchars($first['member_phone']) ?></p>
                 <p><strong>วันที่ เวลา ที่ออกใบเสร็จ / Date time of receipt issue:</strong> <?= date("d/m/Y H:i") ?></p>
-                <p><strong>ออกโดย / Issuer:</strong> ระบบอัตโนมัติ</p>
-            </div>
+                <p><strong>ออกโดย / Issuer:</strong> <?= htmlspecialchars($executive_firstname) ?> <?= htmlspecialchars($executive_lastname) ?></p>
+                </div>
 
             <table>
                 <thead>

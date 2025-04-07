@@ -17,8 +17,26 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $member_id);
 $stmt->execute();
 $result = $stmt->get_result();
+
+$sql_exec = "SELECT executive_id, executive_firstname, executive_lastname FROM executive ORDER BY RAND() LIMIT 1";
+$stmt_exec = $conn->prepare($sql_exec);
+$stmt_exec->execute();
+$result_exec = $stmt_exec->get_result();
+$executive = $result_exec->fetch_assoc();
+
+// ตรวจสอบข้อมูลผู้บริหาร
+if ($executive) {
+    $executive_id = $executive['executive_id'];
+    $executive_firstname = $executive['executive_firstname'];
+    $executive_lastname = $executive['executive_lastname'];
+} else {
+    $executive_id = null;  // หรือกำหนดเป็นค่าเริ่มต้น
+    $executive_firstname = "ไม่พบข้อมูลผู้บริหาร";
+    $executive_lastname = "";
+}
+
 ?>
- 
+
 <!DOCTYPE html>
 <html lang="th">
 
@@ -81,19 +99,16 @@ $result = $stmt->get_result();
             while ($row = $result->fetch_assoc()):
                 $orderDate = date("d/m/Y H:i:s", strtotime($row['order_equipment_date']));
 
-                // ถ้าเปลี่ยนกลุ่ม
                 if ($orderDate != $currentDate):
                     if ($currentDate != "") {
-                        // แสดงค่าจัดส่ง + ราคารวมกลุ่มก่อนหน้า
                         echo '<tr><td colspan="5" style="text-align:right;"><strong>ค่าจัดส่งสินค้า (บาท)</strong></td><td><strong>120</strong></td><td></td></tr>';
                         echo '<tr><td colspan="5" style="text-align:right;"><strong>ราคารวม (บาท)</strong></td><td><strong>' . number_format($total + 120, 2) . '</strong></td><td></td></tr>';
-
                         echo '</tbody></table>';
                         $order_ids_str = implode(',', $order_ids);
                         echo '<div class="print-button-wrapper">';
-                        echo '<a href="print_bill.php?order_ids=' . $order_ids_str . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
+                        echo '<a href="print_bill.php?order_ids=' . $order_ids_str . '&executive_id=' . $executive_id . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
                         echo '</div>';
-                        echo '</div><br>'; // ปิดกล่อง
+                        echo '</div><br>';
                         $order_ids = [];
                         $total = 0;
                     }
@@ -132,7 +147,6 @@ $result = $stmt->get_result();
                 </tr>
             <?php endwhile; ?>
 
-            <!-- ปิดกลุ่มสุดท้าย -->
             <tr>
                 <td colspan="5" style="text-align:right;"><strong>ค่าจัดส่งสินค้า (บาท)</strong></td>
                 <td><strong>120</strong></td>
@@ -149,7 +163,8 @@ $result = $stmt->get_result();
             <?php
             $order_ids_str = implode(',', $order_ids);
             echo '<div class="print-button-wrapper">';
-            echo '<a href="print_bill.php?order_ids=' . $order_ids_str . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
+            // ตรวจสอบให้มั่นใจว่า executive_id ถูกส่งไปใน URL
+            echo '<a href="print_bill.php?order_ids=' . $order_ids_str . '&executive_id=' . $executive_id . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
             echo '</div>';
             echo '</div>';
             ?>

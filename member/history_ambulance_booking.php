@@ -33,6 +33,12 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $member_id);
 $stmt->execute();
 $result = $stmt->get_result();
+
+$sql_exec = "SELECT executive_id, executive_firstname, executive_lastname FROM executive ORDER BY RAND() LIMIT 1";
+$stmt_exec = $conn->prepare($sql_exec);
+$stmt_exec->execute();
+$result_exec = $stmt_exec->get_result();
+$executive = $result_exec->fetch_assoc();
 ?>
 
 <!DOCTYPE html>
@@ -160,7 +166,7 @@ $result = $stmt->get_result();
             <?php
             $booking_ids_str = implode(',', $booking_ids);
             echo '<div class="print-button-wrapper">';
-            echo '<a href="print_bill_ambulance_booking.php?booking_ids=' . $booking_ids_str . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
+            echo '<a href="print_bill_ambulance_booking.php?booking_ids=' . $booking_ids_str . '&executive_id=' . $executive['executive_id'] . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
             echo '</div>';
             echo '</div>';
             ?>
