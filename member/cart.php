@@ -130,21 +130,25 @@ $member_id = $_SESSION['user_id'];
                             }
                         }
                         ?>
-
-                        <tr>
-                            <td class="text-end" colspan="4">ค่าจัดส่ง</td>
-                            <td>120</td>
-                            <td>บาท</td>
+                        <td class="text-end" colspan="4">ราคารวม</td>
+                        <td><?= number_format($sumPrice, 2) ?></td>
+                        <td>บาท</td>
                         </tr>
-                        <?php $vat = ($sumPrice * 7)/100  ?>
+                        <?php $vat = ($sumPrice * 7) / 100  ?>
                         <tr>
                             <td class="text-end" colspan="4">Vat 7%</td>
                             <td><?= number_format($vat, 2) ?></td>
                             <td>บาท</td>
                         </tr>
+                        <tr>
+                            <td class="text-end" colspan="4">ค่าจัดส่งสินค้า</td>
+                            <td>120</td>
+                            <td>บาท</td>
+                        </tr>
+
                         <?php $sumPrice = $sumPrice + $vat ?>
                         <tr>
-                            <td class="text-end" colspan="4">รวมเป็นเงิน</td>
+                            <td class="text-end" colspan="4">ยอดชำระทั้งหมด</td>
                             <td><?= number_format($sumPrice + 120 + $vat, 2) ?></td>
                             <td>บาท</td>
                         </tr>
