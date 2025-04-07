@@ -165,7 +165,7 @@ if ($executive) {
                     <td><?= htmlspecialchars($row['ambulance_plate']) ?></td>
                     <td>
                         <?= htmlspecialchars($row['ambulance_booking_date']) ?><br>
-                        <?= htmlspecialchars($row['ambulance_booking_start_time']) ?> - <?= htmlspecialchars($row['ambulance_booking_finish_time']) ?>
+                        <?= htmlspecialchars($row['ambulance_booking_start_time']) ?>
                     </td>
                     <td><?= htmlspecialchars($row['ambulance_booking_distance']) ?></td>
                     <td><?= htmlspecialchars($row['ambulance_booking_status']) ?></td>
