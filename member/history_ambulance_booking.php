@@ -50,7 +50,6 @@ if ($executive) {
     $executive_firstname = "ไม่พบข้อมูลผู้บริหาร";
     $executive_lastname = "";
 }
-echo "executive_id: " . $executive_id;
 
 ?>
 
