@@ -66,8 +66,11 @@ $row = mysqli_fetch_assoc($result);
 
     <section class="QRcode">
         <img src="image/QRcode.jpeg" alt="" class="qr-preview" id="qr-preview"><br>
-        <p>ยอดค้างชำระทั้งหมด : ฿<?php echo number_format($row['order_emergency_case_price'], 2); ?></p>
-        <br><br>
+        <p>ค่าบริการ : <?php echo number_format($row['order_emergency_case_price'], 2); ?></p>
+        <p>Vat 7% :  <?= number_format($row['order_emergency_case_price'] * 0.07, 2) ?> บาท</p>
+        <p>ยอดค้างชำระทั้งหมด :  <?= number_format($row['order_emergency_case_price'] * 1.07, 2) ?> บาท</p>
+
+        <br>
         <div class="bottom-row">
             <p>แนบหลักฐานยืนยัน</p>
             <button class="upload-btn" id="upload-btn">อัพโหลด</button>
@@ -97,6 +100,10 @@ $row = mysqli_fetch_assoc($result);
                     // ตรวจสอบผลลัพธ์จากเซิร์ฟเวอร์
                     let response = xhr.responseText;
                     if (response === "success") {
+                        // เปิดหน้าใหม่ในแท็บใหม่
+                        window.open('print_bill_emergency.php?order_id=' + orderId, '_blank'); // เปิดหน้า print_bill_emergency.php ในแท็บใหม่
+
+                        // ไปยังหน้า success_payment.html ในแท็บเดิม
                         window.location.href = "success_payment.html"; // ไปหน้า success_payment.html โดยตรง
                     } else {
                         // สามารถแสดงข้อความบนหน้าเว็บได้ เช่น

@@ -117,7 +117,7 @@ if ($hasSearched) {
                     <td><?= $row['order_emergency_case_hospital_waypoint'] ?></td>
                     <td><?= $row['order_emergency_case_date'] ?></td>
                     <td><?= $row['order_emergency_case_time'] ?></td>
-                    <td><?= number_format($row['order_emergency_case_price']) ?> บาท</td>
+                    <td><?= number_format($row['order_emergency_case_price'] * 1.07, 2) ?> บาท</td>
                     <td>
                         <?php if ($row['order_emergency_case_status'] === "ชำระเงินแล้ว"): ?>
                             <span style="color: gray;">✅ ชำระเงินแล้ว</span>
