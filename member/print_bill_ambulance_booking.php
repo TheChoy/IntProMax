@@ -244,8 +244,8 @@ if ($executive_id) {
                     <tr>
                         <th>ลำดับ<br>No.</th>
                         <th>เส้นทาง<br>Route</th>
-                        <th>ระยะทาง(กิโลเมตร)<br>Route</th>
-                        <th>ราคา (บาท/กิโลเมตร)<br>Route</th>
+                        <th>ระยะทาง(กิโลเมตร)<br>distance</th>
+                        <th>ราคา (บาท/กิโลเมตร)<br>Price</th>
                         <th>เลขทะเบียนรถ<br>Vehicle registration number</th>
                         <th>วันเวลาที่เดินทาง<br>Travel date and time</th>
                         <th>ราคารวม<br>Total</th>

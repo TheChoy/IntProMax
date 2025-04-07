@@ -248,10 +248,10 @@ if ($executive_id) {
                     <tr>
                         <th>ลำดับ<br>No.</th>
                         <th>สถานที่จัด Event<br>Event location</th>
-                        <th>ระยะทาง(กิโลเมตร)<br>Route</th>
-                        <th>ราคา (บาท/กิโลเมตร)<br>Route</th>
-                        <th>จำนวนพยาบาลที่เพิ่ม (คน)<br>Route</th>
-                        <th>จำนวนรถ (คัน)<br>Route</th>
+                        <th>ระยะทาง(กิโลเมตร)<br>distance</th>
+                        <th>ราคา (บาท/กิโลเมตร)<br>Price</th>
+                        <th>จำนวนพยาบาลที่เพิ่ม (คน)<br>Number of nurses added</th>
+                        <th>จำนวนรถ (คัน)<br>Number of cars</th>
                         <th>เลขทะเบียนรถ<br>Vehicle registration number</th>
                         <th>วันเวลาเดินทาง<br>Travel date and time</th>
                         <th>ราคารวม<br>Total</th>
