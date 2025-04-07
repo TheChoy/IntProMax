@@ -135,7 +135,7 @@ $executive = $result_exec->fetch_assoc();
                             <th>สถานที่</th>
                             <th>ทะเบียนรถ</th>
                             <th>วันเวลางาน</th>
-                            <th>ชื่อผู้จอง</th>
+                            <th>ระยะทาง (กิโลเมตร)</th>
                             <th>เบอร์โทร</th>
                             <th>ค่าบริการ (บาท)</th>
                         </tr>
@@ -155,7 +155,7 @@ $executive = $result_exec->fetch_assoc();
                         <?= htmlspecialchars($row['event_booking_date']) ?><br>
                         <?= htmlspecialchars($row['event_booking_start_time']) ?> - <?= htmlspecialchars($row['event_booking_finish_time']) ?>
                     </td>
-                    <td><?= htmlspecialchars($row['member_firstname'] . ' ' . $row['member_lastname']) ?></td>
+                    <td><?= htmlspecialchars($row['event_booking_distance'] ) ?></td>
                     <td><?= htmlspecialchars($row['member_phone']) ?></td>
                     <td class="text-end"><?= number_format($row['event_booking_price'], 2) ?></td>
                 </tr>
