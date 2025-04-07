@@ -149,7 +149,7 @@ $member_id = $_SESSION['user_id'];
                         <?php $sumPrice = $sumPrice + $vat ?>
                         <tr>
                             <td class="text-end" colspan="4">ยอดชำระทั้งหมด</td>
-                            <td><?= number_format($sumPrice + 120 + $vat, 2) ?></td>
+                            <td><?= number_format($sumPrice  + 120, 2) ?></td>
                             <td>บาท</td>
                         </tr>
                     </table>

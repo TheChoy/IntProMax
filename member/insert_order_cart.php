@@ -104,7 +104,13 @@ if (!empty($last_orders)) {
     $queryString = '&' . implode('&', $params);
 }
 
-// ส่งไปหน้าชำระเงิน พร้อมราคาสินค้ารวมและค่าจัดส่ง
-header("Location: QRpayment_order.php?price_total=$final_total$queryString");
+// ใช้ยอดรวมของสินค้าที่บันทึกไว้ใน order_equipment
+$total = $sum_total; // <<<<< ตรงนี้แหละที่คุณต้องการ
+
+$vat = $total * 0.07;
+$total_with_vat = $total + $vat + $shipping_cost;
+
+header("Location: QRpayment_order.php?price_total=$total_with_vat$queryString");
 exit();
+
 ?>
