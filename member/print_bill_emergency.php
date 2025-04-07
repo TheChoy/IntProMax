@@ -1,37 +1,52 @@
-<?php 
-include 'username.php'; 
+<?php
+include 'username.php';
 
 // รับค่า emergency_id จาก URL
 $emergency_id = isset($_GET['order_id']) ? $_GET['order_id'] : null;
 
-// ตรวจสอบว่า emergency_id มีค่า
 if ($emergency_id) {
-    // คิวรีข้อมูลจากฐานข้อมูล (เปลี่ยนชื่อคอลัมน์เป็น order_emergency_case_id)
-    $sql_exec = "SELECT * FROM order_emergency_case WHERE order_emergency_case_id = ?";
-    $stmt_exec = $conn->prepare($sql_exec);
-    $stmt_exec->bind_param("i", $emergency_id); // ใช้ $emergency_id แทน $executive_id
-    $stmt_exec->execute();
-    $result_exec = $stmt_exec->get_result();
+    // คิวรีข้อมูลพร้อม JOIN ตาราง ambulance แบบไม่ใช้ตัวย่อ
+    $sql_query = "
+        SELECT order_emergency_case.*, ambulance.ambulance_plate
+        FROM order_emergency_case
+        LEFT JOIN ambulance ON order_emergency_case.ambulance_id = ambulance.ambulance_id
+        WHERE order_emergency_case.order_emergency_case_id = ?
+    ";
 
-    // ตรวจสอบว่าได้ข้อมูลมาแล้วหรือไม่
-    if ($result_exec->num_rows > 0) {
-        // ดึงข้อมูลจากฐานข้อมูล
-        $row = $result_exec->fetch_assoc();
+    $statement = $conn->prepare($sql_query);
+    $statement->bind_param("i", $emergency_id);
+    $statement->execute();
+    $result = $statement->get_result();
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+
+        // ดึงข้อมูลป้ายทะเบียนรถพยาบาล
+        $ambulance_plate = $row['ambulance_plate'];
+
     } else {
         echo "ไม่พบข้อมูลในฐานข้อมูลสำหรับ emergency_id: " . $emergency_id;
     }
 } else {
     echo "ไม่มีค่า emergency_id";
 }
-$sql_exec = "SELECT executive_id, executive_firstname, executive_lastname FROM executive ORDER BY RAND() LIMIT 1";
-$stmt_exec = $conn->prepare($sql_exec);
-$stmt_exec->execute();
-$result_exec = $stmt_exec->get_result();
+
+// สุ่มข้อมูลผู้บริหาร
+$sql_executive = "
+    SELECT executive_id, executive_firstname, executive_lastname 
+    FROM executive 
+    ORDER BY RAND() 
+    LIMIT 1
+";
+$statement_exec = $conn->prepare($sql_executive);
+$statement_exec->execute();
+$result_exec = $statement_exec->get_result();
 $executive = $result_exec->fetch_assoc();
 $executive_firstname = $executive['executive_firstname'];
 $executive_lastname = $executive['executive_lastname'];
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="th">
@@ -219,9 +234,9 @@ $executive_lastname = $executive['executive_lastname'];
                         <td class="text-end"><?= number_format($row['order_emergency_case_price'], 2) ?></td>
                     </tr>
                 </tbody>
-                <?php 
-                    $vat = ($row['order_emergency_case_price'] * 7) / 100;
-                    $total = $row['order_emergency_case_price'] + $vat;
+                <?php
+                $vat = ($row['order_emergency_case_price'] * 7) / 100;
+                $total = $row['order_emergency_case_price'] + $vat;
                 ?>
                 <tfoot>
                     <tr>
