@@ -192,7 +192,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $region = getRegion($province); // ตรวจสอบภูมิภาคจากจังหวัด
         $price = $_POST['calculatedPrice2'];
         $distance = $_POST['calculatedDistance2'];
-        $member_id = rand(1, 10);
         // Mapping hospital codes to names
         $hospitalMap = [
             "hospital1" => "โรงพยาบาลมหาวิทยาลัยนเรศวร",
