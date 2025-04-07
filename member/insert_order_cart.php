@@ -2,8 +2,6 @@
 session_start();
 include 'username.php'; // ต้องมี $conn สำหรับเชื่อมฐานข้อมูล
 
-// รับราคารวมจาก cart
-$total_price = $_POST['price_total'] ?? 0;
 $member_id = $_SESSION['user_id'] ?? null;
 
 // ตรวจสอบว่ามีข้อมูลผู้ใช้และตะกร้าหรือไม่
@@ -13,6 +11,8 @@ if (!$member_id || !isset($_SESSION["strProductID"])) {
 }
 
 $last_orders = [];
+$sum_total = 0; // ใช้เก็บราคารวมของสินค้า
+$shipping_cost = 120; // ค่าจัดส่งคงที่
 
 // วนลูปสินค้าในตะกร้าและทำการ insert + อัปเดต stock
 for ($i = 0; $i <= (int)$_SESSION["intLine"]; $i++) {
@@ -38,7 +38,8 @@ for ($i = 0; $i <= (int)$_SESSION["intLine"]; $i++) {
     }
 
     $price = $row['equipment_price_per_unit'];
-    $total = ($price * $quantity) + 120;
+    $total = $price * $quantity;
+    $sum_total += $total; // สะสมราคาสินค้าทั้งหมด
 
     // เพิ่มข้อมูลลงตาราง order_equipment
     $insert = "INSERT INTO order_equipment (
@@ -73,6 +74,8 @@ for ($i = 0; $i <= (int)$_SESSION["intLine"]; $i++) {
             $update_stmt->execute();
             $update_stmt->close();
         }
+
+        // เก็บรายการที่ insert สำเร็จไว้
         $last_orders[] = [
             'order_equipment_id' => $order_equipment_id,
             'quantity' => $quantity,
@@ -86,6 +89,9 @@ unset($_SESSION["strProductID"]);
 unset($_SESSION["strQty"]);
 unset($_SESSION["intLine"]);
 
+// คำนวณราคารวมทั้งหมด + ค่าจัดส่ง
+$final_total = $sum_total + $shipping_cost;
+
 // สร้าง query string สำหรับ redirect ไป QRpayment_order.php
 $queryString = '';
 if (!empty($last_orders)) {
@@ -98,7 +104,7 @@ if (!empty($last_orders)) {
     $queryString = '&' . implode('&', $params);
 }
 
-// ส่งไปหน้าชำระเงิน
-header("Location: QRpayment_order.php?price_total=$total_price$queryString");
-// ปิดการเชื่อมต่อฐานข้อมูล
+// ส่งไปหน้าชำระเงิน พร้อมราคาสินค้ารวมและค่าจัดส่ง
+header("Location: QRpayment_order.php?price_total=$final_total$queryString");
 exit();
+?>
