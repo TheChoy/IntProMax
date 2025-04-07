@@ -19,6 +19,8 @@ $sql = "SELECT
             event_booking.event_booking_finish_time,
             event_booking.event_booking_price,
             event_booking.event_booking_distance,
+            event_booking.event_booking_amount_nurse,
+            event_booking_amount_ambulance,
             member.member_firstname,
             member.member_lastname,
             member.member_phone,
@@ -117,7 +119,7 @@ $executive = $result_exec->fetch_assoc();
                         echo '</tbody></table>';
                         $event_ids_str = implode(',', $event_ids);
                         echo '<div class="print-button-wrapper">';
-                        echo '<a href="print_bill_event_booking.php?event_ids=' . $event_ids_str .'&executive_id=' . $executive['executive_id'] . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
+                        echo '<a href="print_bill_event_booking.php?event_ids=' . $event_ids_str . '&executive_id=' . $executive['executive_id'] . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
                         echo '</div>';
                         echo '</div><br>'; // ปิดกล่อง
                         $event_ids = [];
@@ -149,13 +151,13 @@ $executive = $result_exec->fetch_assoc();
             ?>
                 <tr>
                     <td><?= htmlspecialchars($row['event_booking_type']) ?></td>
-                    <td><?= htmlspecialchars($row['event_booking_location'])." ". htmlspecialchars($row['event_booking_province']) ?></td>
+                    <td><?= htmlspecialchars($row['event_booking_location']) . " " . htmlspecialchars($row['event_booking_province']) ?></td>
                     <td><?= htmlspecialchars($row['ambulance_plate']) ?></td>
                     <td>
                         <?= htmlspecialchars($row['event_booking_date']) ?><br>
                         <?= htmlspecialchars($row['event_booking_start_time']) ?> - <?= htmlspecialchars($row['event_booking_finish_time']) ?>
                     </td>
-                    <td><?= htmlspecialchars($row['event_booking_distance'] ) ?></td>
+                    <td><?= htmlspecialchars($row['event_booking_distance']) ?></td>
                     <td><?= htmlspecialchars($row['member_phone']) ?></td>
                     <td class="text-end"><?= number_format($row['event_booking_price'], 2) ?></td>
                 </tr>
@@ -166,7 +168,7 @@ $executive = $result_exec->fetch_assoc();
             <?php
             $event_ids_str = implode(',', $event_ids);
             echo '<div class="print-button-wrapper">';
-            echo '<a href="print_bill_event_booking.php?event_ids=' . $event_ids_str .'&executive_id=' . $executive['executive_id'] . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
+            echo '<a href="print_bill_event_booking.php?event_ids=' . $event_ids_str . '&executive_id=' . $executive['executive_id'] . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
             ?>
         <?php else: ?>
             <div class="alert alert-warning">ไม่พบรายการจองรถสำหรับรับงาน Event</div>
