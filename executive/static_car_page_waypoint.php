@@ -497,6 +497,34 @@ $conn->close();
                     }
 
                     const ctx = document.getElementById('bookingChart').getContext('2d');
+
+                    // ลงทะเบียน plugin สำหรับแสดงอันดับ
+                    const rankingPlugin = {
+                        id: 'customRanking',
+                        beforeDraw: (chart) => {
+                            const ctx = chart.ctx;
+                            ctx.save();
+                            const xAxis = chart.scales.x;
+                            
+                            // กำหนดรูปแบบตัวอักษร
+                            ctx.font = '16px Itim';
+                            ctx.fillStyle = '#666666';
+                            ctx.textAlign = 'center';
+                            
+                            // วนลูปเพื่อวาดอันดับ
+                            chart.data.labels.forEach((label, index) => {
+                                const x = xAxis.getPixelForValue(index);
+                                const y = chart.chartArea.bottom + 35; // ปรับระยะห่างจากแท่งกราฟ
+                                ctx.fillText(`อันดับ ${index + 1}`, x, y);
+                            });
+                            
+                            ctx.restore();
+                        }
+                    };
+
+                    // ลงทะเบียน plugin กับ Chart.js
+                    Chart.register(rankingPlugin);
+
                     window.myChart = new Chart(ctx, {
                         type: 'bar',
                         data: data,
@@ -510,7 +538,7 @@ $conn->close();
                                     beginAtZero: true,
                                     title: {
                                         display: true,
-                                        text: 'โรงพยาบาล'
+                                        text: ''
                                     },
                                 },
                                 y: {
@@ -532,7 +560,7 @@ $conn->close();
                                     display: true,
                                     text: 'สถิติการใช้งานรถแยกตามประเภทงานและโรงพยาบาล (10 อันดับแรก)'
                                 }
-                            },
+                            }
                         }
                     });
                 })
