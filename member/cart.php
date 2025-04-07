@@ -136,9 +136,16 @@ $member_id = $_SESSION['user_id'];
                             <td>120</td>
                             <td>บาท</td>
                         </tr>
+                        <?php $vat = ($sumPrice * 7)/100  ?>
+                        <tr>
+                            <td class="text-end" colspan="4">Vat 7%</td>
+                            <td><?= number_format($vat, 2) ?></td>
+                            <td>บาท</td>
+                        </tr>
+                        <?php $sumPrice = $sumPrice + $vat ?>
                         <tr>
                             <td class="text-end" colspan="4">รวมเป็นเงิน</td>
-                            <td><?= number_format($sumPrice + 120, 2) ?></td>
+                            <td><?= number_format($sumPrice + 120 + $vat, 2) ?></td>
                             <td>บาท</td>
                         </tr>
                     </table>
