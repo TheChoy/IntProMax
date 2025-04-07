@@ -74,21 +74,6 @@ foreach ($order_equipment_id as $index => $order_id) {
     }
 }
 
-// // โหลดข้อมูลสินค้า
-// foreach ($order_equipment_id as $order_id) {
-//     $sql = "SELECT * FROM equipment 
-//             LEFT JOIN order_equipment ON equipment.equipment_id = order_equipment.equipment_id 
-//             WHERE order_equipment.order_equipment_id = ?";
-//     $stmt = $conn->prepare($sql);
-//     $stmt->bind_param("i", $order_id);
-//     $stmt->execute();
-//     $result = $stmt->get_result();
-//     $row = $result->fetch_assoc();
-
-//     if ($row) {
-//         echo "รายการ: " . $row['equipment_name'] . " จำนวน: " . $row['order_equipment_quantity'] . "<br>";
-//     }
-// }
 
 ?>
 
@@ -102,7 +87,6 @@ foreach ($order_equipment_id as $index => $order_id) {
     <link rel="stylesheet" href="css/style_QR_payment.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <title>ชำระเงิน</title>
-    <!-- <script src="javascrip_member/QRpayment.js" defer></script> -->
 </head>
 
 <body>
