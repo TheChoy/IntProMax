@@ -19,6 +19,7 @@ $sql = "SELECT
             ambulance_booking.ambulance_booking_finish_time,
             ambulance_booking.ambulance_booking_price,
             ambulance_booking.ambulance_booking_status,
+            ambulance_booking.ambulance_booking_distance,
             member.member_firstname,
             member.member_lastname,
             member.member_phone,
@@ -189,4 +190,5 @@ if ($executive) {
 
 
 </body>
+
 </html>

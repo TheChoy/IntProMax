@@ -18,6 +18,7 @@ $sql = "SELECT
             event_booking.event_booking_start_time,
             event_booking.event_booking_finish_time,
             event_booking.event_booking_price,
+            event_booking.event_booking_distance,
             member.member_firstname,
             member.member_lastname,
             member.member_phone,
