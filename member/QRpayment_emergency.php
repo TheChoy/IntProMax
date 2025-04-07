@@ -74,6 +74,7 @@ $row = mysqli_fetch_assoc($result);
         </div><br>
         <div class="QR-buttons">
             <!-- กดปุ่มยืนยัน -->
+            <button class="cancle">ยกเลิก</button>
             <button class="confirm" id="confirm-btn">ยืนยัน</button>
         </div>
     </section>
