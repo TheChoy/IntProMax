@@ -997,7 +997,7 @@ $conn->close();
             document.getElementById("calculatedDistance1").value = distance.toFixed(2);
             // สร้างข้อความรายละเอียดการคำนวณ
             const details = `
-                ระยะทาง: ${distance.toFixed(2)} กม. ค่าน้ำมัน: 5.25 บาท/กม.<br>>
+                ระยะทาง: ${distance.toFixed(2)} กม. ค่าน้ำมัน: 5.25 บาท/กม.<br>
             `;
 
             // แสดงผลในหน้าเว็บ
@@ -3126,7 +3126,7 @@ $conn->close();
             document.getElementById("calculatedDistance2").value = distance.toFixed(2);
             // สร้างข้อความรายละเอียดการคำนวณ
             const details = `
-                 ระยะทาง: ${distance.toFixed(2)} กม. ค่าน้ำมัน: ${fuelCostPerKm} บาท/กม. 
+                 ระยะทาง: ${distance.toFixed(2)} กม. ค่าน้ำมัน: ${fuelCostPerKm} บาท/กม. <br>
             `;
 
             // แสดงผลในหน้าเว็บ
