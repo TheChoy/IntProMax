@@ -146,9 +146,9 @@ $row_result_member = mysqli_fetch_assoc($result_member);
             </div>
 
             <div class="summary">
-                <p>รวมคำสั่งซื้อ <span class="sumprice">฿ 5,900</span></p>
-                <p>ค่าจัดส่ง <span class="delivery">฿ 120</span></p>
+                <p>ราคารวม <span class="sumprice">฿ 5,900</span></p>
                 <p>Vat 7 % <span class="vat">฿ 413</span> </p>
+                <p>ค่าจัดส่งสินค้า <span class="delivery">฿ 120</span></p>
                 <p>ยอดชำระทั้งหมด <span class="totalprice">฿ 6,433</span></p>
             </div>
             <button class="order-button2" id="tbtn">สั่งสินค้า</button>
