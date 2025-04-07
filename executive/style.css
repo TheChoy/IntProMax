@@ -867,7 +867,7 @@ body {
 .filter-sidebar .reset-button {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #f44336; /* สีแดง */
+    background-color: #fe8b5e; /* สีแดง */
     color: white;
     text-align: center;
     font-size: 16px;
@@ -877,9 +877,9 @@ body {
 }
 
 .filter-sidebar .reset-button:hover {
-    background-color: #e53935; /* สีแดงเข้มขึ้นเมื่อ hover */
+    background-color: #fc7f40; /* สีแดงเข้มขึ้นเมื่อ hover */
 }
 
 .filter-sidebar .reset-button:active {
-    background-color: #d32f2f; /* สีแดงเข้มสุดเมื่อคลิก */
+    background-color: #ff6a1f; /* สีแดงเข้มสุดเมื่อคลิก */
 }
