@@ -201,7 +201,7 @@ $executive_lastname = $executive['executive_lastname'];
 
         <?php if ($row): ?>
             <div class="detail">
-                <p><strong>เลขที่ใบเสร็จ / Receipt No.:</strong> <?= htmlspecialchars($row['order_emergency_case_id']) ?></p>
+                <p><strong>เลขที่ใบเสร็จ / Receipt No.:</strong> 0012<?= htmlspecialchars($row['order_emergency_case_id']) ?></p>
                 <p><strong>ผู้ติดต่อ / Contact person:</strong> <?= htmlspecialchars($row['order_emergency_case_communicant']) ?></p>
                 <p><strong>เบอร์โทร / Phone:</strong> <?= htmlspecialchars($row['order_emergency_case_communicant_phone']) ?></p>
                 <p><strong>วันที่ เวลา ที่ออกใบเสร็จ / Date time of receipt issue:</strong> <?= date("d/m/Y H:i") ?></p>
