@@ -155,7 +155,7 @@ $executive = $result_exec->fetch_assoc();
                     <td><?= htmlspecialchars($row['ambulance_plate']) ?></td>
                     <td>
                         <?= htmlspecialchars($row['event_booking_date']) ?><br>
-                        <?= htmlspecialchars($row['event_booking_start_time']) ?> - <?= htmlspecialchars($row['event_booking_finish_time']) ?>
+                        <?= htmlspecialchars($row['event_booking_start_time']) ?>
                     </td>
                     <td><?= htmlspecialchars($row['event_booking_distance']) ?></td>
                     <td><?= htmlspecialchars($row['member_phone']) ?></td>

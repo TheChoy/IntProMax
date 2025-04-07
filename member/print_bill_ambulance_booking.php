@@ -264,7 +264,7 @@ if ($executive_id) {
                             <td><?= htmlspecialchars($order['ambulance_booking_distance']) ?></td>
                             <td>3.5</td>
                             <td><?= htmlspecialchars($order['ambulance_plate']) ?></td>
-                            <td><?= htmlspecialchars($order['ambulance_booking_date']) ?><br><?= htmlspecialchars($order['ambulance_booking_start_time']) ?> - <?= htmlspecialchars($order['ambulance_booking_finish_time']) ?></td>
+                            <td><?= htmlspecialchars($order['ambulance_booking_date']) ?><br><?= htmlspecialchars($order['ambulance_booking_start_time']) ?></td>
                             <td class="text-end"><?= number_format($order['ambulance_booking_price'], 2) ?></td>
                         </tr>
                     <?php endforeach; ?>
