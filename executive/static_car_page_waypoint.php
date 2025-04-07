@@ -145,12 +145,12 @@ $chartDataJson = json_encode([
         [
             'label' => 'รับเคสฉุกเฉิน',
             'data' => $chartValues['emergency'],
-            'backgroundColor' => 'rgba(255, 99, 132, 0.6)'
+            'backgroundColor' => 'rgb(252, 147, 98)'
         ],
         [
             'label' => 'รับส่งผู้ป่วย',
             'data' => $chartValues['ambulance'],
-            'backgroundColor' => 'rgba(54, 162, 235, 0.6)'
+            'backgroundColor' => 'rgb(129, 179, 210)'
         ]
     ]
 ]);
@@ -220,9 +220,10 @@ $conn->close();
                     <div class="sidebar-content">
 
                         <select class="filter-select" style="margin-left: 2%;" onchange="location = this.value;">
-                            <option value="static_car_page.php">ดูสถิติรถ(รวม)</option>
-                            <option value="static_car_page_gender.php">ดูสถิติรถ(แยกเพศ)</option>
-                            <option value="static_car_page_waypoint.php" selected>ดูสถิติรถ(โรงพยาบาลที่ส่งผู้ป่วย)</option>
+                            <option value="static_car_page.php">ดูสถิติการใช้งานรถตามประเภทและระดับ</option>
+                            <option value="static_car_page_gender.php">ดูสถิติการใช้งานรถแยกตามเพศของสมาชิก</option>
+                            <option value="static_car_page_waypoint.php" selected>ดูสถิติการใช้งานรถแยกตามประเภทงานและโรงพยาบาล</option>
+                            <option value="static_car_page_region.php">ดูสถิติการใช้งานรถแยกตามประเภทงานและภูมิภาค</option>
                         </select>
 
                         <label for="">เลือกประเภทงาน:</label>
@@ -234,11 +235,12 @@ $conn->close();
                         <br> -->
 
                         <label for="">เลือกระดับรถ:</label>
-                        <input type="checkbox" name="level[]" value="1" checked> ระดับ 1
+                        <input type="checkbox" name="level[]" value="1" checked> ระดับ 1 (Basic Life Support)
                         <br>
-                        <input type="checkbox" name="level[]" value="2" checked> ระดับ 2
+                        <input type="checkbox" name="level[]" value="2" checked> ระดับ 2 (Advance Life Support)
                         <br>
-                        <input type="checkbox" name="level[]" value="3" checked> ระดับ 3
+                        <input type="checkbox" name="level[]" value="3" checked> ระดับ 3 (Mobile Intensive Care Unit)
+
                         <br>
 
                         <label for="filter-price">จังหวัด:</label>
@@ -501,24 +503,24 @@ $conn->close();
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            indexAxis: 'y',
+                            indexAxis: 'x',
                             scales: {
                                 x: {
-                                    stacked: true,
+                                    stacked: false,
                                     beginAtZero: true,
                                     title: {
                                         display: true,
-                                        text: 'จำนวนครั้ง'
+                                        text: 'โรงพยาบาล'
+                                    },
+                                },
+                                y: {
+                                    stacked: false,
+                                    title: {
+                                        display: true,
+                                        text: 'จำนวนที่ไปส่งผู้ป่วย (ครั้ง)'
                                     },
                                     ticks: {
                                         precision: 0
-                                    }
-                                },
-                                y: {
-                                    stacked: true,
-                                    title: {
-                                        display: true,
-                                        text: 'โรงพยาบาล'
                                     }
                                 }
                             },

@@ -100,50 +100,39 @@ $sql .= " AND DATE_FORMAT(merged.booking_date, '%Y-%m') BETWEEN '$date_start' AN
 $result = $conn->query($sql);
 
 // เตรียมข้อมูลจากฐานข้อมูล
-$chartData = [];
+$chartData = [
+    'ภาคเหนือ' => ['emergency' => 0, 'ambulance' => 0, 'event' => 0],
+    'ภาคตะวันออกเฉียงเหนือ' => ['emergency' => 0, 'ambulance' => 0, 'event' => 0],
+    'ภาคกลาง' => ['emergency' => 0, 'ambulance' => 0, 'event' => 0], 
+    'ภาคใต้' => ['emergency' => 0, 'ambulance' => 0, 'event' => 0]
+];
 
+// ดึงข้อมูลจากฐานข้อมูล
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
+        $region = $row['region'];
         $source = $row['source'];
-        if ($source == 'emergency') {
-            $source = 'รับเคสฉุกเฉิน';
-        } elseif ($source == 'ambulance') {
-            $source = 'รับส่งผู้ป่วย';
-        } elseif ($source == 'event') {
-            $source = 'รับงาน EVENT';
-        }
-
-        $gender = $row['gender'];
-        $level = $row['ambulance_level'];
-
-        if (!isset($chartData[$source])) {
-            $chartData[$source] = [
-                'ชาย' => ['count' => 0, 'levels' => []],
-                'หญิง' => ['count' => 0, 'levels' => []]
-            ];
-        }
-
-        if ($gender) {
-            $chartData[$source][$gender]['count']++;
-            $chartData[$source][$gender]['levels'][] = $level;
+        
+        // เพิ่มการนับตามภูมิภาคและประเภทการใช้งาน
+        if (isset($chartData[$region][$source])) {
+            $chartData[$region][$source]++;
         }
     }
 }
 
 // สร้าง Labels และ Values สำหรับกราฟ
-$chartLabels = array_keys($chartData);
+$chartLabels = array_keys($chartData); // Labels: ชื่อภูมิภาค
 
-// แยกข้อมูลแต่ละเพศออกมาให้เป็น dataset
-$maleData = [];
-$femaleData = [];
-$maleLevels = [];
-$femaleLevels = [];
+// แยกข้อมูลแต่ละประเภทออกมาให้เป็น dataset
+$sourceTypes = ['emergency', 'ambulance', 'event'];
+$chartValues = [];
 
-foreach ($chartLabels as $source) {
-    $maleData[] = $chartData[$source]['ชาย']['count'];
-    $femaleData[] = $chartData[$source]['หญิง']['count'];
-    $maleLevels[] = array_count_values($chartData[$source]['ชาย']['levels']);
-    $femaleLevels[] = array_count_values($chartData[$source]['หญิง']['levels']);
+foreach ($sourceTypes as $source) {
+    $values = [];
+    foreach ($chartLabels as $region) {
+        $values[] = $chartData[$region][$source];
+    }
+    $chartValues[$source] = $values;
 }
 
 // ส่งออกข้อมูลเป็น JSON สำหรับ JavaScript
@@ -151,20 +140,19 @@ $chartDataJson = json_encode([
     'labels' => $chartLabels,
     'datasets' => [
         [
-            'label' => 'สมาชิกเพศชาย',
-            'data' => $maleData,
-            'backgroundColor' => 'rgba(54, 162, 235, 0.6)',
-            'borderColor' => 'rgba(54, 162, 235, 1)',
-            'borderWidth' => 1,
-            'levels' => $maleLevels
+            'label' => 'รับเคสฉุกเฉิน',
+            'data' => $chartValues['emergency'],
+            'backgroundColor' => 'rgb(252, 147, 98)'
         ],
         [
-            'label' => 'สมาชิกเพศหญิง',
-            'data' => $femaleData,
-            'backgroundColor' => 'rgba(255, 99, 132, 0.6)',
-            'borderColor' => 'rgba(255, 99, 132, 1)',
-            'borderWidth' => 1,
-            'levels' => $femaleLevels
+            'label' => 'รับส่งผู้ป่วย',
+            'data' => $chartValues['ambulance'],
+            'backgroundColor' => 'rgb(129, 179, 210)'
+        ],
+        [
+            'label' => 'รับงาน EVENT',
+            'data' => $chartValues['event'],
+            'backgroundColor' => 'rgba(75, 192, 192, 0.6)'
         ]
     ]
 ]);
@@ -235,9 +223,9 @@ $conn->close();
 
                         <select class="filter-select" style="margin-left: 2%;" onchange="location = this.value;">
                             <option value="static_car_page.php">ดูสถิติการใช้งานรถตามประเภทและระดับ</option>
-                            <option value="static_car_page_gender.php" selected>สถิติการใช้งานรถแยกตามเพศของสมาชิก</option>
+                            <option value="static_car_page_gender.php">ดูสถิติการใช้งานรถแยกตามเพศของสมาชิก</option>
                             <option value="static_car_page_waypoint.php">ดูสถิติการใช้งานรถแยกตามประเภทงานและโรงพยาบาล</option>
-                            <option value="static_car_page_region.php">ดูสถิติการใช้งานรถแยกตามประเภทงานและภูมิภาค</option>
+                            <option value="static_car_page_region.php" selected>ดูสถิติการใช้งานรถแยกตามประเภทงานและภูมิภาค</option>
                         </select>
 
                         <label for="">เลือกประเภทงาน:</label>
@@ -256,8 +244,8 @@ $conn->close();
                         <input type="checkbox" name="level[]" value="3" checked> ระดับ 3 (Mobile Intensive Care Unit)
                         <br>
 
-                        <label for="filter-price">จังหวัด:</label>
-                        <select id="filter-price-list" name="province" class="filter-select">
+                        <!-- <label for="filter-price" hidden>จังหวัด:</label> -->
+                        <select id="filter-price-list" name="province" class="filter-select" hidden>
                             <option value="" selected hidden>กรุณาเลือกจังหวัด</option>
                             <option value="ทั้งหมด" selected>ทั้งหมด</option>
                             <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
@@ -370,7 +358,7 @@ $conn->close();
                             placeholder="เลือกเดือน/ปี" value="<?= $_GET['end_month'] ?? '' ?>">
 
 
-                        <a href="static_car_page_gender.php" class="reset-button" id="reset-button">Reset</a>
+                        <a href="static_car_page.php" class="reset-button" id="reset-button">Reset</a>
                     </div>
                 </form>
 
@@ -432,14 +420,6 @@ $conn->close();
         }
     });
 
-    // Initialize end_month flatpickr
-    let endMonthPicker = flatpickr("#end_month", {
-        ...monthSelectConfig,
-        defaultDate: "<?= $_GET['end_month'] ?? date('Y-m') ?>",
-        minDate: startMonthPicker.selectedDates[0] || "<?= $_GET['start_month'] ?? date('Y-m') ?>",
-        maxDate: today
-    });
-
     function handleRegionFilter() {
         const provinceSelect = document.querySelector('select[name="province"]');
         const regionCheckboxes = document.querySelectorAll('input[name="region[]"]');
@@ -475,6 +455,13 @@ $conn->close();
         }
     }
 
+    // Initialize end_month flatpickr
+    let endMonthPicker = flatpickr("#end_month", {
+        ...monthSelectConfig,
+        defaultDate: "<?= $_GET['end_month'] ?? date('Y-m') ?>",
+        minDate: startMonthPicker.selectedDates[0] || "<?= $_GET['start_month'] ?? date('Y-m') ?>",
+        maxDate: today
+    });
 
     //กราฟ
     document.addEventListener('DOMContentLoaded', function() {
@@ -522,7 +509,7 @@ $conn->close();
                                     stacked: false,
                                     title: {
                                         display: true,
-                                        text: 'ประเภทงาน'
+                                        text: 'ภูมิภาค'
                                     }
                                 },
                                 y: {
@@ -530,7 +517,7 @@ $conn->close();
                                     beginAtZero: true,
                                     title: {
                                         display: true,
-                                        text: 'จำนวนที่สมาชิกใช้บริการ (ครั้ง)'
+                                        text: 'จำนวนครั้งที่ใช้บริการ'
                                     },
                                     ticks: {
                                         precision: 0
@@ -543,40 +530,9 @@ $conn->close();
                                 },
                                 title: {
                                     display: true,
-                                    text: 'สถิติการใช้งานรถแยกตามเพศของสมาชิก'
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            const datasetLabel = context.dataset.label || '';
-                                            const value = context.parsed.y;
-
-                                            // ดึงข้อมูลระดับรถ
-                                            const levels = context.dataset.levels[context.dataIndex];
-                                            let levelInfo = [];
-
-                                            // ถ้ามีข้อมูลระดับรถ
-                                            if (levels) {
-                                                // วนลูปแต่ละระดับรถ
-                                                for (let level = 1; level <= 3; level++) {
-                                                    const count = levels[level] || 0;
-                                                    if (count > 0) {
-                                                        levelInfo.push(`รถระดับ ${level}: ${count} ครั้ง`);
-                                                    }
-                                                }
-                                            }
-
-                                            // สร้าง array ของข้อความที่จะแสดง
-                                            const tooltipLines = [
-                                                `${datasetLabel}: ${value} ครั้ง`,
-                                                ...levelInfo
-                                            ];
-
-                                            return tooltipLines;
-                                        }
-                                    }
+                                    text: 'สถิติการใช้งานรถแยกตามประเภทงานและภูมิภาค'
                                 }
-                            }
+                            },
                         }
                     });
                 })

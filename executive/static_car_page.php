@@ -214,9 +214,10 @@ $conn->close();
                     <div class="sidebar-content">
 
                         <select class="filter-select" style="margin-left: 2%;" onchange="location = this.value;">
-                            <option value="static_car_page.php" selected>ดูสถิติรถ(รวม)</option>
-                            <option value="static_car_page_gender.php">ดูสถิติรถ(แยกเพศ)</option>
-                            <option value="static_car_page_waypoint.php">ดูสถิติรถ(โรงพยาบาลที่ส่งผู้ป่วย)</option>
+                            <option value="static_car_page.php" selected>ดูสถิติการใช้งานรถตามประเภทและระดับ</option>
+                            <option value="static_car_page_gender.php">ดูสถิติการใช้งานรถแยกตามเพศของสมาชิก</option>
+                            <option value="static_car_page_waypoint.php">ดูสถิติการใช้งานรถแยกตามประเภทงานและโรงพยาบาล</option>
+                            <option value="static_car_page_region.php">ดูสถิติการใช้งานรถแยกตามประเภทงานและภูมิภาค</option>
                         </select>
 
                         <label for="">เลือกประเภทงาน:</label>
@@ -228,11 +229,11 @@ $conn->close();
                         <br>
 
                         <label for="">เลือกระดับรถ:</label>
-                        <input type="checkbox" name="level[]" value="1" checked> ระดับ 1
+                        <input type="checkbox" name="level[]" value="1" checked> ระดับ 1 (Basic Life Support)
                         <br>
-                        <input type="checkbox" name="level[]" value="2" checked> ระดับ 2
+                        <input type="checkbox" name="level[]" value="2" checked> ระดับ 2 (Advance Life Support)
                         <br>
-                        <input type="checkbox" name="level[]" value="3" checked> ระดับ 3
+                        <input type="checkbox" name="level[]" value="3" checked> ระดับ 3 (Mobile Intensive Care Unit)
                         <br>
 
                         <label for="filter-price">จังหวัด:</label>
@@ -504,7 +505,7 @@ $conn->close();
                                     beginAtZero: true,
                                     title: {
                                         display: true,
-                                        text: 'จำนวน (ครั้ง)'
+                                        text: 'จำนวนที่ไปรับงาน (ครั้ง)'
                                     },
                                     ticks: {
                                         precision: 0
