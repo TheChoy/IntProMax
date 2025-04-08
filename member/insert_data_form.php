@@ -304,6 +304,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $province = $provinceMap[$province] ?? $province;
         // สร้างคำสั่ง SQL
 
+        $member_id = $_SESSION['user_id']; // ✅ เพิ่มบรรทัดนี้
+
         $sql = "INSERT INTO ambulance_booking 
                     (member_id,ambulance_id,ambulance_booking_date,ambulance_booking_start_time,ambulance_booking_location, ambulance_booking_hospital_waypoint, ambulance_booking_province,ambulance_booking_region, ambulance_booking_disease, ambulance_booking_allergy_medicine,ambulance_booking_buy_type,ambulance_booking_price,ambulance_booking_detail,ambulance_booking_distance) 
                     VALUES ('$member_id','$ambulance_id','$booking_date','$booking_start_time','$pickup_location', '$hospital', '$province','$region', '$symptom', '$allergy','$payment_method','$price','$place_ambulance_detail','$distance')";
