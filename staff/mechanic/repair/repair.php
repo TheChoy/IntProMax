@@ -1,17 +1,17 @@
 <?php
-include 'con_repair.php';
+include 'con_repair.php'; // เชื่อมต่อฐานข้อมูล
 
-// แก้ไข query ให้เพิ่มเงื่อนไข WHERE repair_status IN ('รอดำเนินการ', 'กำลังดำเนินการ') และ repair_reason ไม่เป็นค่าว่าง
+// ดึงข้อมูลการซ่อมที่สถานะคือ 'รอดำเนินการ' หรือ 'กำลังดำเนินการ' มาแสดง
 $query_result = mysqli_query($conn, "SELECT * FROM repair WHERE repair_status IN ('รอดำเนินการ', 'กำลังดำเนินการ')");
 $repair_data = mysqli_fetch_all($query_result, MYSQLI_ASSOC);
 
-// คงไว้เหมือนเดิมเพื่อใช้ในการกรอง
+// ดึงรายชื่อ ID รถพยาบาลทั้งหมด (ไม่ซ้ำกัน) มาใช้ใน dropdown filter
 $ambulance_query = mysqli_query($conn, "SELECT DISTINCT ambulance_id FROM repair ORDER BY ambulance_id");
 $ambulance_data = mysqli_fetch_all($ambulance_query, MYSQLI_ASSOC);
 
+// ดึงสถานะการซ่อมทั้งหมดที่ยังไม่เสร็จมาใช้ใน dropdown filter
 $status_query = mysqli_query($conn, "SELECT DISTINCT repair_status FROM repair WHERE repair_status IN ('รอดำเนินการ', 'กำลังดำเนินการ')");
 $status_data = mysqli_fetch_all($status_query, MYSQLI_ASSOC);
-
 ?>
 
 <!DOCTYPE html>

@@ -1,4 +1,6 @@
+// รอให้ DOM โหลดเสร็จ
 document.addEventListener('DOMContentLoaded', () => {
+     // ดึง element ต่าง ๆ จากหน้า HTML มาใช้งาน
     const dateField = document.getElementById('currentDate');
     const noteField = document.getElementById('note');
     const reasonField = document.getElementById('reason');
@@ -10,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const otherCauseRow = document.getElementById('other-cause-row');
     const otherCauseField = document.getElementById('note');
 
+      // ฟังก์ชันกำหนดวันที่ปัจจุบันในรูปแบบ yyyy-mm-dd
     const getCurrentDate = () => {
         const today = new Date();
         const year = today.getFullYear();
@@ -18,18 +21,20 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${year}-${month}-${day}`;
     };
 
+      // ตั้งค่า default เป็นวันที่ปัจจุบัน
     dateField.value = getCurrentDate();
     noteField.disabled = true;
 
+      // เมื่อเลือก "สาเหตุ" ถ้าเลือก "อื่นๆ" ให้แสดงช่องกรอกข้อความเพิ่มเติม
     reasonField.addEventListener('change', () => {
         if (reasonField.value === 'other') {
-            otherCauseRow.style.display = 'block';
+            otherCauseRow.style.display = 'block'; // แสดงช่องกรอก "อื่นๆ"
             otherCauseField.required = true;
             noteField.disabled = false;
             reasonField.name = ''; // ไม่ส่งค่าจาก select
             otherCauseField.name = 'reason'; // ส่งค่าจาก input text แทน
         } else {
-            otherCauseRow.style.display = 'none';
+            otherCauseRow.style.display = 'none'; // ซ่อนช่องกรอก "อื่นๆ"
             otherCauseField.required = false;
             otherCauseField.value = '';
             noteField.disabled = true;
@@ -37,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
             otherCauseField.name = '';
         }
     });
-
+     // เมื่อเปลี่ยน "ระดับรถ" ให้โหลดทะเบียนรถตามระดับนั้น ๆ
     levelField.addEventListener('change', () => {
         const level = levelField.value;
         let numberOptions = '';
@@ -59,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         numberField.innerHTML = `<option value="" disabled selected>ระบุทะเบียนรถ</option>${numberOptions}`;
     });
-
+     // เมื่อเปลี่ยน "ประเภท" (รถพยาบาล/อุปกรณ์) ให้โหลดรายการอุปกรณ์ + สาเหตุที่เกี่ยวข้อง
     categoryField.addEventListener('change', () => {
         const category = categoryField.value;
         let deviceOptions = '';
@@ -97,19 +102,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 <option value="other">อื่นๆ</option>
             `;
         }
-
+        // ใส่ตัวเลือกใหม่ให้ select
         deviceField.innerHTML = `<option value="" disabled selected>ระบุอุปกรณ์</option>${deviceOptions}`;
         reasonField.innerHTML = `<option value="" disabled selected>สาเหตุ</option>${reasonOptions}`;
     });
-
+    // ปุ่มยกเลิก -> กลับไปหน้า repair.php
     cancelButton.addEventListener('click', () => {
         window.location.href = 'repair.php';
     });
 });
+// ตรวจสอบว่ากรอกข้อมูลครบก่อนส่งฟอร์ม
 document.querySelector('.formReportRepair').addEventListener('submit', function (e) {
     e.preventDefault();
 
-    // ตรวจสอบว่าฟิลด์ที่จำเป็นถูกกรอกครบหรือไม่
+     // ฟิลด์ที่จำเป็นต้องกรอก
     const required = ['level', 'number', 'category', 'device', 'reason'];
     const isEmpty = required.some(id => !document.getElementById(id).value);
 
@@ -121,4 +127,3 @@ document.querySelector('.formReportRepair').addEventListener('submit', function 
     // ถ้าข้อมูลครบถ้วน ให้ส่งฟอร์ม
     this.submit();
 });
-//
