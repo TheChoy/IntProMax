@@ -1,17 +1,7 @@
 <?php
 // ตั้งค่าการเชื่อมต่อฐานข้อมูล
-$host = 'localhost';
-$user = 'root';
-$password = '';
-$database = 'intpro';
 
-// สร้างการเชื่อมต่อฐานข้อมูล
-$conn = new mysqli($host, $user, $password, $database);
-
-// ตรวจสอบการเชื่อมต่อ
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include 'username.php';
 
 // รับค่าฟิลเตอร์จาก GET parameters
 $min_age = isset($_GET['min_age']) ? (int)$_GET['min_age'] : 0;
@@ -281,7 +271,7 @@ $conn->close();
                         stacked: true,
                         title: {
                             display: true,
-                            text: 'จำนวนผู้ป่วย'
+                            text: 'จำนวนผู้ป่วย (คน)'
                         },
                         ticks: {
                             beginAtZero: true,

@@ -213,7 +213,7 @@ foreach ($ambuDistance as $row) {
                         data: total_distances
                     },
                     {
-                        label: 'จำนวนครั้งที่ซ่อม',
+                        label: 'จำนวนครั้งที่ซ่อม (ครั้ง)',
                         backgroundColor: 'rgba(255, 99, 132, 0.6)',
                         data: repair_counts
                     }

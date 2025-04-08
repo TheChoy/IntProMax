@@ -110,14 +110,12 @@ $status_data = mysqli_fetch_all($status_query, MYSQLI_ASSOC);
 
 // ------------------------------
 
-// ข้อมูลของวันนี้
 // นับจำนวนรถทั้งหมด
 $count_all_ambu_query = mysqli_query(
     $conn,
     "SELECT COUNT(ambulance_id) as AllAmbu FROM ambulance"
 );
 $all_ambu_data = mysqli_fetch_all($count_all_ambu_query, MYSQLI_ASSOC);
-
 // เก็บจำนวนรถทั้งหมดไว้ในตัวแปรชื่อว่า $all_ambu
 $all_ambu = 0;
 foreach ($all_ambu_data as $num) {
@@ -132,7 +130,6 @@ $count_ready_ambu_query = mysqli_query(
     "SELECT COUNT(ambulance_id) as readyAmbu FROM ambulance WHERE ambulance_status='พร้อม'"
 );
 $ready_ambu_data = mysqli_fetch_all($count_ready_ambu_query, MYSQLI_ASSOC);
-
 // เก็บจำนวนรถทั้งหมดไว้ในตัวแปรชื่อว่า $ready_ambu
 $ready_ambu = 0;
 foreach ($ready_ambu_data as $num) {
@@ -147,7 +144,6 @@ $count_notReady_ambu_query = mysqli_query(
     "SELECT COUNT(ambulance_id) as readyAmbu FROM ambulance WHERE ambulance_status='ไม่พร้อม'"
 );
 $notReady_ambu_data = mysqli_fetch_all($count_notReady_ambu_query, MYSQLI_ASSOC);
-
 // เก็บจำนวนรถทั้งหมดไว้ในตัวแปรชื่อว่า $notReady_ambu
 $notReady_ambu = 0;
 foreach ($notReady_ambu_data as $num) {
@@ -155,6 +151,53 @@ foreach ($notReady_ambu_data as $num) {
         $notReady_ambu = $value;
     }
 }
+
+// Query นับจำนวนรถพยาบาลแยกตาม level และ status
+$query = mysqli_query($conn, "
+    SELECT ambulance_level, ambulance_status, COUNT(*) as count
+    FROM ambulance
+    GROUP BY ambulance_level, ambulance_status
+");
+
+// เตรียม array เก็บข้อมูล
+$levels = [];
+$ready_data = [];
+$not_ready_data = [];
+
+while ($row = mysqli_fetch_assoc($query)) {
+    $level = $row['ambulance_level'];
+    $status = $row['ambulance_status'];
+    $count = (int)$row['count'];
+
+    // เพิ่มคำว่า "ระดับ" ตอนเก็บค่า label
+    $label_with_prefix = "ระดับ " . $level;
+
+    if (!in_array($label_with_prefix, $levels)) {
+        $levels[] = $label_with_prefix;
+    }
+
+    // ใช้ label ที่มี prefix เป็น key
+    if ($status === 'พร้อม') {
+        $ready_data[$label_with_prefix] = $count;
+    } else if ($status === 'ไม่พร้อม') {
+        $not_ready_data[$label_with_prefix] = $count;
+    }
+}
+
+foreach ($levels as $level) {
+    if (!isset($ready_data[$level])) $ready_data[$level] = 0;
+    if (!isset($not_ready_data[$level])) $not_ready_data[$level] = 0;
+}
+
+// เตรียมข้อมูลแบบเรียงตามลำดับ levels
+$ready_counts = [];
+$not_ready_counts = [];
+
+foreach ($levels as $level) {
+    $ready_counts[] = $ready_data[$level];
+    $not_ready_counts[] = $not_ready_data[$level];
+}
+
 
 // ------------------------------
 ?>
@@ -166,6 +209,7 @@ foreach ($notReady_ambu_data as $num) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/history_fixed_page.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
@@ -181,11 +225,12 @@ foreach ($notReady_ambu_data as $num) {
         canvas {
             width: 80% !important;
             height: 60% !important;
-            max-width: 800px;
-            max-height: 600px;
+            max-width: 600px;
+            max-height: 400px;
             margin: auto;
             display: block;
         }
+
         .filter-container {
             text-align: center;
             margin: 20px 0;
@@ -219,98 +264,127 @@ foreach ($notReady_ambu_data as $num) {
     <div id="chart-level2Data" style="display: none;"><?php echo json_encode($level2Data); ?></div>
     <div id="chart-level3Data" style="display: none;"><?php echo json_encode($level3Data); ?></div>
 
+    <br>
     <h1 style="text-align: center;">ประวัติการส่งซ่อมรถและอุปกรณ์การแพทย์</h1>
-    
-    <main class="main-content">
-        <div class="search-section">
-            <div class="filter-icon">
-                <i class="fa-solid fa-filter"></i> <!-- ไอคอน Filter -->
-            </div>
 
-            <div class="filter-sidebar" id="filterSidebar">
-                <div class="sidebar-header">
-                    <h2>ตัวกรอง</h2>
-                    <button class="close-sidebar">&times;</button>
+    <div style="display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap;">
+        <canvas id="ambuStatusChart"></canvas>
+        <canvas id="history"></canvas>
+
+        <main class="main-content">
+
+
+            <div class="search-section">
+                <div class="filter-icon">
+                    <i class="fa-solid fa-filter"></i> <!-- ไอคอน Filter -->
                 </div>
-                <div class="sidebar-content">
 
-                    <select class="filter-select" onchange="location = this.value;">
-                        <option value="history_fixed_page.php" selected>ประวัติการส่งซ่อมและอุปกรณ์การแพทย์</option>
-                        <option value="history_ambuByDistance.php">ประวัติระยะทางและจำนวนการซ่อมรถพยาบาล</option>
-                    </select>
+                <div class="filter-sidebar" id="filterSidebar">
+                    <div class="sidebar-header">
+                        <h2>ตัวกรอง</h2>
+                        <button class="close-sidebar">&times;</button>
+                    </div>
+                    <div class="sidebar-content">
 
-                    <label for="calendarSelect">เลือกวันที่:</label>
-                    <input class="calendar-selected" id="calendarSelect1" type="text" placeholder="เลือกวันที่" value="2025-01-22">
-                    <input class="calendar-selected" id="calendarSelect2" type="text" placeholder="เลือกวันที่" value="2025-01-22">
+                        <select class="filter-select" onchange="location = this.value;">
+                            <option value="history_fixed_page.php" selected>ประวัติการส่งซ่อมและอุปกรณ์การแพทย์</option>
+                            <option value="history_ambuByDistance.php">ประวัติระยะทางและจำนวนการซ่อมรถพยาบาล</option>
+                        </select>
 
-                    <label for="">ระดับรถ:</label>
-                    <div class="checkbox">
-                        <input id="level_select1" type="checkbox" name="level[]" value="1" checked> Level 1
-                        <input id="level_select2" type="checkbox" name="level[]" value="2" checked> Level 2
-                        <input id="level_select3" type="checkbox" name="level[]" value="3" checked> Level 3
-                    </div> <br>
+                        <label for="calendarSelect">เลือกวันที่:</label>
+                        <input class="calendar-selected" id="calendarSelect1" type="text" placeholder="เลือกวันที่" value="2025-01-22">
+                        <input class="calendar-selected" id="calendarSelect2" type="text" placeholder="เลือกวันที่" value="2025-01-22">
 
-                    <label for="filter-type">ประเภท:</label>
-                    <select id="filter-type-list" class="filter-select">
-                        <option value="ทั้งหมด" <?php if ($selected_type == "ทั้งหมด") echo "selected"; ?>>ทั้งหมด</option>
-                        <option value="อุปกรณ์ทางการแพทย์" <?php if ($selected_type == "อุปกรณ์ทางการแพทย์") echo "selected"; ?>>อุปกรณ์ทางการแพทย์</option>
-                        <option value="รถพยาบาล" <?php if ($selected_type == "รถพยาบาล") echo "selected"; ?>>รถพยาบาล</option>
-                    </select>
+                        <label for="">ระดับรถ:</label>
+                        <div class="checkbox">
+                            <input id="level_select1" type="checkbox" name="level[]" value="1" checked> Level 1
+                            <input id="level_select2" type="checkbox" name="level[]" value="2" checked> Level 2
+                            <input id="level_select3" type="checkbox" name="level[]" value="3" checked> Level 3
+                        </div> <br>
 
-                    <label for="filter-repairing">อะไหล่:</label>
-                    <select id="filter-repairing" class="filter-select">
-                        <option value="ทั้งหมด" <?php if ($selected_repairing == "ทั้งหมด") echo "selected"; ?>>ทั้งหมด</option>
-                        <?php foreach ($repairing_data as $row) :
-                            $value = $row["repair_repairing"];
-                        ?>
-                            <option value="<?php echo $value; ?>" <?php if ($selected_repairing == $value) echo "selected"; ?>>
-                                <?php echo $value; ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                        <label for="filter-type">ประเภท:</label>
+                        <select id="filter-type-list" class="filter-select">
+                            <option value="ทั้งหมด" <?php if ($selected_type == "ทั้งหมด") echo "selected"; ?>>ทั้งหมด</option>
+                            <option value="อุปกรณ์ทางการแพทย์" <?php if ($selected_type == "อุปกรณ์ทางการแพทย์") echo "selected"; ?>>อุปกรณ์ทางการแพทย์</option>
+                            <option value="รถพยาบาล" <?php if ($selected_type == "รถพยาบาล") echo "selected"; ?>>รถพยาบาล</option>
+                        </select>
 
-                    <label for="filter-reason">สาเหตุ:</label>
-                    <select id="filter-reason" class="filter-select">
-                        <option value="ทั้งหมด" <?php if ($selected_reason == "ทั้งหมด") echo "selected"; ?>>ทั้งหมด</option>
-                        <?php foreach ($reason_data as $row) :
-                            $value = $row["repair_reason"];
-                        ?>
-                            <option value="<?php echo $value; ?>" <?php if ($selected_reason == $value) echo "selected"; ?>>
-                                <?php echo $value; ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                        <label for="filter-repairing">อะไหล่:</label>
+                        <select id="filter-repairing" class="filter-select">
+                            <option value="ทั้งหมด" <?php if ($selected_repairing == "ทั้งหมด") echo "selected"; ?>>ทั้งหมด</option>
+                            <?php foreach ($repairing_data as $row) :
+                                $value = $row["repair_repairing"];
+                            ?>
+                                <option value="<?php echo $value; ?>" <?php if ($selected_repairing == $value) echo "selected"; ?>>
+                                    <?php echo $value; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
 
-                    <label for="filter-status">สถานะการซ่อม:</label>
-                    <select id="filter-status" class="filter-select">
-                        <option value="ทั้งหมด" <?php if ($selected_status == "ทั้งหมด") echo "selected"; ?>>ทั้งหมด</option>
-                        <?php foreach ($status_data as $row) :
-                            $value = $row["repair_status"];
-                        ?>
-                            <option value="<?php echo $value; ?>" <?php if ($selected_status == $value) echo "selected"; ?>>
-                                <?php echo $value; ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                        <label for="filter-reason">สาเหตุ:</label>
+                        <select id="filter-reason" class="filter-select">
+                            <option value="ทั้งหมด" <?php if ($selected_reason == "ทั้งหมด") echo "selected"; ?>>ทั้งหมด</option>
+                            <?php foreach ($reason_data as $row) :
+                                $value = $row["repair_reason"];
+                            ?>
+                                <option value="<?php echo $value; ?>" <?php if ($selected_reason == $value) echo "selected"; ?>>
+                                    <?php echo $value; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
 
-                    <label for="">ค่าใช้จ่าย:</label>
-                    <select id="filter-cost" class="filter-select">
-                        <option value="" <?php if ($selected_cost == "") echo "selected"; ?> selected>ทั้งหมด</option>
-                        <option value=" BETWEEN 1 AND 9999" <?php if ($selected_cost == " BETWEEN 1 AND 9999") echo "selected"; ?>>ต่ำกว่า 10,000 บาท</option>
-                        <option value=" BETWEEN 10000 AND 50000" <?php if ($selected_cost == " BETWEEN 10000 AND 50000") echo "selected"; ?>>10,000-50,000 บาท</option>
-                        <option value=" > 50000" <?php if ($selected_cost == " > 50000") echo "selected"; ?>>มากกว่า 50,000 บาท</option>
-                    </select>
-                    <a href="history_fixed_page.php" class="reset-button" id="reset-button">reset</a>
+                        <label for="filter-status">สถานะการซ่อม:</label>
+                        <select id="filter-status" class="filter-select">
+                            <option value="ทั้งหมด" <?php if ($selected_status == "ทั้งหมด") echo "selected"; ?>>ทั้งหมด</option>
+                            <?php foreach ($status_data as $row) :
+                                $value = $row["repair_status"];
+                            ?>
+                                <option value="<?php echo $value; ?>" <?php if ($selected_status == $value) echo "selected"; ?>>
+                                    <?php echo $value; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
 
+                        <label for="">ค่าใช้จ่าย:</label>
+                        <select id="filter-cost" class="filter-select">
+                            <option value="" <?php if ($selected_cost == "") echo "selected"; ?> selected>ทั้งหมด</option>
+                            <option value=" BETWEEN 1 AND 9999" <?php if ($selected_cost == " BETWEEN 1 AND 9999") echo "selected"; ?>>ต่ำกว่า 10,000 บาท</option>
+                            <option value=" BETWEEN 10000 AND 50000" <?php if ($selected_cost == " BETWEEN 10000 AND 50000") echo "selected"; ?>>10,000-50,000 บาท</option>
+                            <option value=" > 50000" <?php if ($selected_cost == " > 50000") echo "selected"; ?>>มากกว่า 50,000 บาท</option>
+                        </select>
+                        <a href="history_fixed_page.php" class="reset-button" id="reset-button">reset</a>
+
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
+        </main>
+        <main class="main-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>จำนวนรถทั้งหมด</th>
+                        <th>จำนวนรถที่พร้อม</th>
+                        <th>จำนวนรถที่ไม่พร้อม</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><?php echo $all_ambu?> คัน</td>
+                        <td><?php echo $ready_ambu?> คัน</td>
+                        <td><?php echo $notReady_ambu?> คัน</td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
 
-    <canvas id="history"></canvas>
+
+    </div>
+
 
     <script>
         // จำนวนรถพยาบาลที่พร้อมและไม่พร้อม
+
+        // ตัวเลขใช้คำนวณ
         var allAmbu = <?php echo $all_ambu; ?>;
         var readyAmbu = <?php echo $ready_ambu; ?>;
         var notReadyAmbu = <?php echo $notReady_ambu; ?>;
@@ -326,6 +400,66 @@ foreach ($notReady_ambu_data as $num) {
         if (percent > 65) {
             alert("รถพยาบาลไม่พร้อมใช้งานมากกว่า 65%");
         }
+
+        // ข้อมูลที่ใช้ในกราฟ
+        const levels = <?php echo json_encode($levels); ?>;
+        const readyCounts = <?php echo json_encode($ready_counts); ?>;
+        const notReadyCounts = <?php echo json_encode($not_ready_counts); ?>;
+
+        const AmbuChart = document.getElementById('ambuStatusChart').getContext('2d');
+        new Chart(AmbuChart, {
+            type: 'bar',
+            data: {
+                labels: levels,
+                datasets: [{
+                        label: 'พร้อม',
+                        data: readyCounts,
+                        backgroundColor: '#B7E5B4'
+                    },
+                    {
+                        label: 'ไม่พร้อม',
+                        data: notReadyCounts,
+                        backgroundColor: '#F28585'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'จำนวนรถ (คัน)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'ระดับรถพยาบาล (1-3)'
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutCubic'
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'จำนวนรถพยาบาลแยกตามระดับและสถานะ'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 20,
+                            padding: 15
+                        }
+                    }
+                },
+            }
+        });
 
 
         // รับข้อมูลจาก PHP เพื่อใช้ในกราฟ
@@ -345,21 +479,15 @@ foreach ($notReady_ambu_data as $num) {
                         label: 'ระดับ 1',
                         data: level1Data,
                         backgroundColor: 'rgba(131, 255, 141, 0.5)',
-                        borderColor: 'rgba(68, 206, 79, 0.5)',
-                        borderWidth: 2
                     }, {
                         label: 'ระดับ 2',
                         data: level2Data,
                         backgroundColor: 'rgba(99, 213, 255, 0.5)',
-                        borderColor: 'rgba(64, 158, 193, 0.5)',
-                        borderWidth: 2
                     },
                     {
                         label: 'ระดับ 3',
                         data: level3Data,
                         backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 2
                     }
                 ]
             },
@@ -377,7 +505,7 @@ foreach ($notReady_ambu_data as $num) {
                         stacked: true,
                         title: {
                             display: true,
-                            text: 'จำนวนครั้งที่ซ่อม'
+                            text: 'จำนวนครั้งที่ซ่อม (ครั้ง)'
                         },
                         ticks: {
                             beginAtZero: true,
