@@ -235,10 +235,16 @@ $conn->close();
 
                         <select class="filter-select" style="margin-left: 2%;" onchange="location = this.value;">
                             <option value="static_car_page.php">ดูสถิติการใช้งานรถตามประเภทงานและระดับรถ</option>
-                            <option value="static_car_page_gender.php" selected>สถิติการใช้งานรถแยกตามเพศของสมาชิก</option>
+                            <option value="static_car_page_gender.php" selected>ดูสถิติการใช้งานรถแยกตามเพศของสมาชิก</option>
                             <option value="static_car_page_waypoint.php">ดูสถิติการใช้งานรถแยกตามประเภทงานและโรงพยาบาล</option>
                             <option value="static_car_page_region.php">ดูสถิติการใช้งานรถแยกตามประเภทงานและภูมิภาค</option>
                         </select>
+
+                        <label for="">ปี/เดือน:</label>
+                        <input type="text" id="start_month" class="month-selected" name="start_month"
+                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['start_month'] ?? '' ?>"> ถึง
+                        <input type="text" id="end_month" class="month-selected" name="end_month"
+                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['end_month'] ?? '' ?>">
 
                         <label for="">เลือกประเภทงาน:</label>
                         <input type="checkbox" name="source[]" value="emergency" checked> รับเคสฉุกเฉิน
@@ -363,11 +369,7 @@ $conn->close();
                         <input type="checkbox" name="region[]" value="ภาคใต้" checked> ภาคใต้
                         <br>
 
-                        <label for="">ปี/เดือน:</label>
-                        <input type="text" id="start_month" class="month-selected" name="start_month"
-                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['start_month'] ?? '' ?>"> ถึง
-                        <input type="text" id="end_month" class="month-selected" name="end_month"
-                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['end_month'] ?? '' ?>">
+
 
 
                         <a href="static_car_page_gender.php" class="reset-button" id="reset-button">Reset</a>

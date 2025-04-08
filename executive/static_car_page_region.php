@@ -228,6 +228,12 @@ $conn->close();
                             <option value="static_car_page_region.php" selected>ดูสถิติการใช้งานรถแยกตามประเภทงานและภูมิภาค</option>
                         </select>
 
+                        <label for="">ปี/เดือน:</label>
+                        <input type="text" id="start_month" class="month-selected" name="start_month"
+                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['start_month'] ?? '' ?>"> ถึง
+                        <input type="text" id="end_month" class="month-selected" name="end_month"
+                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['end_month'] ?? '' ?>">
+
                         <label for="">เลือกประเภทงาน:</label>
                         <input type="checkbox" name="source[]" value="emergency" checked> รับเคสฉุกเฉิน
                         <br>
@@ -351,11 +357,7 @@ $conn->close();
                         <input type="checkbox" name="region[]" value="ภาคใต้" checked> ภาคใต้
                         <br>
 
-                        <label for="">ปี/เดือน:</label>
-                        <input type="text" id="start_month" class="month-selected" name="start_month"
-                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['start_month'] ?? '' ?>"> ถึง
-                        <input type="text" id="end_month" class="month-selected" name="end_month"
-                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['end_month'] ?? '' ?>">
+
 
 
                         <a href="static_car_page.php" class="reset-button" id="reset-button">Reset</a>

@@ -226,6 +226,12 @@ $conn->close();
                             <option value="static_car_page_region.php">ดูสถิติการใช้งานรถแยกตามประเภทงานและภูมิภาค</option>
                         </select>
 
+                        <label for="">ปี/เดือน:</label>
+                        <input type="text" id="start_month" class="month-selected" name="start_month"
+                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['start_month'] ?? '' ?>"> ถึง
+                        <input type="text" id="end_month" class="month-selected" name="end_month"
+                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['end_month'] ?? '' ?>">
+
                         <label for="">เลือกประเภทงาน:</label>
                         <input type="checkbox" name="source[]" value="emergency" checked> รับเคสฉุกเฉิน
                         <br>
@@ -350,11 +356,7 @@ $conn->close();
                         <input type="checkbox" name="region[]" value="ภาคใต้" checked> ภาคใต้
                         <br>
 
-                        <label for="">ปี/เดือน:</label>
-                        <input type="text" id="start_month" class="month-selected" name="start_month"
-                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['start_month'] ?? '' ?>"> ถึง
-                        <input type="text" id="end_month" class="month-selected" name="end_month"
-                            placeholder="เลือกเดือน/ปี" value="<?= $_GET['end_month'] ?? '' ?>">
+
 
 
                         <a href="static_car_page.php" class="reset-button" id="reset-button">Reset</a>
@@ -505,19 +507,19 @@ $conn->close();
                             const ctx = chart.ctx;
                             ctx.save();
                             const xAxis = chart.scales.x;
-                            
+
                             // กำหนดรูปแบบตัวอักษร
                             ctx.font = '16px Itim';
                             ctx.fillStyle = '#666666';
                             ctx.textAlign = 'center';
-                            
+
                             // วนลูปเพื่อวาดอันดับ
                             chart.data.labels.forEach((label, index) => {
                                 const x = xAxis.getPixelForValue(index);
                                 const y = chart.chartArea.bottom + 35; // ปรับระยะห่างจากแท่งกราฟ
                                 ctx.fillText(`อันดับ ${index + 1}`, x, y);
                             });
-                            
+
                             ctx.restore();
                         }
                     };
