@@ -180,6 +180,7 @@ function checkTest(orderId, status) {
 
     console.log("arrApproved", arrApproved);
 }
+
 function toggleSelectAll(status) {
     // ตรวจว่าคลิกซ้ำหรือไม่
     const isToggle = selectedAllStatus === status;
@@ -208,7 +209,7 @@ function toggleSelectAll(status) {
     console.log("arrApproved", arrApproved);
 }
 
-
+// ตัวที่ส่งข้อมูลไปยัง save_order PHP
 function submitApproval() {
     let selectedOrders = [];
     document.querySelectorAll(".item-radio:checked").forEach(input => {

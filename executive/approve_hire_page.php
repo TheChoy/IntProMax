@@ -196,10 +196,10 @@ if (!empty($order_by)) {
                     <th>ราคารวม (บาท)</th>
                     <!-- ปุ่มอนุมัติ/ไม่อนุมัติทั้งหมด -->
                     <th>
-                        <input type="radio" onclick="toggleSelectAll('approved')" name="approval_all" class="item-radio" value="approved"> อนุมัติทั้งหมด
+                        <input type="radio" onclick="toggleSelectAll('approve')" name="approval_all" class="item-radio" value="approve"> อนุมัติทั้งหมด
                     </th>
                     <th>
-                        <input type="radio" onclick="toggleSelectAll('not_approved')" name="approval_all" class="item-radio" value="not_approved"> ไม่อนุมัติทั้งหมด
+                        <input type="radio" onclick="toggleSelectAll('reject')" name="approval_all" class="item-radio" value="reject"> ไม่อนุมัติทั้งหมด
                     </th>
                 </tr>
             </thead>
@@ -224,10 +224,10 @@ if (!empty($order_by)) {
                             <td><?= $row['order_equipment_total'] ?></td>
                             <!-- สำหรับแต่ละรายการ -->
                             <td>
-                                <input type="radio" name="approval_<?=$row['order_equipment_id']?>" class="item-radio" value="approved" onchange="checkTest(<?=$row['order_equipment_id']?>, 'approved')"> อนุมัติ
+                                <input type="radio" name="approval_<?=$row['order_equipment_id']?>" class="item-radio" value="approve" onclick="checkTest(<?=$row['order_equipment_id']?>, 'approve')"> อนุมัติ
                             </td>
                             <td>
-                                <input type="radio" name="approval_<?=$row['order_equipment_id']?>" class="item-radio" value="not_approved" onchange="checkTest(<?=$row['order_equipment_id']?>, 'not_approved')"> ไม่อนุมัติ
+                                <input type="radio" name="approval_<?=$row['order_equipment_id']?>" class="item-radio" value="reject" onclick="checkTest(<?=$row['order_equipment_id']?>, 'reject')"> ไม่อนุมัติ
                             </td>     
                         </tr>
                     <?php endwhile;

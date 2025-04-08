@@ -161,43 +161,57 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 let arrApproved = [];
+let selectedAllStatus = null; // เก็บสถานะ selectAll ล่าสุด
 
-function checkTest(orderId, e) {
-    
-    //console.log("before", array);
-    arrApproved = arrApproved.filter(e=>e?.orderId!==orderId);    
-    arrApproved.push({orderId:orderId,  approval: e.checked});                  
-    console.log("after", arrApproved);
-    // console.log(orderId, e.checked );
-    
+function checkTest(orderId, status) {
+    // ถ้าเคยเลือกอันนี้แล้ว และกำลังคลิกซ้ำ ให้ยกเลิก
+    const existingIndex = arrApproved.findIndex(item => item.orderId === orderId);
+
+    if (existingIndex !== -1 && arrApproved[existingIndex].approval === status) {
+        // คลิกซ้ำ = ยกเลิก
+        arrApproved.splice(existingIndex, 1);
+
+        // เอา radio ออก
+        const radios = document.querySelectorAll(`input[name="approval_${orderId}"]`);
+        radios.forEach(r => r.checked = false);
+    } else {
+        // ลบรายการเก่าออกก่อน
+        arrApproved = arrApproved.filter(item => item.orderId !== orderId);
+        arrApproved.push({ orderId: orderId, approval: status });
+    }
+
+    console.log("arrApproved", arrApproved);
 }
 
 
 
 //ปุ่มยืนยันตัวที่ติ๊กทั้งหมด
-function selectAll(status) {
-    // ค้นหา radio button ทุกตัวที่มี value ตามที่เลือก (อนุมัติหรือไม่อนุมัติ)
-    let radios = document.querySelectorAll(`input[type="radio"][value="${status}"]`);
+function toggleSelectAll(status) {
+    // ตรวจว่าคลิกซ้ำหรือไม่
+    const isToggle = selectedAllStatus === status;
+    selectedAllStatus = isToggle ? null : status;
+
+    // หา radio buttons ทั้งหมดที่ตรงกับ value
+    const radios = document.querySelectorAll(`input[type="radio"][value="${status}"]`);
 
     radios.forEach(radio => {
-        radio.checked = true; // กำหนดค่าให้เลือก
-    });
-}
+        const name = radio.name;
+        const orderId = name.split('_')[1]; // แยกจากชื่อ name="approval_123"
+        if (!orderId) return;
 
-function submitApproval() {
-    let selectedOrders = [];
-    document.querySelectorAll(".item-radio:checked").forEach(input => {
-        let orderId = input.name.split("_")[1]; // ดึง order_id จาก name
-        selectedOrders.push({
-            order_equipment_id: orderId,
-            approval_status: input.value
-        });
+        if (isToggle) {
+            // ยกเลิกทั้งหมด
+            radio.checked = false;
+            arrApproved = arrApproved.filter(item => item.orderId != orderId);
+        } else {
+            // ตั้งค่าใหม่
+            radio.checked = true;
+            arrApproved = arrApproved.filter(item => item.orderId != orderId);
+            arrApproved.push({ orderId: parseInt(orderId), approval: status });
+        }
     });
 
-    if (selectedOrders.length === 0) {
-        alert("กรุณาเลือกออเดอร์ก่อนกดอนุมัติ");
-        return;
-    }
+    console.log("arrApproved", arrApproved);
 }
 
 

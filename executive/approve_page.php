@@ -197,10 +197,13 @@ if (!empty($order_by)) {
                     <th>จำนวน</th>
                     <th>ราคา (บาท)</th>
                     <th>ราคารวม (บาท)</th>
-                    <th><input type="radio" onclick="selectAll('approve')" name="approval_<?= htmlspecialchars($row['order_id'] ?? '') ?>" class="item-radio" value="approve" 
-                    onchange="checkTest(<?= htmlspecialchars($row['order_id'] ?? 0) ?>, 'approved')">อนุมัติทั้งหมด</th>
-                    <th><input type="radio" onclick="selectAll('reject')"  name="approval_<?= htmlspecialchars($row['order_id'] ?? '') ?>" class="item-radio" value="reject" 
-                    onchange="checkTest(<?= htmlspecialchars($row['order_id'] ?? 0) ?>, 'not_approved')">ไม่อนุมัติทั้งหมด</th>         
+                    <!-- ปุ่มอนุมัติ/ไม่อนุมัติทั้งหมด -->
+                    <th>
+                        <input type="radio" onclick="toggleSelectAll('approve')" name="approval_all" class="item-radio" value="approve"> อนุมัติทั้งหมด
+                    </th>
+                    <th>
+                        <input type="radio" onclick="toggleSelectAll('reject')" name="approval_all" class="item-radio" value="reject"> ไม่อนุมัติทั้งหมด
+                    </th>     
                 </tr>
             </thead>
             <tbody>
@@ -221,8 +224,13 @@ if (!empty($order_by)) {
                             <td><?= $row['order_equipment_quantity'] ?></td>
                             <td><?= $row['order_equipment_price'] ?></td>
                             <td><?= $row['order_equipment_total'] ?></td>
-                            <td><input type="radio" name="approval_<?=$row['order_equipment_id']?>" class="item-radio" value="approve" onchange="checkTest(<?=$row['order_equipment_id']?>, 'approved')"> อนุมัติ</td>
-                            <td><input type="radio" name="approval_<?=$row['order_equipment_id']?>" class="item-radio" value="reject" onchange="checkTest(<?=$row['order_equipment_id']?>, 'not_approved')">ไม่อนุมัติ</td>
+                            <!-- สำหรับแต่ละรายการ -->
+                            <td>
+                                <input type="radio" name="approval_<?=$row['order_equipment_id']?>" class="item-radio" value="approve" onclick="checkTest(<?=$row['order_equipment_id']?>, 'approve')"> อนุมัติ
+                            </td>
+                            <td>
+                                <input type="radio" name="approval_<?=$row['order_equipment_id']?>" class="item-radio" value="reject" onclick="checkTest(<?=$row['order_equipment_id']?>, 'reject')"> ไม่อนุมัติ
+                            </td> 
                         </tr>
                     <?php endwhile;
                 else: ?>
