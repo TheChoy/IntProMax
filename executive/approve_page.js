@@ -28,11 +28,15 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 //filter ต่างๆ เขียนโค้ดในนนี้
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
 
 
     const slider = document.getElementById("priceRange");
     const priceInput = document.getElementById("priceInput");
+    const productList = document.getElementById("productList");
 
     // อัปเดต Input เมื่อเลื่อน Slider
     slider?.addEventListener("input", () => {
@@ -48,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
    //ตัวรับค่าปุ่มของ php
-    const btnApplyFilter = document.getElementById('btnApplyFilter');
+    
     const objfilterQuantityList = document.getElementById('filter-quantity-list');
     const objStartDate = document.getElementById('start_date');
     const objEndDate = document.getElementById('end_date');
@@ -56,7 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const objMinPriceRange = document.getElementById('minPriceRange');
     const objMaxPriceRange = document.getElementById('maxPriceRange');
     const objEquipMentFilterList = document.getElementById('equipment-filter-list');
-
    
     btnApplyFilter.addEventListener('click', (e) => {       
         reloadPage();
@@ -84,34 +87,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-
-
-    const reloadPage = ()=>{
+        const reloadPage = ()=>{
       
-        // let filterValue = objfilterQuantityList.value;
-        let filterPrice = objFilterPriceList.value;
-        let minPriceRange = objMinPriceRange.value;
-        let maxPriceRange = objMaxPriceRange.value;
-        let equipmentFilter = objEquipMentFilterList.value;
-        let startDate = objStartDate.value;
-        let endDate = objEndDate.value;
-        
-        //ไว้ debug
-        console.log(minPriceRange, maxPriceRange);
-        
-        // alt + 96  `
-        window.location.href = 'approve_page.php?' + 
-        `start_date=${startDate}` + 
-        `&end_date=${endDate}` +
-        // `&order_quantity=${filterValue}` +
-        `&order_equipment_price=${filterPrice}`+
-        `&min_price=${minPriceRange}` +
-        `&max_price=${maxPriceRange}`+
-        `&equipment_type=${equipmentFilter}`; 
-    }
+            // let filterValue = objfilterQuantityList.value;
+            let filterPrice = objFilterPriceList.value;
+            let minPriceRange = objMinPriceRange.value;
+            let maxPriceRange = objMaxPriceRange.value;
+            let equipmentFilter = objEquipMentFilterList.value;
+            let startDate = objStartDate.value;
+            let endDate = objEndDate.value;
 
+            
+            //ไว้ debug
+            console.log(minPriceRange, maxPriceRange);
+            
+            // alt + 96  `
+            window.location.href = 'approve_page.php?' + 
+            `start_date=${startDate}` + 
+            `&end_date=${endDate}` +
+            // `&order_quantity=${filterValue}` +
+            `&order_equipment_total=${filterPrice}`+
+            `&min_price=${minPriceRange}` +
+            `&max_price=${maxPriceRange}`+
+            `&equipment_type=${equipmentFilter}`; 
+        }
 });
-
 
 
 /**  */
@@ -155,66 +155,63 @@ document.addEventListener("DOMContentLoaded", () => {
         onChange: function (selectedDates, dateStr, instance) {
             updateChart(dateStr);
         }
+    
     });
+
 });
 
 let arrApproved = [];
+let selectedAllStatus = null; // เก็บสถานะ selectAll ล่าสุด
 
-function checkTest(orderId, e) {
+function checkTest(orderId, status) {
+    // ถ้าเคยเลือกอันนี้แล้ว และกำลังคลิกซ้ำ ให้ยกเลิก
+    const existingIndex = arrApproved.findIndex(item => item.orderId === orderId);
 
+    if (existingIndex !== -1 && arrApproved[existingIndex].approval === status) {
+        // คลิกซ้ำ = ยกเลิก
+        arrApproved.splice(existingIndex, 1);
 
-    
-    //console.log("before", array);
-    arrApproved = arrApproved.filter(e=>e?.orderId!==orderId);    
-    arrApproved.push({orderId:orderId,  approval: e.checked});                  
-    console.log("after", arrApproved);
-    // console.log(orderId, e.checked );
-    
+        // เอา radio ออก
+        const radios = document.querySelectorAll(`input[name="approval_${orderId}"]`);
+        radios.forEach(r => r.checked = false);
+    } else {
+        // ลบรายการเก่าออกก่อน
+        arrApproved = arrApproved.filter(item => item.orderId !== orderId);
+        arrApproved.push({ orderId: orderId, approval: status });
+    }
+
+    console.log("arrApproved", arrApproved);
 }
+
 
 
 //ปุ่มยืนยันตัวที่ติ๊กทั้งหมด
-let lastClickedHeader = null;
+function toggleSelectAll(status) {
+    // ตรวจว่าคลิกซ้ำหรือไม่
+    const isToggle = selectedAllStatus === status;
+    selectedAllStatus = isToggle ? null : status;
 
-function selectAll(status) {
-    // ถ้ากดซ้ำสถานะเดิม ให้ยกเลิก
-    if (lastClickedHeader === status) {
-        document.querySelectorAll(`input[type="radio"][value="${status}"]`).forEach(radio => {
+    // หา radio buttons ทั้งหมดที่ตรงกับ value
+    const radios = document.querySelectorAll(`input[type="radio"][value="${status}"]`);
+
+    radios.forEach(radio => {
+        const name = radio.name;
+        const orderId = name.split('_')[1]; // แยกจากชื่อ name="approval_123"
+        if (!orderId) return;
+
+        if (isToggle) {
+            // ยกเลิกทั้งหมด
             radio.checked = false;
-        });
-        lastClickedHeader = null;
-    } else {
-        document.querySelectorAll(`input[type="radio"][value="${status}"]`).forEach(radio => {
+            arrApproved = arrApproved.filter(item => item.orderId != orderId);
+        } else {
+            // ตั้งค่าใหม่
             radio.checked = true;
-        });
-        lastClickedHeader = status;
-    }
-}
-
-
-// function selectAll(status) {
-//     // ค้นหา radio button ทุกตัวที่มี value ตามที่เลือก (อนุมัติหรือไม่อนุมัติ)
-//     let radios = document.querySelectorAll(`input[type="radio"][value="${status}"]`);
-
-//     radios.forEach(radio => {
-//         radio.checked = true; // กำหนดค่าให้เลือก
-//     });
-// }
-
-function submitApproval() {
-    let selectedOrders = [];
-    document.querySelectorAll(".item-radio:checked").forEach(input => {
-        let orderId = input.name.split("_")[1]; // ดึง order_id จาก name
-        selectedOrders.push({
-            order_equipment_id: orderId,
-            approval_status: input.value
-        });
+            arrApproved = arrApproved.filter(item => item.orderId != orderId);
+            arrApproved.push({ orderId: parseInt(orderId), approval: status });
+        }
     });
 
-    if (selectedOrders.length === 0) {
-        alert("กรุณาเลือกออเดอร์ก่อนกดอนุมัติ");
-        return;
-    }
+    console.log("arrApproved", arrApproved);
 }
 
 

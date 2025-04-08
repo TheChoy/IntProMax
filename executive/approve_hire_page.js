@@ -159,30 +159,57 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 let arrApproved = [];
+let selectedAllStatus = null; // เก็บสถานะ selectAll ล่าสุด
 
-function checkTest(orderId, e) {
+function checkTest(orderId, status) {
+    // ถ้าเคยเลือกอันนี้แล้ว และกำลังคลิกซ้ำ ให้ยกเลิก
+    const existingIndex = arrApproved.findIndex(item => item.orderId === orderId);
 
+    if (existingIndex !== -1 && arrApproved[existingIndex].approval === status) {
+        // คลิกซ้ำ = ยกเลิก
+        arrApproved.splice(existingIndex, 1);
 
-    
-    //console.log("before", array);
-    arrApproved = arrApproved.filter(e=>e?.orderId!==orderId);    
-    arrApproved.push({orderId:orderId,  approval: e.checked});                  
-    console.log("after", arrApproved);
-    // console.log(orderId, e.checked );
-    
+        // เอา radio ออก
+        const radios = document.querySelectorAll(`input[name="approval_${orderId}"]`);
+        radios.forEach(r => r.checked = false);
+    } else {
+        // ลบรายการเก่าออกก่อน
+        arrApproved = arrApproved.filter(item => item.orderId !== orderId);
+        arrApproved.push({ orderId: orderId, approval: status });
+    }
+
+    console.log("arrApproved", arrApproved);
 }
 
+function toggleSelectAll(status) {
+    // ตรวจว่าคลิกซ้ำหรือไม่
+    const isToggle = selectedAllStatus === status;
+    selectedAllStatus = isToggle ? null : status;
 
-//ปุ่มยืนยันตัวที่ติ๊กทั้งหมด
-function selectAll(status) {
-    // ค้นหา radio button ทุกตัวที่มี value ตามที่เลือก (อนุมัติหรือไม่อนุมัติ)
-    let radios = document.querySelectorAll(`input[type="radio"][value="${status}"]`);
+    // หา radio buttons ทั้งหมดที่ตรงกับ value
+    const radios = document.querySelectorAll(`input[type="radio"][value="${status}"]`);
 
     radios.forEach(radio => {
-        radio.checked = true; // กำหนดค่าให้เลือก
+        const name = radio.name;
+        const orderId = name.split('_')[1]; // แยกจากชื่อ name="approval_123"
+        if (!orderId) return;
+
+        if (isToggle) {
+            // ยกเลิกทั้งหมด
+            radio.checked = false;
+            arrApproved = arrApproved.filter(item => item.orderId != orderId);
+        } else {
+            // ตั้งค่าใหม่
+            radio.checked = true;
+            arrApproved = arrApproved.filter(item => item.orderId != orderId);
+            arrApproved.push({ orderId: parseInt(orderId), approval: status });
+        }
     });
+
+    console.log("arrApproved", arrApproved);
 }
 
+// ตัวที่ส่งข้อมูลไปยัง save_order PHP
 function submitApproval() {
     let selectedOrders = [];
     document.querySelectorAll(".item-radio:checked").forEach(input => {

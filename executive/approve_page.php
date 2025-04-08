@@ -6,6 +6,7 @@ $start_date = $_GET['start_date'] ?? '';
 $end_date = $_GET['end_date'] ?? '';
 $order_quantity = $_GET['order_equipment_quantity'] ?? '';
 $order_price = $_GET['order_equipment_price'] ?? '';
+$order_price_total = $_GET['order_equipment_total'] ?? '';
 $min_price = $_GET['min_price'] ?? '';
 $max_price = $_GET['max_price'] ?? '';
 $equipment_type = $_GET['equipment_type'] ?? '';
@@ -23,7 +24,7 @@ if ($start_date && $end_date) {
 
 // กรองตามช่วงราคา
 if ($min_price && $max_price) {
-    $sql .= " AND order_equipment_price BETWEEN $min_price AND $max_price";
+    $sql .= " AND order_equipment_total BETWEEN $min_price AND $max_price";
 }
 
 // กรองตามประเภทอุปกรณ์
@@ -40,8 +41,8 @@ if ($order_quantity) {
 
 
 
-if ($order_price) {
-    $order_by[] = "order_equipment_price $order_price";
+if ($order_price_total) {
+    $order_by[] = "order_equipment_total $order_price_total";
 }
 if (!empty($order_by)) {
     $sql .= " ORDER BY " . implode(", ", $order_by);
@@ -131,8 +132,8 @@ if (!empty($order_by)) {
                     <select name="order_price" id="filter-price-list" class="filter-select">
                         <option value="" selected hidden>เลือกการจัดเรียงราคา</option>
                         <option value="">ทั้งหมด</option>
-                        <option value="ASC" <?php echo (isset($_GET['order_equipment_price']) && $_GET['order_equipment_price'] == "ASC") ? "selected" : ""; ?>>น้อยสุด-มากสุด</option>
-                        <option value="DESC" <?php echo (isset($_GET['order_equipment_price']) && $_GET['order_equipment_price'] == "DESC") ? "selected" : ""; ?>>มากสุด-น้อยสุด</option>
+                        <option value="ASC" <?php echo (isset($_GET['order_equipment_total']) && $_GET['order_equipment_total'] == "ASC") ? "selected" : ""; ?>>น้อยสุด-มากสุด</option>
+                        <option value="DESC" <?php echo (isset($_GET['order_equipment_total']) && $_GET['order_equipment_total'] == "DESC") ? "selected" : ""; ?>>มากสุด-น้อยสุด</option>
                     </select>
                     <label for="">ช่วงราคาสินค้า:</label>
                     <div class="price-range">
@@ -180,6 +181,13 @@ if (!empty($order_by)) {
     </select>
 
     <main class="main-content">
+        <!-- **จำ** เมื่อกดปุ่มยืนยันหน้ายังคงอยู่หน้าเดิม -->
+        <form action="save_order.php" method="post" id="approveForm">
+            <div class="button-group-2">
+                <button onclick="submitApproval(); return false;" class="btn btn-approve" >ยืนยัน</button>
+            </div>
+        </form>
+
         <table>
             <thead>
                 <tr>
@@ -189,11 +197,13 @@ if (!empty($order_by)) {
                     <th>จำนวน</th>
                     <th>ราคา (บาท)</th>
                     <th>ราคารวม (บาท)</th>
-                    <th><input type="radio" onclick="selectAll('approve')" name="approval_<?= htmlspecialchars($row['order_id'] ?? '') ?>" class="item-radio" value="approve" 
-                    onchange="checkTest(<?= htmlspecialchars($row['order_id'] ?? 0) ?>, 'approved')">อนุมัติทั้งหมด</th>
-                    <th><input type="radio" onclick="selectAll('reject')"  name="approval_<?= htmlspecialchars($row['order_id'] ?? '') ?>" class="item-radio" value="reject" 
-                    onchange="checkTest(<?= htmlspecialchars($row['order_id'] ?? 0) ?>, 'not_approved')">ไม่อนุมัติทั้งหมด</th>
-                   
+                    <!-- ปุ่มอนุมัติ/ไม่อนุมัติทั้งหมด -->
+                    <th>
+                        <input type="radio" onclick="toggleSelectAll('approve')" name="approval_all" class="item-radio" value="approve"> อนุมัติทั้งหมด
+                    </th>
+                    <th>
+                        <input type="radio" onclick="toggleSelectAll('reject')" name="approval_all" class="item-radio" value="reject"> ไม่อนุมัติทั้งหมด
+                    </th>     
                 </tr>
             </thead>
             <tbody>
@@ -214,8 +224,13 @@ if (!empty($order_by)) {
                             <td><?= $row['order_equipment_quantity'] ?></td>
                             <td><?= $row['order_equipment_price'] ?></td>
                             <td><?= $row['order_equipment_total'] ?></td>
-                            <td><input type="radio" name="approval_<?=$row['order_equipment_id']?>" class="item-radio" value="approve" onchange="checkTest(<?=$row['order_equipment_id']?>, 'approved')"> อนุมัติ</td>
-                            <td><input type="radio" name="approval_<?=$row['order_equipment_id']?>" class="item-radio" value="reject" onchange="checkTest(<?=$row['order_equipment_id']?>, 'not_approved')">ไม่อนุมัติ</td>
+                            <!-- สำหรับแต่ละรายการ -->
+                            <td>
+                                <input type="radio" name="approval_<?=$row['order_equipment_id']?>" class="item-radio" value="approve" onclick="checkTest(<?=$row['order_equipment_id']?>, 'approve')"> อนุมัติ
+                            </td>
+                            <td>
+                                <input type="radio" name="approval_<?=$row['order_equipment_id']?>" class="item-radio" value="reject" onclick="checkTest(<?=$row['order_equipment_id']?>, 'reject')"> ไม่อนุมัติ
+                            </td> 
                         </tr>
                     <?php endwhile;
                 else: ?>
