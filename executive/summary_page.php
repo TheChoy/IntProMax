@@ -6,11 +6,11 @@ date_default_timezone_set('Asia/Bangkok');
 $selected_month1 = isset($_GET['month1']) ? $_GET['month1'] : date('Y-m');
 $selected_month2 = isset($_GET['month2']) ? $_GET['month2'] : date('Y-m');
 $selected_gender = isset($_GET['gender']) ? $_GET['gender'] : "ทั้งหมด";
-$selected_type = isset($_GET['type']) ? $_GET['type'] : "ทั้งหมด";
+$selected_types = isset($_GET['type']) ? (is_array($_GET['type']) ? $_GET['type'] : [$_GET['type']]) : [];
 $min_price = isset($_GET['min_price']) ? (int)$_GET['min_price'] : 0;
 $max_price = isset($_GET['max_price']) ? (int)$_GET['max_price'] : 1000000;
 $selected_province = isset($_GET['province']) ? $_GET['province'] : "ทั้งหมด";
-
+$selected_regions = isset($_GET['region']) ? (is_array($_GET['region']) ? $_GET['region'] : [$_GET['region']]) : [];
 
 // สร้าง WHERE Clause ตามฟิลเตอร์ที่เลือก
 // ช่วงราคาสินค้า
@@ -24,15 +24,118 @@ if ($selected_gender !== "ทั้งหมด") {
     $where_clause .= " AND member_gender = '$selected_gender'";
 }
 // ประเภทสินค้า
-if ($selected_type !== "ทั้งหมด") {
-    $where_clause .= " AND equipment_type = '$selected_type'";
+if (!empty($selected_types)) {
+    $types_str = "'" . implode("','", $selected_types) . "'";
+    $where_clause .= " AND equipment_type IN ($types_str)";
 }
 // จังหวัดที่อยู่ลูกค้า
 if ($selected_province !== "ทั้งหมด") {
     $where_clause .= " AND member_province = '$selected_province'";
 }
+// ภูมิภาคที่อยู่ลูกค้า
+if (!empty($selected_regions)) {
+    $regions_str = "'" . implode("','", $selected_regions) . "'";
+    $where_clause .= " AND member_region IN ($regions_str)";
+}
+
 // ---------------------------------------------------------------------------
 
+// Query for regions
+$region_query = "SELECT DISTINCT member_region FROM member ORDER BY member_region";
+$region_result = $conn->query($region_query);
+
+$region_options = [];
+if ($region_result->num_rows > 0) {
+    while ($row = $region_result->fetch_assoc()) {
+        if (!empty($row['member_region'])) {
+            $region_options[] = $row['member_region'];
+        }
+    }
+}
+
+// กำหนดรายชื่อจังหวัดทั้งหมดในประเทศไทย
+$province_options = array(
+    'กระบี่',
+    'กาญจนบุรี',
+    'กาฬสินธุ์',
+    'กำแพงเพชร',
+    'ขอนแก่น',
+    'จันทบุรี',
+    'ฉะเชิงเทรา',
+    'ชลบุรี',
+    'ชัยนาท',
+    'ชัยภูมิ',
+    'ชุมพร',
+    'เชียงราย',
+    'เชียงใหม่',
+    'ตรัง',
+    'ตราด',
+    'ตาก',
+    'นครนายก',
+    'นครปฐม',
+    'นครพนม',
+    'นครราชสีมา',
+    'นครศรีธรรมราช',
+    'นครสวรรค์',
+    'นนทบุรี',
+    'นราธิวาส',
+    'น่าน',
+    'บึงกาฬ',
+    'บุรีรัมย์',
+    'ปทุมธานี',
+    'ประจวบคีรีขันธ์',
+    'ปราจีนบุรี',
+    'ปัตตานี',
+    'พระนครศรีอยุธยา',
+    'พะเยา',
+    'พังงา',
+    'พัทลุง',
+    'พิจิตร',
+    'พิษณุโลก',
+    'เพชรบุรี',
+    'เพชรบูรณ์',
+    'แพร่',
+    'ภูเก็ต',
+    'มหาสารคาม',
+    'มุกดาหาร',
+    'แม่ฮ่องสอน',
+    'ยโสธร',
+    'ยะลา',
+    'ร้อยเอ็ด',
+    'ระนอง',
+    'ระยอง',
+    'ราชบุรี',
+    'ลพบุรี',
+    'ลำปาง',
+    'ลำพูน',
+    'เลย',
+    'ศรีสะเกษ',
+    'สกลนคร',
+    'สงขลา',
+    'สตูล',
+    'สมุทรปราการ',
+    'สมุทรสงคราม',
+    'สมุทรสาคร',
+    'สระแก้ว',
+    'สระบุรี',
+    'สิงห์บุรี',
+    'สุโขทัย',
+    'สุพรรณบุรี',
+    'สุราษฎร์ธานี',
+    'สุรินทร์',
+    'หนองคาย',
+    'หนองบัวลำภู',
+    'อ่างทอง',
+    'อำนาจเจริญ',
+    'อุดรธานี',
+    'อุตรดิตถ์',
+    'อุทัยธานี',
+    'อุบลราชธานี',
+    'กรุงเทพมหานคร'
+);
+
+// เรียงลำดับจังหวัดตามตัวอักษร
+sort($province_options);
 
 // เริ่มต้นคำสั่ง SQL
 $sqrt = "SELECT
@@ -76,12 +179,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 1) {
 $province_query = "SELECT DISTINCT member_province FROM member";
 $province_result = $conn->query($province_query);
 
-$province_options = [];
-if ($province_result->num_rows > 0) {
-    while ($row = $province_result->fetch_assoc()) {
-        $province_options[] = $row['member_province'];
-    }
-}
+// $province_options = [];
+// if ($province_result->num_rows > 0) {
+//     while ($row = $province_result->fetch_assoc()) {
+//         $province_options[] = $row['member_province'];
+//     }
+// }
 
 // ปิดการเชื่อมต่อฐานข้อมูล
 $conn->close();
@@ -97,7 +200,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -133,6 +236,28 @@ $conn->close();
             border-radius: 4px;
             border: 1px solid #ddd;
         }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin: 0;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -162,12 +287,7 @@ $conn->close();
 
         <h1 style="text-align: center;">สถิติคำสั่งซื้อ/เช่าสินค้า</h1>
         <div class="search-section">
-            <!-- <div class="search-container">
-                <input type="text" placeholder="ระบุชื่อสินค้า..." class="search-input">
-                <button class="search-button">
-                    <i class="fa-solid fa-magnifying-glass"></i> ไอคอนแว่นขยาย
-                </button>
-            </div> -->
+
             <div class="filter-icon">
                 <i class="fa-solid fa-filter"></i> <!--ไอคอน Filter-->
             </div>
@@ -198,23 +318,38 @@ $conn->close();
 
 
                     <label for="filter-type">ประเภทสินค้า:</label>
-                    <select id="filter-type-list" class="filter-select" name="type">
-                        <option value="ทั้งหมด" <?php if ($selected_type == "ทั้งหมด") echo "selected"; ?>>ทั้งหมด</option>
-                        <option value="อุปกรณ์วัดและตรวจสุขภาพ" <?php if ($selected_type == "อุปกรณ์วัดและตรวจสุขภาพ") echo "selected"; ?>>อุปกรณ์วัดและตรวจสุขภาพ</option>
-                        <option value="อุปกรณ์ช่วยการเคลื่อนไหว" <?php if ($selected_type == "อุปกรณ์ช่วยการเคลื่อนไหว") echo "selected"; ?>>อุปกรณ์ช่วยการเคลื่อนไหว</option>
-                        <option value="อุปกรณ์สำหรับการฟื้นฟูและกายภาพบำบัด" <?php if ($selected_type == "อุปกรณ์สำหรับการฟื้นฟูและกายภาพบำบัด") echo "selected"; ?>>อุปกรณ์สำหรับการฟื้นฟูและกายภาพบำบัด</option>
-                        <option value="อุปกรณ์ดูแลสุขอนามัย" <?php if ($selected_type == "อุปกรณ์ดูแลสุขอนามัย") echo "selected"; ?>>อุปกรณ์ดูแลสุขอนามัย</option>
-                        <option value="อุปกรณ์ช่วยหายใจและระบบทางเดินหายใจ" <?php if ($selected_type == "อุปกรณ์ช่วยหายใจและระบบทางเดินหายใจ") echo "selected"; ?>>อุปกรณ์ช่วยหายใจและระบบทางเดินหายใจ</option>
-                        <option value="อุปกรณ์ปฐมพยาบาล" <?php if ($selected_type == "อุปกรณ์ปฐมพยาบาล") echo "selected"; ?>>อุปกรณ์ปฐมพยาบาล</option>
-                    </select>
-
-                    <!-- <label for="">ช่วงราคาสินค้า:</label>
-                        <div class="price-range">
-                            <input type="number" id="minPrice" placeholder="ต่ำสุด" min="0" max="1000000" value="0">
-                            <input type="range" id="minPriceRange" min="0" max="1000000" step="100" value="0" oninput="updateMinPrice()">
-                            <input type="range" id="maxPriceRange" min="0" max="1000000" step="100" value="1000000" oninput="updateMaxPrice()">
-                            <input type="number" id="maxPrice" placeholder="สูงสุด" min="0" max="1000000" value="1000000">
-                        </div><br> -->
+                    <div class="checkbox-group" id="filter-type-list">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="type-1" name="type[]" value="อุปกรณ์วัดและตรวจสุขภาพ" checked
+                                <?php if (in_array("อุปกรณ์วัดและตรวจสุขภาพ", $selected_types)) echo "checked"; ?>>
+                            <label for="type-1">อุปกรณ์วัดและตรวจสุขภาพ</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="type-2" name="type[]" value="อุปกรณ์ช่วยการเคลื่อนไหว" checked
+                                <?php if (in_array("อุปกรณ์ช่วยการเคลื่อนไหว", $selected_types)) echo "checked"; ?>>
+                            <label for="type-2">อุปกรณ์ช่วยการเคลื่อนไหว</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="type-3" name="type[]" value="อุปกรณ์สำหรับการฟื้นฟูและกายภาพบำบัด" checked
+                                <?php if (in_array("อุปกรณ์สำหรับการฟื้นฟูและกายภาพบำบัด", $selected_types)) echo "checked"; ?>>
+                            <label for="type-3">อุปกรณ์สำหรับการฟื้นฟูและกายภาพบำบัด</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="type-4" name="type[]" value="อุปกรณ์ดูแลสุขอนามัย" checked
+                                <?php if (in_array("อุปกรณ์ดูแลสุขอนามัย", $selected_types)) echo "checked"; ?>>
+                            <label for="type-4">อุปกรณ์ดูแลสุขอนามัย</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="type-5" name="type[]" value="อุปกรณ์ช่วยหายใจและระบบทางเดินหายใจ" checked
+                                <?php if (in_array("อุปกรณ์ช่วยหายใจและระบบทางเดินหายใจ", $selected_types)) echo "checked"; ?>>
+                            <label for="type-5">อุปกรณ์ช่วยหายใจและระบบทางเดินหายใจ</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="type-6" name="type[]" value="อุปกรณ์ปฐมพยาบาล" checked
+                                <?php if (in_array("อุปกรณ์ปฐมพยาบาล", $selected_types)) echo "checked"; ?>>
+                            <label for="type-6">อุปกรณ์ปฐมพยาบาล</label>
+                        </div>
+                    </div>
 
                     <label for="price">ช่วงราคา :</label>
                     <label for="min_price">ราคา (ต่ำสุด):</label>
@@ -235,8 +370,32 @@ $conn->close();
                             </option>
                         <?php endforeach; ?>
                     </select>
+
+                    <label for="filter-region">ภูมิภาค:</label>
+                    <div class="checkbox-group" id="filter-region-list">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="region-1" name="region[]" value="ภาคเหนือ" checked
+                                <?php if (in_array("ภาคเหนือ", $selected_regions)) echo "checked"; ?>>
+                            <label for="region-1">ภาคเหนือ</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="region-2" name="region[]" value="ภาคกลาง" checked
+                                <?php if (in_array("ภาคกลาง", $selected_regions)) echo "checked"; ?>>
+                            <label for="region-2">ภาคกลาง</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="region-3" name="region[]" value="ภาคตะวันออกเฉียงเหนือ" checked
+                                <?php if (in_array("ภาคตะวันออกเฉียงเหนือ", $selected_regions)) echo "checked"; ?>>
+                            <label for="region-3">ภาคตะวันออกเฉียงเหนือ</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="region-4" name="region[]" value="ภาคใต้" checked
+                                <?php if (in_array("ภาคใต้", $selected_regions)) echo "checked"; ?>>
+                            <label for="region-4">ภาคใต้</label>
+                        </div>
+                    </div>
                 </div>
-                <a href="summary_page.php" class="reset-button" id="reset-button">reset</a>
+                <a href="summary_page.php" style="margin-left: 5%; margin-bottom:10%;" class="reset-button" id="reset-button">Reset</a>
             </div>
     </main>
 
@@ -334,10 +493,20 @@ $conn->close();
                     sidebar.classList.remove("open");
                 }
             });
+
+            // Add event listeners for region checkboxes
+            const regionCheckboxes = document.querySelectorAll('#filter-region-list input[type="checkbox"]');
+            regionCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    // Reset province selection when region changes
+                    document.getElementById("filter-province-list").value = "ทั้งหมด";
+                    updateFilters();
+                });
+            });
         });
 
-        // ตั้งค่า Flatpickr สำหรับเลือกวันที่
-        flatpickr("#calendarSelect1", {
+        // ตั้งค่า Flatpickr สำหรับ calendarSelect1
+        let calendar1Instance = flatpickr("#calendarSelect1", {
             plugins: [
                 new monthSelectPlugin({
                     shorthand: true,
@@ -347,11 +516,15 @@ $conn->close();
             ],
             defaultDate: "<?php echo $selected_month1; ?>",
             onChange: function(selectedDates, dateStr, instance) {
-                document.getElementById("calendarSelect1").value = dateStr; // อัปเดตค่าใน input
-                updateFilters(); // เรียกใช้งานฟังก์ชันอัปเดตข้อมูล
+                // อัพเดทค่า minDate ของ calendarSelect2 ด้วยวันที่เลือกจาก calendar1
+                calendar2Instance.set('minDate', new Date(dateStr));
+                document.getElementById("calendarSelect1").value = dateStr;
+                updateFilters();
             }
         });
-        flatpickr("#calendarSelect2", {
+
+        // สร้างตัวแปรเก็บ instance ของ calendarSelect2
+        let calendar2Instance = flatpickr("#calendarSelect2", {
             plugins: [
                 new monthSelectPlugin({
                     shorthand: true,
@@ -360,9 +533,10 @@ $conn->close();
                 })
             ],
             defaultDate: "<?php echo $selected_month2; ?>",
+            maxDate: "today",
             onChange: function(selectedDates, dateStr, instance) {
-                document.getElementById("calendarSelect2").value = dateStr; // อัปเดตค่าใน input
-                updateFilters(); // เรียกใช้งานฟังก์ชันอัปเดตข้อมูล
+                document.getElementById("calendarSelect2").value = dateStr;
+                updateFilters();
             }
         });
 
@@ -396,58 +570,42 @@ $conn->close();
             document.getElementById("calendarSelect").value = `${year}-${month}`;
         });
 
-
-
         // ฟังก์ชันสำหรับอัปเดตฟิลเตอร์และโหลดข้อมูลใหม่
-        document.addEventListener("DOMContentLoaded", () => {
-            const params = new URLSearchParams(window.location.search);
-
-            // ดึงค่าฟิลเตอร์จาก URL
-            if (params.has("month1")) document.getElementById("calendarSelect1").value = params.get("month1");
-            if (params.has("month2")) document.getElementById("calendarSelect2").value = params.get("month2");
-            if (params.has("gender")) document.getElementById("filter-gender-list").value = params.get("gender");
-            if (params.has("type")) document.getElementById("filter-type-list").value = params.get("type");
-            if (params.has("min_price")) document.getElementById("minPrice").value = params.get("min_price");
-            if (params.has("max_price")) document.getElementById("maxPrice").value = params.get("max_price");
-            if (params.has("province")) document.getElementById("filter-province-list").value = params.get("province");
-
-            // โหลดข้อมูลใหม่ทันทีเมื่อเปิดหน้า
-            loadFiltersFromURL();
-            updateFilters();
-
-            // ตั้งค่า event listener ให้ฟิลเตอร์ทั้งหมด
-            document.getElementById("calendarSelect1").addEventListener("change", updateFilters);
-            document.getElementById("calendarSelect2").addEventListener("change", updateFilters);
-            document.getElementById("filter-gender-list").addEventListener("change", updateFilters);
-            document.getElementById("filter-type-list").addEventListener("change", updateFilters);
-            document.getElementById("minPrice").addEventListener("input", updateFilters);
-            document.getElementById("maxPrice").addEventListener("input", updateFilters);
-            document.getElementById("filter-province-list").addEventListener("change", updateFilters);
-        });
-
         function updateFilters() {
             const month1 = document.getElementById("calendarSelect1").value;
             const month2 = document.getElementById("calendarSelect2").value;
             const gender = document.getElementById("filter-gender-list").value;
             const minPrice = document.getElementById("minPrice").value;
             const maxPrice = document.getElementById("maxPrice").value;
-            const type = document.getElementById("filter-type-list").value;
             const province = document.getElementById("filter-province-list").value;
 
-            // ✅ อัปเดต URL
-            const params = new URLSearchParams({
-                month1,
-                month2,
-                gender,
-                min_price: minPrice,
-                max_price: maxPrice,
-                type,
-                province
-            });
+            // Get checked types
+            const typeCheckboxes = document.querySelectorAll('#filter-type-list input[type="checkbox"]:checked');
+            const selectedTypes = Array.from(typeCheckboxes).map(cb => cb.value);
+
+            // Get checked regions
+            const regionCheckboxes = document.querySelectorAll('#filter-region-list input[type="checkbox"]:checked');
+            const selectedRegions = Array.from(regionCheckboxes).map(cb => cb.value);
+
+            // Create URL parameters
+            const params = new URLSearchParams();
+            params.append("month1", month1);
+            params.append("month2", month2);
+            params.append("gender", gender);
+            params.append("min_price", minPrice);
+            params.append("max_price", maxPrice);
+            params.append("province", province);
+
+            // Add selected types
+            selectedTypes.forEach(type => params.append("type[]", type));
+
+            // Add selected regions
+            selectedRegions.forEach(region => params.append("region[]", region));
+
             const newUrl = window.location.pathname + "?" + params.toString();
             window.history.replaceState({}, "", newUrl);
 
-            // ✅ โหลดข้อมูลใหม่ผ่าน AJAX
+            // Load new data via AJAX
             fetch(newUrl + "&ajax=1")
                 .then(response => response.json())
                 .then(data => {
@@ -458,38 +616,8 @@ $conn->close();
                         mychart.update();
                     }
                 })
-                .catch(error => console.error('❌ Error fetching updated data:', error));
+                .catch(error => console.error('Error fetching updated data:', error));
         }
-
-
-
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById("calendarSelect1").flatpickr({
-                plugins: [new monthSelectPlugin({
-                    shorthand: true,
-                    dateFormat: "Y-m",
-                    altFormat: "F Y"
-                })],
-                defaultDate: "<?php echo $selected_month1; ?>",
-                onChange: updateFilters // ทำให้ AJAX ทำงานเมื่อเปลี่ยนเดือน
-            });
-            document.getElementById("calendarSelect2").flatpickr({
-                plugins: [new monthSelectPlugin({
-                    shorthand: true,
-                    dateFormat: "Y-m",
-                    altFormat: "F Y"
-                })],
-                defaultDate: "<?php echo $selected_month2; ?>",
-                onChange: updateFilters // ทำให้ AJAX ทำงานเมื่อเปลี่ยนเดือน
-            });
-
-            // เพิ่ม Event Listener ให้ฟิลเตอร์อื่น ๆ
-            document.getElementById("filter-gender-list").addEventListener("change", updateFilters);
-            document.getElementById("filter-type-list").addEventListener("change", updateFilters);
-            document.getElementById("minPrice").addEventListener("input", updateFilters);
-            document.getElementById("maxPrice").addEventListener("input", updateFilters);
-            document.getElementById("filter-province-list").addEventListener("change", updateFilters);
-        });
 
         function loadFiltersFromURL() {
             const params = new URLSearchParams(window.location.search);
@@ -497,11 +625,61 @@ $conn->close();
             if (params.has("month1")) document.getElementById("calendarSelect1").value = params.get("month1");
             if (params.has("month2")) document.getElementById("calendarSelect2").value = params.get("month2");
             if (params.has("gender")) document.getElementById("filter-gender-list").value = params.get("gender");
-            if (params.has("type")) document.getElementById("filter-type-list").value = params.get("type");
+            if (params.has("type")) {
+                const types = params.get("type").split(",");
+                const options = document.getElementById("filter-type-list").options;
+                for (let option of options) {
+                    if (types.includes(option.value)) {
+                        option.selected = true;
+                    }
+                }
+            }
             if (params.has("min_price")) document.getElementById("minPrice").value = params.get("min_price");
             if (params.has("max_price")) document.getElementById("maxPrice").value = params.get("max_price");
             if (params.has("province")) document.getElementById("filter-province-list").value = params.get("province");
+            if (params.has("region")) {
+                const regions = params.get("region").split(",");
+                const checkboxes = document.querySelectorAll('#filter-region-list input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    if (regions.includes(checkbox.value)) {
+                        checkbox.checked = true;
+                    }
+                });
+            }
         }
+
+        // เพิ่มฟังก์ชันควบคุมการเลือกภูมิภาค
+        function toggleRegionCheckboxes(provinceSelect) {
+            const regionCheckboxes = document.querySelectorAll('#filter-region-list input[type="checkbox"]');
+            const selectedProvince = provinceSelect.value;
+            
+            regionCheckboxes.forEach(checkbox => {
+                if (selectedProvince === "ทั้งหมด") {
+                    checkbox.disabled = false;
+                    checkbox.parentElement.style.opacity = "1";
+                } else {
+                    checkbox.disabled = true;
+                    checkbox.checked = true;
+                    checkbox.parentElement.style.opacity = "0.5";
+                }
+            });
+            
+            // อัพเดทฟิลเตอร์เมื่อมีการเปลี่ยนแปลง
+            updateFilters();
+        }
+
+        // เพิ่ม Event Listener สำหรับการเปลี่ยนแปลงจังหวัด
+        document.addEventListener("DOMContentLoaded", () => {
+            const provinceSelect = document.getElementById("filter-province-list");
+            
+            // ตั้งค่าเริ่มต้นเมื่อโหลดหน้า
+            toggleRegionCheckboxes(provinceSelect);
+            
+            // เพิ่ม event listener สำหรับการเปลี่ยนแปลงจังหวัด
+            provinceSelect.addEventListener("change", function() {
+                toggleRegionCheckboxes(this);
+            });
+        });
     </script>
 
     </div>
