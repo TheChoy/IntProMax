@@ -204,7 +204,7 @@ foreach ($ambuDistance as $row) {
         console.log("repair_counts: ", repair_counts);
 
         var disAmbuChart = new Chart(document.getElementById("ambulanceChart"), {
-            type: 'pie',
+            type: 'bar',
             data: {
                 labels: distance_labels,
                 datasets: [{
