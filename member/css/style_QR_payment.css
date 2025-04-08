@@ -1032,3 +1032,9 @@ a {
     border-radius: 50%;
     cursor: pointer;
 }
+
+#fileName {
+    font-size: 12px; /* ย่อขนาดฟอนต์ให้เล็กลง */
+    color: #555; /* เปลี่ยนสีฟอนต์ (optional) */
+    margin-top: 5px; /* เพิ่มระยะห่างระหว่างชื่อไฟล์กับปุ่ม (optional) */
+}

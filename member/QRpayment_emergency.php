@@ -67,14 +67,15 @@ $row = mysqli_fetch_assoc($result);
     <section class="QRcode">
         <img src="image/QRcode.jpeg" alt="" class="qr-preview" id="qr-preview"><br>
         <p>ค่าบริการ : <?php echo number_format($row['order_emergency_case_price'], 2); ?></p>
-        <p>Vat 7% :  <?= number_format($row['order_emergency_case_price'] * 0.07, 2) ?> บาท</p>
-        <p>ยอดค้างชำระทั้งหมด :  <?= number_format($row['order_emergency_case_price'] * 1.07, 2) ?> บาท</p>
+        <p>Vat 7% : <?= number_format($row['order_emergency_case_price'] * 0.07, 2) ?> บาท</p>
+        <p>ยอดค้างชำระทั้งหมด : <?= number_format($row['order_emergency_case_price'] * 1.07, 2) ?> บาท</p>
 
         <br>
         <div class="bottom-row">
             <p>แนบหลักฐานยืนยัน</p>
-            <button class="upload-btn" id="upload-btn">อัพโหลด</button>
-        </div><br>
+            <button class="upload-btn" id="upload-btn">อัพโหลด</button><br>
+        </div>
+        <p id="fileName"></p> <!-- เพิ่มส่วนนี้ใต้ปุ่มเพื่อแสดงชื่อไฟล์ --> <br>
         <div class="QR-buttons">
             <!-- กดปุ่มยืนยัน -->
             <button class="cancle">ยกเลิก</button>
@@ -114,6 +115,42 @@ $row = mysqli_fetch_assoc($result);
 
             // ส่งข้อมูลไปที่เซิร์ฟเวอร์
             xhr.send(params);
+        });
+        document.addEventListener("DOMContentLoaded", () => {
+            const uploadBtn = document.getElementById("upload-btn");
+            const qrPreview = document.getElementById("qr-preview");
+            const cancelBtn = document.getElementById("cancel-btn");
+            const confirmBtn = document.getElementById("confirm-btn");
+
+            // สร้าง input สำหรับอัพโหลดไฟล์
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+
+            // เมื่อมีการเลือกไฟล์
+            fileInput.addEventListener('change', () => {
+                const file = fileInput.files[0];
+                if (file) {
+                    // แสดงชื่อไฟล์ใต้ปุ่ม
+                    const fileNameDisplay = document.querySelector('#fileName'); // สมมติว่าเรามี element ที่มี id="fileName" สำหรับแสดงชื่อไฟล์
+                    fileNameDisplay.textContent = file.name; // ตั้งชื่อไฟล์ที่เลือกลงใน element
+
+                    // แสดงปุ่มยืนยันและยกเลิกหลังจากเลือกไฟล์
+                    cancelBtn.style.display = 'inline-block';
+                    confirmBtn.style.display = 'inline-block';
+                }
+            });
+
+
+            // เมื่อคลิกที่ปุ่ม "อัพโหลด"
+            uploadBtn.addEventListener('click', () => {
+                fileInput.click(); // เปิดหน้าต่างเลือกไฟล์
+            });
+        });
+
+        // เลือกปุ่มด้วย class 'cancle'
+        document.querySelector(".cancle").addEventListener("click", function() {
+            window.location.href = "order_emergency.php"; // ไปที่ form.php
         });
     </script>
 

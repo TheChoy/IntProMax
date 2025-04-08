@@ -127,81 +127,113 @@ foreach ($order_equipment_id as $index => $order_id) {
         </div>
     </div>
 
-        <section class="QRcode">
-            <img src="image/QRcode.jpeg" alt="" class="qr-preview" id="qr-preview"><br>
-            <?php echo "ยอดชำระทั้งหมด: ฿" . number_format($order_total, 2);  ?>
-            <br><br>
-            <div class="bottom-row">
-                <p>แนบหลักฐานยืนยัน</p>
-                <button class="upload-btn" id="upload-btn">อัพโหลด</button>
-            </div><br>
-            <div class="QR-buttons">
-                <button class="cancle">ยกเลิก</button>
-                <button class="confirm" id="confirm-btn">ยืนยัน</button>
+    <section class="QRcode">
+        <img src="image/QRcode.jpeg" alt="" class="qr-preview" id="qr-preview"><br>
+        <?php echo "ยอดชำระทั้งหมด: ฿" . number_format($order_total, 2);  ?>
+        <br><br>
+        <div class="bottom-row">
+            <p>แนบหลักฐานยืนยัน</p>
+            <button class="upload-btn" id="upload-btn">อัพโหลด</button><br>
+        </div>
+        <p id="fileName"></p> <!-- เพิ่มส่วนนี้ใต้ปุ่มเพื่อแสดงชื่อไฟล์ --> <br>
+        <div class="QR-buttons">
+            <button class="cancle">ยกเลิก</button>
+            <button class="confirm" id="confirm-btn">ยืนยัน</button>
 
-            </div>
-        </section>
-        <script>
-            const urlParams = new URLSearchParams(window.location.search);
-            const orderIds = urlParams.getAll("order_equipment_id[]");
-            const equipmentIds = urlParams.getAll("equipment_id[]");
-            const quantities = urlParams.getAll("quantity[]");
+        </div>
+    </section>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderIds = urlParams.getAll("order_equipment_id[]");
+        const equipmentIds = urlParams.getAll("equipment_id[]");
+        const quantities = urlParams.getAll("quantity[]");
 
-            if (orderIds.length === 0 && urlParams.get("order_equipment_id")) {
-                orderIds.push(urlParams.get("order_equipment_id"));
-                equipmentIds.push(urlParams.get("id"));
-                quantities.push(urlParams.get("quantity"));
-            }
+        if (orderIds.length === 0 && urlParams.get("order_equipment_id")) {
+            orderIds.push(urlParams.get("order_equipment_id"));
+            equipmentIds.push(urlParams.get("id"));
+            quantities.push(urlParams.get("quantity"));
+        }
 
-            function postActionToServer(action, callback) {
-                let completed = 0;
+        function postActionToServer(action, callback) {
+            let completed = 0;
 
-                for (let i = 0; i < orderIds.length; i++) {
-                    fetch(window.location.href, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                equipment_id: equipmentIds[i],
-                                quantity: quantities[i],
-                                action: action,
-                                order_equipment_id: orderIds[i]
-                            })
+            for (let i = 0; i < orderIds.length; i++) {
+                fetch(window.location.href, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            equipment_id: equipmentIds[i],
+                            quantity: quantities[i],
+                            action: action,
+                            order_equipment_id: orderIds[i]
                         })
-                        .then(res => res.json())
-                        .then(data => {
-                            completed++;
-                            if (completed === orderIds.length) {
-                                callback();
-                            }
-                        });
-                }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        completed++;
+                        if (completed === orderIds.length) {
+                            callback();
+                        }
+                    });
             }
+        }
 
-            document.getElementById("confirm-btn").addEventListener("click", () => {
-                postActionToServer("confirm", () => {
-                    const total = parseFloat(urlParams.get("price_total") || 0);
-                    if (total > 100000) {
-                        window.location.href = "approve_payment.html";
-                    } else {
-                        window.location.href = "success_payment.html";
-                    }
-                });
+        document.getElementById("confirm-btn").addEventListener("click", () => {
+            postActionToServer("confirm", () => {
+                const total = parseFloat(urlParams.get("price_total") || 0);
+                if (total > 100000) {
+                    window.location.href = "approve_payment.html";
+                } else {
+                    window.location.href = "success_payment.html";
+                }
             });
+        });
 
-            document.querySelector(".cancle").addEventListener("click", () => {
-                postActionToServer("cancel", () => {
-                    alert("ยกเลิกสำเร็จ");
-                    window.location.href = "shopping.php";
-                });
-            });
-
-            setTimeout(() => {
-                alert("หมดเวลาการชำระเงิน กรุณาสั่งซื้อใหม่");
+        document.querySelector(".cancle").addEventListener("click", () => {
+            postActionToServer("cancel", () => {
+                alert("ยกเลิกสำเร็จ");
                 window.location.href = "shopping.php";
-            }, 600000);
-        </script>
-    </body>
+            });
+        });
+
+        setTimeout(() => {
+            alert("หมดเวลาการชำระเงิน กรุณาสั่งซื้อใหม่");
+            window.location.href = "shopping.php";
+        }, 600000);
+        document.addEventListener("DOMContentLoaded", () => {
+            const uploadBtn = document.getElementById("upload-btn");
+            const qrPreview = document.getElementById("qr-preview");
+            const cancelBtn = document.getElementById("cancel-btn");
+            const confirmBtn = document.getElementById("confirm-btn");
+
+            // สร้าง input สำหรับอัพโหลดไฟล์
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+
+            // เมื่อมีการเลือกไฟล์
+            fileInput.addEventListener('change', () => {
+                const file = fileInput.files[0];
+                if (file) {
+                    // แสดงชื่อไฟล์ใต้ปุ่ม
+                    const fileNameDisplay = document.querySelector('#fileName'); // สมมติว่าเรามี element ที่มี id="fileName" สำหรับแสดงชื่อไฟล์
+                    fileNameDisplay.textContent = file.name; // ตั้งชื่อไฟล์ที่เลือกลงใน element
+
+                    // แสดงปุ่มยืนยันและยกเลิกหลังจากเลือกไฟล์
+                    cancelBtn.style.display = 'inline-block';
+                    confirmBtn.style.display = 'inline-block';
+                }
+            });
+
+
+            // เมื่อคลิกที่ปุ่ม "อัพโหลด"
+            uploadBtn.addEventListener('click', () => {
+                fileInput.click(); // เปิดหน้าต่างเลือกไฟล์
+            });
+        });
+    </script>
+</body>
 
 </html>

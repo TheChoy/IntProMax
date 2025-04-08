@@ -95,23 +95,33 @@ if ($executive) {
             $index = 0;
             $order_ids = [];
             $total = 0;
+            $vat = 0;  // VAT เริ่มต้นที่ 0
 
             while ($row = $result->fetch_assoc()):
                 $orderDate = date("d/m/Y H:i:s", strtotime($row['order_equipment_date']));
 
                 if ($orderDate != $currentDate):
-                    if ($currentDate != "") {
-                        echo '<tr><td colspan="5" style="text-align:right;"><strong>ค่าจัดส่งสินค้า (บาท)</strong></td><td><strong>120</strong></td><td></td></tr>';
+                    if ($currentDate != ""):
+                        // คำนวณ VAT สำหรับรายการทั้งหมดในวันนั้น
+                        $vat = ($total * 7) / 100;  // 7% VAT
+
+                        // แสดงค่าจัดส่งและราคารวม
                         echo '<tr><td colspan="5" style="text-align:right;"><strong>ราคารวม (บาท)</strong></td><td><strong>' . number_format($total + 120, 2) . '</strong></td><td></td></tr>';
+                        echo '<tr><td colspan="5" style="text-align:right;"><strong>Vat 7%</strong></td><td><strong>' . number_format($vat, 2) . '</strong></td><td></td></tr>';
+                        echo '<tr><td colspan="5" style="text-align:right;"><strong>ค่าจัดส่งสินค้า (บาท)</strong></td><td><strong>120</strong></td><td></td></tr>';
+                        echo '<tr><td colspan="5" style="text-align:right;"><strong>ราคารวมทั้งหมด (รวม VAT และค่าจัดส่ง)</strong></td><td><strong>' . number_format($total + $vat + 120, 2) . '</strong></td><td></td></tr>';
                         echo '</tbody></table>';
+
                         $order_ids_str = implode(',', $order_ids);
                         echo '<div class="print-button-wrapper">';
                         echo '<a href="print_bill.php?order_ids=' . $order_ids_str . '&executive_id=' . $executive_id . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
                         echo '</div>';
                         echo '</div><br>';
+
+                        // รีเซ็ตตัวแปรเพื่อเตรียมพร้อมสำหรับการแสดงผลในรอบถัดไป
                         $order_ids = [];
                         $total = 0;
-                    }
+                    endif;
 
                     $index++;
                     echo '<div id="print-section-' . $index . '" class="mb-4">';
@@ -119,20 +129,21 @@ if ($executive) {
                     echo '<div class="table-responsive">';
                     echo '<table class="custom-table">';
                     echo '<thead>
-                            <tr>
-                                <th></th>
-                                <th>ชื่อสินค้า</th>
-                                <th>ประเภทการชำระเงิน</th>
-                                <th>ประเภทการสั่งซื้อ</th>
-                                <th>จำนวน</th>
-                                <th>ราคารวม (บาท)</th>
-                                <th>สถานะคำสั่งซื้อ</th>
-                            </tr>
-                          </thead><tbody>';
+                    <tr>
+                        <th></th>
+                        <th>ชื่อสินค้า</th>
+                        <th>ประเภทการชำระเงิน</th>
+                        <th>ประเภทการสั่งซื้อ</th>
+                        <th>จำนวน</th>
+                        <th>ราคารวม (บาท)</th>
+                        <th>สถานะคำสั่งซื้อ</th>
+                    </tr>
+                  </thead><tbody>';
 
                     $currentDate = $orderDate;
                 endif;
 
+                // คำนวณรวมยอดทั้งหมด
                 $order_ids[] = $row['order_equipment_id'];
                 $total += $row['order_equipment_total'];
             ?>
@@ -146,24 +157,17 @@ if ($executive) {
                     <td><?= htmlspecialchars($row['order_equipment_status']) ?></td>
                 </tr>
             <?php endwhile; ?>
-
-            <tr>
-                <td colspan="5" style="text-align:right;"><strong>ค่าจัดส่งสินค้า (บาท)</strong></td>
-                <td><strong>120</strong></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td colspan="5" style="text-align:right;"><strong>ราคารวม (บาท)</strong></td>
-                <td><strong><?= number_format($total + 120, 2) ?></strong></td>
-                <td></td>
-            </tr>
-
-            </tbody>
-            </table>
             <?php
+            // คำนวณ VAT และแสดงผลในกรณีที่มีรายการคำสั่งซื้อสุดท้าย
+            $vat = ($total * 7) / 100;  // 7% VAT
+
+            echo '<tr><td colspan="5" style="text-align:right;"><strong>ค่าจัดส่งสินค้า</strong></td><td><strong>120 บาท</strong></td><td></td></tr>';
+            echo '<tr><td colspan="5" style="text-align:right;"><strong>Vat 7%</strong></td><td><strong>' . number_format($vat, 2) . ' บาท</strong></td><td></td></tr>';
+            echo '<tr><td colspan="5" style="text-align:right;"><strong>ราคารวม</strong></td><td><strong>' . number_format($total + $vat + 120, 2) . ' บาท</strong></td><td></td></tr>';
+            echo '</table>';
+
             $order_ids_str = implode(',', $order_ids);
             echo '<div class="print-button-wrapper">';
-            // ตรวจสอบให้มั่นใจว่า executive_id ถูกส่งไปใน URL
             echo '<a href="print_bill.php?order_ids=' . $order_ids_str . '&executive_id=' . $executive_id . '" target="_blank" class="btn btn-primary">พิมพ์ใบเสร็จ</a>';
             echo '</div>';
             echo '</div>';
@@ -171,6 +175,7 @@ if ($executive) {
         <?php else: ?>
             <div class="alert alert-warning">ไม่พบรายการสั่งซื้อที่ชำระเงินเสร็จสิ้น</div>
         <?php endif; ?>
+
     </div>
 </body>
 

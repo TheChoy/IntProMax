@@ -5,6 +5,7 @@ $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
 <html lang="en">
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -60,8 +61,10 @@ $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
             <br><br>
             <div class="bottom-row">
                 <p>แนบหลักฐานยืนยัน</p>
-                <button class="upload-btn" id="upload-btn">อัพโหลด</button>
-            </div><br>
+                <button class="upload-btn" id="upload-btn">อัพโหลด</button><br>
+            </div>
+            <p id="fileName"></p> <!-- เพิ่มส่วนนี้ใต้ปุ่มเพื่อแสดงชื่อไฟล์ --> <br>
+
             <div class="QR-buttons">
                 <button class="cancle">ยกเลิก</button>
                 <button class="confirm" id="confirm-btn">ยืนยัน</button>
@@ -80,6 +83,11 @@ $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
             }
         });
 
+        // เลือกปุ่มด้วย class 'cancle'
+        document.querySelector(".cancle").addEventListener("click", function() {
+            window.location.href = "form.php"; // ไปที่ form.php
+        });
+
 
         document.addEventListener("DOMContentLoaded", () => {
             const uploadBtn = document.getElementById("upload-btn");
@@ -96,16 +104,16 @@ $order_total = isset($_GET['price_total']) ? $_GET['price_total'] : 0;
             fileInput.addEventListener('change', () => {
                 const file = fileInput.files[0];
                 if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        qrPreview.src = e.target.result; // อัปเดตรูปภาพใน preview
-                        // แสดงปุ่มยืนยันและยกเลิกหลังจากเลือกไฟล์
-                        cancelBtn.style.display = 'inline-block';
-                        confirmBtn.style.display = 'inline-block';
-                    };
-                    reader.readAsDataURL(file);
+                    // แสดงชื่อไฟล์ใต้ปุ่ม
+                    const fileNameDisplay = document.querySelector('#fileName'); // สมมติว่าเรามี element ที่มี id="fileName" สำหรับแสดงชื่อไฟล์
+                    fileNameDisplay.textContent = file.name; // ตั้งชื่อไฟล์ที่เลือกลงใน element
+
+                    // แสดงปุ่มยืนยันและยกเลิกหลังจากเลือกไฟล์
+                    cancelBtn.style.display = 'inline-block';
+                    confirmBtn.style.display = 'inline-block';
                 }
             });
+
 
             // เมื่อคลิกที่ปุ่ม "อัพโหลด"
             uploadBtn.addEventListener('click', () => {
