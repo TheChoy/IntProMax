@@ -192,6 +192,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $region = getRegion($province); // ตรวจสอบภูมิภาคจากจังหวัด
         $price = $_POST['calculatedPrice2'];
         $distance = $_POST['calculatedDistance2'];
+        $member_id = $_SESSION['user_id']; // ✅ เพิ่มบรรทัดนี้
         $ambulance_status = "รอปฏิบัติหน้าที่";
         // Mapping hospital codes to names
         $hospitalMap = [
