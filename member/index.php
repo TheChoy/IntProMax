@@ -29,7 +29,7 @@ if (empty($_SESSION['logged_in'])) {
 </head>
 <div class="top-navbar">
     <nav class="nav-links">
-        
+
         <div><a href="order_emergency.php">ชำระเงินเคสฉุกเฉิน</a></div>
         <div><a href="contact.html">ติดต่อเรา</a></div>
         <div class="dropdown">
@@ -68,6 +68,9 @@ if (empty($_SESSION['logged_in'])) {
 </div>
 
 <body>
+    <div style="text-align: center; margin-top: 20px;">
+        <img src="image/อัตราค่าบริการรถ.png" alt="">
+    </div>
 </body>
 
 </html>
