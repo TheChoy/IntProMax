@@ -218,7 +218,7 @@ if (!empty($order_by)) {
                             <td><img src="img/<?= $row['equipment_image'] ?>" alt="อุปกรณ์" width="100"></td>
                             <td><?= htmlspecialchars($row['equipment_name']) ?></td>
                             <td><?= $row['member_firstname'] . ' ' . $row['member_lastname'] ?></td>
-                            <td><?= $row['order_equipment_id'] ?></td>
+                            <td><?= $row['order_equipment_quantity'] ?></td>
                             <td><?= $row['order_equipment_months'] ?></td>
                             <td><?= $row['order_equipment_price'] ?></td>
                             <td><?= $row['order_equipment_total'] ?></td>
