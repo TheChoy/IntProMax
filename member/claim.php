@@ -36,7 +36,7 @@ $conn->close(); // ปิดการเชื่อมต่อกับฐา�
     <link rel="stylesheet" href="css/style_claim.css"> <!-- ลิงก์ไปยังไฟล์ CSS สำหรับการจัดรูปแบบ -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> <!-- ใช้ไอคอนจาก Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <title>Claim</title> <!-- กำหนดชื่อหน้าเว็บ -->
+    <title>เคลมสินค้า</title> <!-- กำหนดชื่อหน้าเว็บ -->
 </head>
 
 <body>

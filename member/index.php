@@ -24,7 +24,7 @@ if (empty($_SESSION['logged_in'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style_form_ambulance.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <title>Document</title>
+    <title>หน้าแรก</title>
     <script src="javascrip_member/index.js" defer></script>
 </head>
 <div class="top-navbar">
