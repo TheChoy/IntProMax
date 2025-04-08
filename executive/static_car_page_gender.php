@@ -234,7 +234,7 @@ $conn->close();
                     <div class="sidebar-content">
 
                         <select class="filter-select" style="margin-left: 2%;" onchange="location = this.value;">
-                            <option value="static_car_page.php">ดูสถิติการใช้งานรถตามประเภทและระดับ</option>
+                            <option value="static_car_page.php">ดูสถิติการใช้งานรถตามประเภทงานและระดับรถ</option>
                             <option value="static_car_page_gender.php" selected>สถิติการใช้งานรถแยกตามเพศของสมาชิก</option>
                             <option value="static_car_page_waypoint.php">ดูสถิติการใช้งานรถแยกตามประเภทงานและโรงพยาบาล</option>
                             <option value="static_car_page_region.php">ดูสถิติการใช้งานรถแยกตามประเภทงานและภูมิภาค</option>
