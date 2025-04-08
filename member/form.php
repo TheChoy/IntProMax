@@ -153,13 +153,13 @@ $conn->close();
                     <label for="level">ระดับรถ</label>
 
                     <div>
-                        <input type="radio" id="first" name="level" value="1" required onchange="calculatePrice()"> ระดับ 1
+                        <input type="radio" id="first" name="level" value="1" required onchange="calculatePrice()"> ระดับ 1 (Basic Life Support)
                     </div>
                     <div>
-                        <input type="radio" id="basic" name="level" value="2" required onchange="calculatePrice()"> ระดับ 2
+                        <input type="radio" id="basic" name="level" value="2" required onchange="calculatePrice()"> ระดับ 2 (Advance Life Support)
                     </div>
                     <div>
-                        <input type="radio" id="advanced" name="level" value="3" required onchange="calculatePrice()"> ระดับ 3
+                        <input type="radio" id="advanced" name="level" value="3" required onchange="calculatePrice()"> ระดับ 3 (Mobile Intensive Care Unit)
                     </div>
                 </div>
             </div>
@@ -335,13 +335,13 @@ $conn->close();
                     <label for="level">ระดับรถ</label>
 
                     <div>
-                        <input type="radio" id="first" name="level" value="1" require onchange="calculatePrice()"> ระดับ 1
+                        <input type="radio" id="first" name="level" value="1" require onchange="calculatePrice()"> ระดับ 1 (Basic Life Support)
                     </div>
                     <div>
-                        <input type="radio" id="basic" name="level" value="2" require onchange="calculatePrice()"> ระดับ 2
+                        <input type="radio" id="basic" name="level" value="2" require onchange="calculatePrice()"> ระดับ 2 (Advance Life Support)
                     </div>
                     <div>
-                        <input type="radio" id="advanced" name="level" value="3" require onchange="calculatePrice()"> ระดับ 3
+                        <input type="radio" id="advanced" name="level" value="3" require onchange="calculatePrice()"> ระดับ 3 (Mobile Intensive Care Unit)
                     </div>
                 </div>
             </div>

@@ -48,8 +48,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 data.forEach(event => {
                     if (event.type === 'ambulance') {
-                        event.color = '#3498DB'; // สีฟ้าสำหรับงานที่เกี่ยวกับ ambulance
-                        event.borderColor = '#1F618D'; // กำหนดสีกรอบให้เข้มขึ้น
+                        if (event.status === 'ปฏิบัติเสร็จสิ้นแล้ว') {
+                            event.color = '#999'; // สีเทา
+                            event.borderColor = '#777';
+                        } else {
+                            event.color = '#3498DB'; // สีฟ้า
+                            event.borderColor = '#1F618D';
+                        }
                     } else if (event.type === 'event') {
                         event.color = '#9B59B6'; // สีม่วงสำหรับงานทั่วไป
                         event.borderColor = '#6C3483'; // กำหนดสีกรอบให้เข้มขึ้น
@@ -72,7 +77,32 @@ document.addEventListener('DOMContentLoaded', function () {
         // เมื่อผู้ใช้ลาก event ไปตำแหน่งใหม่ จะอัปเดตเวลาทั้งหมดของ event
         eventDrop: function (info) {
             updateEventFinishTime(info.event);
-        }
+        },
+
+        eventClick: function (info) {
+            const event = info.event;
+          
+            // ตรวจสอบว่าเป็นประเภท ambulance เท่านั้น
+            if (event.extendedProps.type === 'ambulance') {
+              if (confirm(`คุณต้องการเปลี่ยนสถานะงานนี้เป็น "ปฏิบัติภารกิจเสร็จสิ้นแล้ว" ใช่หรือไม่?`)) {
+                $.ajax({
+                  url: 'update_ambulance_status.php',
+                  method: 'POST',
+                  data: {
+                    id: event.id // ใช้ id จาก event ที่ FullCalendar มีอยู่
+                  },
+                  success: function (response) {
+                    alert('อัปเดตสถานะเรียบร้อยแล้ว');
+                    event.setProp('color', '#999'); 
+                  },
+                  error: function () {
+                    alert('เกิดข้อผิดพลาดในการอัปเดตสถานะ');
+                  }
+                });
+              }
+            }
+          }
+          
     });
 
     // แสดงปฏิทินบนหน้าเว็บ
@@ -104,4 +134,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    
 });
+

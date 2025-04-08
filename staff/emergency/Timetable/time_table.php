@@ -25,11 +25,6 @@ session_start();
 </head>
 
 <body>
-
-    <!-- ส่วนหัวของหน้าเว็บที่แสดงชื่อเรื่อง -->
-    <div>
-       
-    </div>
     <div class="title">
         <h1>ตารางเวลารถพยาบาล</h1>
     </div>
@@ -41,6 +36,8 @@ session_start();
 
         <!-- แสดงสีหรือรูปแบบสำหรับการจองอีเวนต์ -->
         <span class="evBooking"></span> Event Booking
+
+        <span class="fnBooking"></span> Finished Ambulance Booking
     </div>
 
     <!-- ส่วนแสดงปฏิทินสำหรับการจอง -->

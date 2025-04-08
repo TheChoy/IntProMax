@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  // ดึงตัวรับ input จากหน้าเว็บด้วย id เพื่อใส่ eventListener (filterTable)
+   // ดึง input filter ต่าง ๆ แล้วผูกกับฟังก์ชัน filterTable
 
   const filterDate = document.getElementById("filter-date");
   filterDate.addEventListener('input', filterTable);
@@ -18,7 +18,7 @@ async function filterTable() {
   //ดึง id ของ div ที่ต้องการแสดงผลลัพธ์จากการกรอง
   const contentDiv = document.getElementById("my-list");
 
-  //รับค่าที่ user ใส่มา
+  // รับค่าจาก input ทั้งหมด
   const filterDate = document.getElementById("filter-date").value;
   const filterAmbuID = document.getElementById("filter-ambulance-ID").value;
   const filterStatus = document.getElementById("filter-status").value;
@@ -40,16 +40,16 @@ async function filterTable() {
   })
     //รับข้อมูลที่ส่งกลับมาเป็น text
     .then((response) => response.text())
-    //แสดงข้อมูลที่ได้ใน div ที่กำหนดไว้
+     // นำไปแสดงในตาราง
     .then((text) => contentDiv.innerHTML = text)
 
 }
 
 function addRepair() {
   // เอาไว้เชื่อมกับ from_repair.php
-  window.location.href = 'from_repair.html';
+  window.location.href = 'from_repair.php';
 }
-
+//ฟังก์ชัน updateRepair(): ใช้ fetch ส่งข้อมูลไปอัปเดตในฐานข้อมูล
 function updateRepair(repairId, value, type) {
   fetch('update_repair.php', {
     method: 'POST',
@@ -64,10 +64,7 @@ function updateRepair(repairId, value, type) {
       }
     });
 }
-function addRepair() {
-  window.location.href = "from_repair.php";
-}
-
+//ตรวจสอบวันเสร็จสิ้น
 function validateAndUpdateRepairDate(input, repairId) {
   const selectedDate = new Date(input.value);
   const repairDate = new Date(input.dataset.repairDate);
@@ -77,10 +74,11 @@ function validateAndUpdateRepairDate(input, repairId) {
     input.value = '';
     return;
   }
-
-  // เรียกฟังก์ชันส่งข้อมูลไปอัปเดต
+  // ถ้าไม่ผิดเงื่อนไข ส่งไปอัปเดต
   updateRepair(repairId, input.value, 'date');
 }
+
+//ตรวจสอบสถานะก่อนเปลี่ยนเป็น "เสร็จสิ้น"
 function validateAndUpdateStatus(selectElement, repairId) {
   const selectedStatus = selectElement.value;
 

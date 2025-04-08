@@ -14,12 +14,12 @@ if ($con->connect_error) {
 }
 
 // ตรวจสอบว่า login แล้วหรือยัง
-if (!isset($_SESSION['logged_in'])) {
+if (!isset($_SESSION['emergency_staff_id'])) {
     echo json_encode(['error' => 'Unauthorized']);
     exit;
 }
 
-$staff_id = $_SESSION['user_id'];
+$staff_id = $_SESSION['emergency_staff_id'];
 
 // ดึง ambulance_id ที่ assign กับเจ้าหน้าที่คนนี้
 $ambulance_ids = [];
@@ -60,7 +60,8 @@ while ($row = $ambulance_result->fetch_assoc()) {
                    " | จุดพัก: " . $row['ambulance_booking_hospital_waypoint'],
         'start' => $row['ambulance_booking_date'] . 'T' . $row['ambulance_booking_start_time'],
         'end'   => $row['ambulance_booking_date'] . 'T' . $row['ambulance_booking_finish_time'],
-        'type'  => 'ambulance'
+        'type'  => 'ambulance',
+        'status' => $row['ambulance_booking_status']
     ];
 }
 
